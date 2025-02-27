@@ -1,0 +1,38 @@
+# JPA
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SPRING_DATASOURCE_URL}
+    username: root
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  web:
+    cors:
+      allowed-origins: "http://localhost:5173"
+      allowed-methods: "GET,POST"
+
+
+
+  thymeleaf:
+    prefix: classpath:/static/
+    suffix: .html
+
+  springdoc:
+    api-docs:
+      path: /v3/api-docs
+    swagger-ui:
+      path: /swagger-ui.html
+      display-request-duration: true
+      operations-sorter: alpha
+
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+    show-sql: true
+    hibernate:
+      format_sql: true
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
