@@ -18,13 +18,18 @@
 
 ## ⚙️ 백엔드 흐름도
 
-```mermaid
-graph TD;
-    A[사용자 글 작성 (Vue.js)] -->|전송| B[SpringBoot 서버]
-    B -->|전달| C[Flask 서버 (ML 모델)]
-    C -->|결과 반환| B
-    B -->|결과 표시| A
-```
+1. **사용자 글 작성** (Vue.js)  
+   ⬇  
+2. **Spring Boot 서버로 전송**  
+   ⬇  
+3. **Flask 서버 (ML 모델)에 전달**  
+   ⬇  
+4. **Flask 서버에서 결과 반환**  
+   ⬇  
+5. **Spring Boot 서버가 결과를 받아 Vue.js에 전달**  
+   ⬇  
+6. **Vue.js에서 결과 표시**
+
 ## 🔄 시스템 흐름
 **App.vue** ↔ **MLController** ↔ **MLService** ↔ **api-server.py**
 
