@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 @Service  // 서비스 클래스 선언
 public class MLService {
     // flask 연결
-    private static final String MODEL_API_URL = "/predict"; // flask 서버 url
+    // https 로 설정해야 한다.
+    private static final String MODEL_API_URL = "http://da38-34-125-250-219.ngrok-free.app/predict"; // flask 서버 url
 
     public Map<String, Object> predict(String text) {
         System.out.println("[Spring Boot] MLService, predict 실행 응답: " + text);
