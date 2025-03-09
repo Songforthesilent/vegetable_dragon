@@ -28,6 +28,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
 
+    // spring Security
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.security:spring-security-test"
+
     // MySQL 및 JPA 의존성
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.mysql:mysql-connector-j'
