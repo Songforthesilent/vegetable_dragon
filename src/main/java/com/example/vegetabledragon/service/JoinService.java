@@ -1,6 +1,7 @@
 package com.example.vegetabledragon.service;
 
 import com.example.vegetabledragon.domain.User;
+import com.example.vegetabledragon.dto.LoginForm;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -40,5 +41,18 @@ public class JoinService {
         // 저장
         return userRepository.save(newUser);
 
+    }
+
+    public String login(LoginForm loginForm) {
+        // 이메일로 사용자 조회
+        User user = userRepository.findByEmail(loginForm.getEmail())
+                .orElseThrow(() -> new RuntimeException("The email does not exists"));
+
+        // 비밀번호 검증
+        if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Wrong password");
+        }
+
+        return "Login Success";
     }
 }

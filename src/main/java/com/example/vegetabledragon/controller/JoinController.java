@@ -1,6 +1,7 @@
 package com.example.vegetabledragon.controller;
 
 import com.example.vegetabledragon.domain.User;
+import com.example.vegetabledragon.dto.LoginForm;
 import com.example.vegetabledragon.service.JoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,5 +20,11 @@ public class JoinController {
     public ResponseEntity<String> register(@RequestBody User user){
         joinService.join(user);
         return ResponseEntity.ok("Success");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginForm loginForm){
+        String result = joinService.login(loginForm);
+        return ResponseEntity.ok(result);
     }
 }
