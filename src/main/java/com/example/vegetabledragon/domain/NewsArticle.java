@@ -29,9 +29,4 @@ public class NewsArticle {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now(); // 게시글 생성 시간
-
-    // 관계 설정 - 한 뉴스 기사에 여러 개의 사람들의 피드백 가능
-    @OneToMany(mappedBy = "newsArticle", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserFeedback> feedbackList;
-
 }

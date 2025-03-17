@@ -36,3 +36,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+flask:
+  api:
+    url: "https://da38-34-125-250-219.ngrok-free.app/predict"
