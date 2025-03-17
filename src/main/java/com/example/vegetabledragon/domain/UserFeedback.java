@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Getter
@@ -19,22 +20,23 @@ public class UserFeedback {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "news_id", nullable = false) // 뉴스 기사 ID를 외래키로 적용
-    private NewsArticle newsArticle;
+    @JoinColumn(name="post_id", nullable = false)
+    private Post post;
 
-    @Column(nullable = false, length = 255)
-    private String userId; // 사용자의 ID(ex. dndjd, qwerty)
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private FeedbackType feedbackType; // 사람들이 게시글에 남긴 반응(가짜다 vs 진짜다)
+    private boolean isFakeNews; // true면 가짜뉴스, false면 진짜뉴스
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    // Enum 정의
-    public enum FeedbackType {
-        FAKE, REAL
+    public UserFeedback(Post post, User user, boolean isFakeNews){
+        this.post = post;
+        this.user = user;
+        this.isFakeNews = isFakeNews;
     }
-
 }

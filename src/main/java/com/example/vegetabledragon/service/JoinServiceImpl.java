@@ -48,7 +48,7 @@ public class JoinServiceImpl implements JoinService {
             throw new InvalidLoginException("The password is incorrect");
         }
 
-        return "Login Success";
+        return user.getUsername();
     }
 
     private void validateUser(User user) {

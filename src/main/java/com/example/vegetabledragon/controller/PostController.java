@@ -19,7 +19,7 @@ public class PostController {
     // 게시글 작성
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
-        System.out.println("📌 createPost() 실행됨");  // 디버깅 로그
+        System.out.println("📌 createP   ost() 실행됨");  // 디버깅 로그
         Post savedPost = postService.createPost(request.getAnonymousName(), request);
         System.out.println("📌 저장된 Post ID: " + savedPost.getId());
         return ResponseEntity.ok(savedPost);

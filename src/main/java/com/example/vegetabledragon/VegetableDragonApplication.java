@@ -18,30 +18,30 @@ public class VegetableDragonApplication {
         SpringApplication.run(VegetableDragonApplication.class, args);
     }
 }
-
-@Component
-class DatabaseInitializer implements CommandLineRunner {
-    private final JdbcTemplate jdbcTemplate;
-
-    public DatabaseInitializer(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @Override
-    public void run(String... args) throws Exception {
-        try{
-            List<Map<String, Object>> articles = jdbcTemplate.queryForList("select * from news_articles");
-
-            if (!articles.isEmpty()) {
-                System.out.println("Found " + articles.size() + " articles");
-            }
-            else {
-                System.out.println("No articles found");
-            }
-
-        } catch (Exception e)    {
-            System.err.println("오류발생");
-        }
-    }
-}
-
+//
+//@Component
+//class DatabaseInitializer implements CommandLineRunner {
+//    private final JdbcTemplate jdbcTemplate;
+//
+//    public DatabaseInitializer(JdbcTemplate jdbcTemplate) {
+//        this.jdbcTemplate = jdbcTemplate;
+//    }
+//
+//    @Override
+//    public void run(String... args) throws Exception {
+//        try{
+//            List<Map<String, Object>> articles = jdbcTemplate.queryForList("select * from news_articles");
+//
+//            if (!articles.isEmpty()) {
+//                System.out.println("Found " + articles.size() + " articles");
+//            }
+//            else {
+//                System.out.println("No articles found");
+//            }
+//
+//        } catch (Exception e)    {
+//            System.err.println("오류발생");
+//        }
+//    }
+//}
+//
