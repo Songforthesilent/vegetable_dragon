@@ -11,11 +11,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {
-//
-//    @Value("${flask.api.url}")
-//    private String flaskApiUrl;
-
-
     @Bean
     public PostService postService(PostRepository postRepository) {
         return new PostServiceImpl(postRepository);
