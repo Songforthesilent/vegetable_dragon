@@ -25,7 +25,7 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
     @Override
     @Transactional
     public UserFeedback saveFeedback(Long postId, String username, FeedbackRequest request) {
-        System.out.println("✅ [DEBUG] saveFeedback() 호출됨 - username: " + username);
+        System.out.println("[DEBUG] saveFeedback() 호출됨 - username: " + username);
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
         User user = userRepository.findByUsername(username)
