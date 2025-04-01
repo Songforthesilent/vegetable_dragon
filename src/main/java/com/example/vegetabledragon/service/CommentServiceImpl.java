@@ -4,13 +4,12 @@ import com.example.vegetabledragon.domain.Comment;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.dto.CommentRequest;
-import com.example.vegetabledragon.exception.InvalidLoginException;
 import com.example.vegetabledragon.exception.PostNotFoundException;
+import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.repository.CommentRepository;
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
 
     @Override
-    public Comment saveComment(Long postId, String sessionUsername, CommentRequest request) {
+    public Comment saveComment(Long postId, String sessionUsername, CommentRequest request) throws PostNotFoundException, UserNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
@@ -35,7 +34,7 @@ public class CommentServiceImpl implements CommentService {
         // Session 이 다른 거하고 유지되는지를 확인해야 한다.
         if (sessionUsername != null) {
             User user = userRepository.findByUsername(sessionUsername)
-                    .orElseThrow(() -> new UsernameNotFoundException(sessionUsername));
+                    .orElseThrow(() -> new UserNotFoundException(sessionUsername));
             comment.setUser(user);
             comment.setWriter(user.getAnonymousName());
         } else {
@@ -48,7 +47,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<Comment> getCommentsByPost(Long postId) {
+    public List<Comment> getCommentsByPost(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 

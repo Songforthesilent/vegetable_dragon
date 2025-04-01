@@ -2,6 +2,8 @@ package com.example.vegetabledragon.controller;
 
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.dto.PostRequest;
+import com.example.vegetabledragon.exception.InvalidPageSizeException;
+import com.example.vegetabledragon.exception.InvalidPostFieldException;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.service.PostService;
 import com.example.vegetabledragon.service.PostServiceImpl;
@@ -18,8 +20,8 @@ public class PostController {
 
     // 게시글 작성
     @PostMapping
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
-        System.out.println("📌 createP   ost() 실행됨");  // 디버깅 로그
+    public ResponseEntity<Post> createPost(@RequestBody PostRequest request) throws InvalidPostFieldException {
+        System.out.println("📌 createPost() 실행됨");  // 디버깅 로그
         Post savedPost = postService.createPost(request.getAnonymousName(), request);
         System.out.println("📌 저장된 Post ID: " + savedPost.getId());
         return ResponseEntity.ok(savedPost);
@@ -29,13 +31,13 @@ public class PostController {
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
+            @RequestParam(defaultValue = "10") int size) throws InvalidPageSizeException {
         return ResponseEntity.ok(postService.getAllPosts(page, size));
     }
 
     // 특정 게시글 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostById(@PathVariable Long postId){
+    public ResponseEntity<Post> getPostById(@PathVariable Long postId) throws PostNotFoundException {
         return postService.getPostById(postId)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new PostNotFoundException(postId));
