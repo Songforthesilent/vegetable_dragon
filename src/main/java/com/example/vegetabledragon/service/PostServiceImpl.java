@@ -45,4 +45,32 @@ public class PostServiceImpl implements PostService {
         return Optional.ofNullable(postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId)));
     }
+
+    @Override
+    public void deletePostById(Long postId) throws PostNotFoundException {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+        postRepository.deleteById(postId); // postRepository가 JpaRepository를 확장하고 있으므로, CrudRepository에 있는 deleteById(ID id)를 사용할 수 있다.
+    }
+
+    @Override
+    public Post updatePost(Long postId, PostRequest request) throws PostNotFoundException, InvalidPostFieldException {
+        // 게시물 존재 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new PostNotFoundException(postId));
+
+        // 수정할 필드의 유효성 검사
+        if (request.getTitle() == null)
+            throw new InvalidPostFieldException(request.getTitle());
+
+        if (request.getContent() == null)
+            throw new InvalidPostFieldException(request.getContent());
+
+        // 필드 업데이트
+        post.setTitle(request.getTitle());
+        post.setContent(request.getContent());
+
+        // 업데이트된 게시물 저장
+        return postRepository.save(post);
+    }
 }

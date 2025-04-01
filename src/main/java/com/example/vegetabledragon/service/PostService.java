@@ -15,4 +15,8 @@ public interface PostService {
     Post createPost(String username, PostRequest request) throws InvalidPostFieldException;
     Page<Post> getAllPosts(int page, int size) throws InvalidPageSizeException;
     Optional<Post> getPostById(Long postId) throws PostNotFoundException;
+
+    //  CRUD에서 UD 추가
+    void deletePostById(Long postId) throws PostNotFoundException;
+    Post updatePost(Long postId, PostRequest request) throws PostNotFoundException, InvalidPostFieldException;
 }

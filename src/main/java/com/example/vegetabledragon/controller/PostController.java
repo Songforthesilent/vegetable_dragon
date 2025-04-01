@@ -46,4 +46,22 @@ public class PostController {
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
+    // 게시글 삭제
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePostById(@PathVariable Long postId) throws PostNotFoundException {
+        log.info("[PostController] 게시글 삭제 - 게시글 ID: {}", postId);
+        postService.deletePostById(postId);
+        log.info("[PostController] 게시글 삭제 완료");
+        return ResponseEntity.noContent().build();
+    }
+
+    // 게시글 수정
+    @PutMapping("/{postId}")
+    public ResponseEntity<Post> updatePostById(@PathVariable Long postId, @RequestBody PostRequest request) throws PostNotFoundException, InvalidPostFieldException {
+        log.info("[PostController] 게시글 수정 - 게시글 ID: {}", postId);
+        Post updatedPost = postService.updatePost(postId, request);
+        log.info("[PostController] 게시글 수정 완료");
+        return ResponseEntity.ok(updatedPost);
+    }
+
 }
