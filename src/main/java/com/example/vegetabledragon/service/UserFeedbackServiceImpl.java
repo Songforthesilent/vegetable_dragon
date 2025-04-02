@@ -4,10 +4,13 @@ import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.domain.UserFeedback;
 import com.example.vegetabledragon.dto.FeedbackRequest;
+import com.example.vegetabledragon.exception.PostNotFoundException;
+import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserFeedbackRepository;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +20,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserFeedbackServiceImpl implements UserFeedbackService {
     private final UserFeedbackRepository userFeedbackRepository;
     private final PostRepository postRepository;
@@ -24,12 +28,12 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
     @Override
     @Transactional
-    public UserFeedback saveFeedback(Long postId, String username, FeedbackRequest request) {
-        System.out.println("[DEBUG] saveFeedback() 호출됨 - username: " + username);
+    public UserFeedback saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
+        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new PostNotFoundException(postId));
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(username));
 
         // 기존 피드백이 있는지 확인
         Optional<UserFeedback> exisitngFeedback = userFeedbackRepository.findByPostAndUser(post, user);
@@ -46,17 +50,17 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
     }
 
     @Override
-    public List<UserFeedback> getFeedbacksByPost(Long postId) {
+    public List<UserFeedback> getFeedbacksByPost(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new PostNotFoundException(postId));
 
         return userFeedbackRepository.findByPost(post);
     }
 
     @Override
-    public Map<String, Double> getFakeNewsFeedbackRatio(Long postId) {
+    public Map<String, Double> getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new PostNotFoundException(postId));
 
         long fakeNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsTrue(post);
         long trueNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsFalse(post);

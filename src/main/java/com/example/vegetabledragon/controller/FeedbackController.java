@@ -2,6 +2,8 @@ package com.example.vegetabledragon.controller;
 
 import com.example.vegetabledragon.domain.UserFeedback;
 import com.example.vegetabledragon.dto.FeedbackRequest;
+import com.example.vegetabledragon.exception.PostNotFoundException;
+import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.service.UserFeedbackService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class FeedbackController {
 
     // 게시글에 대한 피드백 추가
     @PostMapping("/{postId}")
-    public ResponseEntity<?> addFeedback(@PathVariable Long postId, @RequestBody FeedbackRequest request, HttpSession session){
+    public ResponseEntity<?> addFeedback(@PathVariable Long postId, @RequestBody FeedbackRequest request, HttpSession session) throws UserNotFoundException, PostNotFoundException {
         String loggedInUser = (String) session.getAttribute("loggedInUser");
 
         if (loggedInUser == null)
@@ -31,14 +33,14 @@ public class FeedbackController {
 
     // 특정 게시글의 모든 피드백 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<List<UserFeedback>> getFeedbacks(@PathVariable Long postId){
+    public ResponseEntity<List<UserFeedback>> getFeedbacks(@PathVariable Long postId) throws PostNotFoundException {
         List<UserFeedback> feedbacks = userFeedbackService.getFeedbacksByPost(postId);
         return ResponseEntity.ok(feedbacks);
     }
 
     // 특정 게시글의 가짜 뉴스 비율 조회
     @GetMapping("/{postId}/ratio")
-    public ResponseEntity<Map<String, Double>> getFakeNewsRatio(@PathVariable Long postId){
+    public ResponseEntity<Map<String, Double>> getFakeNewsRatio(@PathVariable Long postId) throws PostNotFoundException {
         Map<String, Double> ratio = userFeedbackService.getFakeNewsFeedbackRatio(postId);
         return ResponseEntity.ok(ratio);
     }

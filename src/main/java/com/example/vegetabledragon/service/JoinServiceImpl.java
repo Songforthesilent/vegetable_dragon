@@ -16,7 +16,7 @@ public class JoinServiceImpl implements JoinService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User join(User user) {
+    public User join(User user) throws UserAlreadyExistsException {
         // 중복 검사
         validateUser(user);
 
@@ -38,10 +38,10 @@ public class JoinServiceImpl implements JoinService {
 
     }
     @Override
-    public String login(LoginForm loginForm) {
+    public String login(LoginForm loginForm) throws InvalidLoginException {
         // 이메일로 사용자 조회
         User user = userRepository.findByEmail(loginForm.getEmail())
-                .orElseThrow(() -> new InvalidLoginException("The Email does not exist"));
+                .orElseThrow(() -> new InvalidLoginException("The email does not exist"));
 
         // 비밀번호 검증
         if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
@@ -51,7 +51,7 @@ public class JoinServiceImpl implements JoinService {
         return user.getUsername();
     }
 
-    private void validateUser(User user) {
+    private void validateUser(User user) throws UserAlreadyExistsException {
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExistsException("Username already exists");
         }
