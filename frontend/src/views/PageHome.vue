@@ -50,15 +50,15 @@
 
         <div class="recent-table">
           <table>
-              <tr v-for="article in filteredArticles" :key="article.id" class="table-row">
-                <td class="category">{{ article.category }}</td>
-                <td class="title">
-                  <!-- 제목 클릭 시 상세 페이지로 이동 -->
-                  <router-link :to="'/board/view/' + article.id" class="title-link">
-                    {{ article.title }}
-                  </router-link>
-                </td>
-              </tr>
+            <tr v-for="article in filteredArticles" :key="article.id" class="table-row">
+              <td class="category">{{ article.category }}</td>
+              <td class="title">
+                <!-- 제목 클릭 시 상세 페이지로 이동 -->
+                <router-link :to="'/board/view/' + article.id" class="title-link">
+                  {{ article.title }}
+                </router-link>
+              </td>
+            </tr>
           </table>
         </div>
       </section>
@@ -80,7 +80,7 @@
         </div>
         <button class="login-button">로그인</button>
         <div class="links">
-          <a href="#">회원가입하기</a>
+          <router-link to="/register">회원가입하기</router-link>>
           <a href="#">비밀번호찾기</a>
         </div>
       </div>
@@ -354,7 +354,7 @@ h3 {
   margin-bottom: 15px;
   border: 1px solid white;
   border-radius: 8px;
- }
+}
 
 .username {
   color: #939393;
@@ -363,25 +363,25 @@ h3 {
 .password {
   color: #939393;
 }
- .login-button {
-   background-color: #3A4CA4;
-   color: white;
-   padding: 12px;
-   border: 1px solid #3A4CA4;
-   border-radius: 25px;
-   cursor: pointer;
-   width: 100%;
-   margin-top: 10px;
- }
+.login-button {
+  background-color: #3A4CA4;
+  color: white;
+  padding: 12px;
+  border: 1px solid #3A4CA4;
+  border-radius: 25px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
 
- .links {
-   display: flex;
-   justify-content: space-between;
-   width: 100%;
-   font-size: 10px;
-   margin-top: 10px;
-   color: #939393;
- }
+.links {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 10px;
+  margin-top: 10px;
+  color: #939393;
+}
 
 /* ✅ 제목 스타일 수정 */
 .title {
