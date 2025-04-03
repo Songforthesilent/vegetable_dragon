@@ -35,4 +35,5 @@ public class CommentController {
         List<Comment> comments = commentService.getCommentsByPost(postId);
         return ResponseEntity.ok(comments);
     }
+
 }

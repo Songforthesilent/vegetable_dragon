@@ -12,8 +12,8 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class AppConfig {
     @Bean
-    public PostService postService(PostRepository postRepository) {
-        return new PostServiceImpl(postRepository);
+    public PostService postService(PostRepository postRepository, UserRepository userRepository) {
+        return new PostServiceImpl(postRepository, userRepository);
     }
 
     @Bean
