@@ -6,6 +6,7 @@ import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.dto.CommentRequest;
 import com.example.vegetabledragon.exception.CommentNotPermissionException;
 import com.example.vegetabledragon.exception.PostNotFoundException;
+import com.example.vegetabledragon.exception.UnauthorizedException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.repository.CommentRepository;
 import com.example.vegetabledragon.repository.PostRepository;
@@ -78,9 +79,15 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long commentId, HttpSession session) throws CommentNotPermissionException {
+    public void deleteComment(Long commentId, String sessionUsername, String password) throws CommentNotPermissionException, UnauthorizedException {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("comment not find"));
+
+        // 권한 확인
+        checkPermissionService.validateCommentPermission(comment, sessionUsername, password);
+
+        // 권한이 확인되면 댓글 삭제
+        commentRepository.deleteById(commentId);
 
     }
-
-
 }
