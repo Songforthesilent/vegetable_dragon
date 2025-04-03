@@ -18,5 +18,5 @@ public interface PostService {
     //  CRUD에서 UD 추가
     void deletePostById(Long postId, HttpSession session) throws PostNotFoundException, UnauthorizedException;
 
-    Post updatePost(Long postId, PostRequest request) throws PostNotFoundException, InvalidPostFieldException;
+    Post updatePost(Long postId, PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException;
 }

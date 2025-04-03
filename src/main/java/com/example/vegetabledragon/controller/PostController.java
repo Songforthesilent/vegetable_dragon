@@ -58,9 +58,9 @@ public class PostController {
 
     // 게시글 수정
     @PutMapping("/{postId}")
-    public ResponseEntity<Post> updatePostById(@PathVariable Long postId, @RequestBody PostRequest request) throws PostNotFoundException, InvalidPostFieldException {
+    public ResponseEntity<Post> updatePostById(@PathVariable Long postId, @RequestBody PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException {
         log.info("[PostController] 게시글 수정 - 게시글 ID: {}", postId);
-        Post updatedPost = postService.updatePost(postId, request);
+        Post updatedPost = postService.updatePost(postId, request, session);
         log.info("[PostController] 게시글 수정 완료");
         return ResponseEntity.ok(updatedPost);
     }

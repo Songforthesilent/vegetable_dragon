@@ -68,10 +68,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post updatePost(Long postId, PostRequest request) throws PostNotFoundException, InvalidPostFieldException {
+    public Post updatePost(Long postId, PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException {
         // 게시물 존재 확인
+        String loggedInUsername = (String) session.getAttribute("loggedInUser");
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
+
+        if (!post.getAuthorUsername().equals(loggedInUsername))
+            throw new UnauthorizedException();
 
         // 수정할 필드의 유효성 검사
         if (request.getTitle() == null)
