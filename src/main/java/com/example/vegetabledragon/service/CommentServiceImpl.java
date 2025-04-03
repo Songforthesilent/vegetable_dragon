@@ -10,6 +10,7 @@ import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.repository.CommentRepository;
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserRepository;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +23,10 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private CheckPermissionServiceImpl checkPermissionService;
+    private final CheckPermissionServiceImpl checkPermissionService;
 
     @Override
-    public Comment saveComment(Long postId, String sessionUsername, CommentRequest request) throws PostNotFoundException, UserNotFoundException {
+    public Comment saveComment(Long postId, HttpSession session, CommentRequest request) throws PostNotFoundException, UserNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
@@ -33,6 +34,7 @@ public class CommentServiceImpl implements CommentService {
         comment.setPost(post);
         comment.setComment(request.getComment());
 
+        String sessionUsername = (String) session.getAttribute("loggedInUser");
 
         // Session 이 다른 거하고 유지되는지를 확인해야 한다.
         if (sessionUsername != null) {
@@ -58,7 +60,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment updateComment(Long commentId, String sessionUsername, CommentRequest request) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException {
+    public Comment updateComment(Long commentId, HttpSession session, CommentRequest request) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException {
+        String sessionUsername = (String) session.getAttribute("loggedInUser");
+        if (sessionUsername == null) sessionUsername = "익명";
+
         // 댓글 조회
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new RuntimeException("Comment not found"));
@@ -73,13 +78,9 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void deleteComment(Long commentId) throws CommentNotPermissionException {
-        // 댓글 조회
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new RuntimeException("Comment not found"));
+    public void deleteComment(Long commentId, HttpSession session) throws CommentNotPermissionException {
 
-        checkPermissionService.validateCommentPermission(comment, comment.getWriter(), comment.getPassword());
-
-        commentRepository.delete(comment);
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.example.vegetabledragon.controller;
 
 import com.example.vegetabledragon.domain.Comment;
 import com.example.vegetabledragon.dto.CommentRequest;
+import com.example.vegetabledragon.exception.CommentNotPermissionException;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.service.CommentService;
@@ -24,7 +25,7 @@ public class CommentController {
                                               @RequestBody CommentRequest request,
                                               HttpSession session) throws PostNotFoundException, UserNotFoundException {
         String sessionUsername = (String) session.getAttribute("loggedInUser"); // 오류 날 거 같음
-        Comment saved = commentService.saveComment(postId, sessionUsername, request);
+        Comment saved = commentService.saveComment(postId, session, request);
 
         return ResponseEntity.ok(saved);
     }
@@ -35,5 +36,22 @@ public class CommentController {
         List<Comment> comments = commentService.getCommentsByPost(postId);
         return ResponseEntity.ok(comments);
     }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<Comment> updateComment(@PathVariable Long postId,
+                                                 @PathVariable Long commentId,
+                                                 @RequestBody CommentRequest request,
+                                                 HttpSession session) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException {
+        Comment updated = commentService.updateComment(commentId, session, request);
+        return ResponseEntity.ok(updated);
+    }
+
+//    @DeleteMapping("/{commentId}")
+//    public ResponseEntity<Void> deleteComment(@PathVariable Long postId,
+//                                              @PathVariable Long commentId,
+//                                              HttpSession session) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException {
+//        commentService.deleteComment(commentId, session, request);
+//        return ResponseEntity.noContent().build();
+//    }
 
 }
