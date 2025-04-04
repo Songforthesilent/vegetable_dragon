@@ -8,6 +8,7 @@ import com.example.vegetabledragon.service.JoinService;
 import com.example.vegetabledragon.service.JoinServiceImpl;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +39,10 @@ public class JoinController {
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpSession session) {
         if (session.getAttribute("loggedInUser") != null) {
-            return ResponseEntity.status(400).body("로그인 상태가 아닙니다.");
+            session.invalidate(); // 세션 무효화
+            return ResponseEntity.ok("로그아웃 성공");
         }
-        session.invalidate(); // 세션 무효화
-        return ResponseEntity.ok("로그아웃 성공");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인 상태가 아닙니다.");
+
     }
 }
