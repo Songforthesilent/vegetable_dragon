@@ -3,6 +3,7 @@ package com.example.vegetabledragon.service;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.domain.UserFeedback;
+import com.example.vegetabledragon.dto.FakeNewsFeedbackRatioResponse;
 import com.example.vegetabledragon.dto.FeedbackRequest;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
@@ -58,7 +59,7 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
     }
 
     @Override
-    public Map<String, Double> getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException {
+    public FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
@@ -66,12 +67,15 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
         long trueNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsFalse(post);
         long total = fakeNewsCount + trueNewsCount;
 
-        if (total == 0)
-            return Map.of("fakeNewsRatio", 0.0, "trueNewsRatio", 0.0);
+        double fakeNewsRatio = 0;
+        double trueNewsRatio = 0;
 
-        return Map.of(
-                "fakeNewsRatio", (double) fakeNewsCount / total,
-                "trueNewsRatio", (double) trueNewsCount / total
-        );
+        if (total > 0){
+            fakeNewsRatio = (double) fakeNewsCount / total;
+            trueNewsRatio = (double) trueNewsCount / total;
+        }
+
+
+        return new FakeNewsFeedbackRatioResponse(fakeNewsCount, trueNewsCount, fakeNewsRatio, trueNewsRatio);
     }
 }
