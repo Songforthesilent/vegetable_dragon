@@ -1,6 +1,7 @@
 package com.example.vegetabledragon.controller;
 
 import com.example.vegetabledragon.domain.UserFeedback;
+import com.example.vegetabledragon.dto.FakeNewsFeedbackRatioResponse;
 import com.example.vegetabledragon.dto.FeedbackRequest;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
@@ -40,8 +41,8 @@ public class FeedbackController {
 
     // 특정 게시글의 가짜 뉴스 비율 조회
     @GetMapping("/{postId}/ratio")
-    public ResponseEntity<Map<String, Double>> getFakeNewsRatio(@PathVariable Long postId) throws PostNotFoundException {
-        Map<String, Double> ratio = userFeedbackService.getFakeNewsFeedbackRatio(postId);
-        return ResponseEntity.ok(ratio);
+    public ResponseEntity<FakeNewsFeedbackRatioResponse> getFakeNewsRatio(@PathVariable Long postId) throws PostNotFoundException {
+        FakeNewsFeedbackRatioResponse response = userFeedbackService.getFakeNewsFeedbackRatio(postId);
+        return ResponseEntity.ok(response);
     }
 }
