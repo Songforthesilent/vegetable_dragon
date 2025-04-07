@@ -40,8 +40,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-
+import {registerUser} from '@/api/user';
 export default {
   name: 'UserRegister',
   data() {
@@ -59,28 +58,16 @@ export default {
   methods: {
     async submitForm() {
       try {
-        const API_URL = 'http://localhost:8081/api/register'; // API 주소 수정
-
-        // API 요청 보내기
-        const response = await axios.post(API_URL, this.form, {
-          headers: { 'Content-Type': 'application/json' } // 헤더 설정
-        });
+        const response = await registerUser(this.form);
 
         alert('회원가입이 완료되었습니다!');
         console.log('회원가입 성공: ', response.data);
+        this.$router.push('/login');
 
-        // 회원가입 성공 시 홈화면으로
-        this.$router.push('/');
       } catch (error) {
         console.error('회원가입 실패: ', error.response?.data || error.message);
         alert(error.response?.data?.message || '회원가입에 실패했습니다.');
       }
-      // 예시: 회원가입 API 호출 (추후 연동 필요)
-      // this.$axios.post('/api/register', this.form).then(response => {
-      //   console.log('회원가입 성공:', response);
-      // }).catch(error => {
-      //   console.error('회원가입 실패:', error);
-      // });
     }
   }
 };

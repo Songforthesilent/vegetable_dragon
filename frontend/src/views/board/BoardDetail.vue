@@ -25,10 +25,38 @@
       <a :href="article.link" target="_blank" class="article-link">기사 원문 보기</a>
     </div>
 
-    <!-- 찬반 투표 -->
     <div class="vote-section">
-      <button @click="vote('agree')" :class="{ active: voteType === 'agree' }">👍 진짜뉴스이다.</button>
-      <button @click="vote('disagree')" :class="{ active: voteType === 'disagree' }">👎 가짜뉴스이다.</button>
+      <div class="vote-button">
+        <button @click="vote('agree')" :class="{ 'active-agree': voteType === 'agree' }">
+          👍 진짜뉴스이다. ({{ getVotePercentage(agreeVotes) }}%)
+        </button>
+        <button @click="vote('disagree')" :class="{ 'active-disagree': voteType === 'disagree' }">
+          👎 가짜뉴스이다. ({{ getVotePercentage(disagreeVotes) }}%)
+        </button>
+      </div>
+
+
+      <p>투표 결과</p>
+      <!-- 투표 퍼센트 바 (클릭 가능) -->
+      <div class="progress-bar" @click="handleVote">
+        <div
+            class="agree-bar"
+            :style="{ width: getVotePercentage(agreeVotes) + '%' }"
+            data-vote="agree">
+          <span v-if="agreeVotes > 0" class="progress-text">
+            {{ getVotePercentage(agreeVotes) }}%
+          </span>
+        </div>
+
+        <div
+            class="disagree-bar"
+            :style="{ width: getVotePercentage(disagreeVotes) + '%' }"
+            data-vote="disagree">
+              <span v-if="disagreeVotes > 0" class="progress-text">
+                {{ getVotePercentage(disagreeVotes) }}%
+              </span>
+        </div>
+      </div>
     </div>
 
     <!-- 댓글 -->
@@ -131,7 +159,10 @@ export default {
       deletePostPasswordModal: false,
       editCommentPassword: "",
       editCommentText: "",
-      deleteCommentPassword: ""
+      deleteCommentPassword: "",
+      agreeVotes: 0,
+      disagreeVotes: 0,
+      totalVotes: 0
     };
   },
   mounted() {
@@ -151,8 +182,24 @@ export default {
       this.article = dummyData;
     },
     vote(type) {
-      this.voteType = type;
-      alert(type === "agree" ? "찬성했습니다." : "반대했습니다.");
+      if (type === "agree") {
+        this.agreeVotes++;
+        this.voteType = "agree";
+      } else {
+        this.disagreeVotes++;
+        this.voteType = "disagree";
+      }
+      this.totalVotes = this.agreeVotes + this.disagreeVotes;
+    },
+    handleVote(event) {
+      const voteType = event.target.getAttribute("data-vote");
+      if (voteType) {
+        this.vote(voteType);
+      }
+    },
+    getVotePercentage(voteCount) {
+      if (this.totalVotes === 0) return "50%";
+      return ((voteCount / this.totalVotes) * 100).toFixed(1);
     },
     addComment() {
       if (!this.newComment.trim() || !this.commentPassword.trim()) {
@@ -307,27 +354,91 @@ export default {
 }
 
 .vote-section {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.1);
   margin-top: 70px;
 }
 
-.vote-section button {
+.vote-button {
+  display: flex;
+  gap: 215x; /* 버튼 사이 간격 조정 */
   width: 100%;
-  margin: 10px 0;
+  height: 180px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.vote-section button {
+  flex: 1;
+  margin: 10px;
   padding: 10px;
   cursor: pointer;
   background-color: white;
   border: 1px solid #ddd;
-  border-radius: 30px;
+  border-radius: 15px;
   box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s, color 0.3s;
 }
 
-.vote-section .active {
-  background-color: #3A4CA4;
+/* 찬성(진짜뉴스) 버튼 클릭 시 파란색 */
+.vote-section button.active-agree {
+  font-weight: bold;
+  color: #3A4CA4;
+  border: 3px solid #3A4CA4;
+}
+
+/* 반대(가짜뉴스) 버튼 클릭 시 빨간색 */
+.vote-section button.active-disagree {
+  font-weight: bold;
+  color: #FF4C4C;
+  border: 3px solid #FF4C4C;
+}
+
+.vote-section p {
+  font-size: 15px;
+  font-weight: bold;
+  margin-top: 30px;
+  padding: 10px;
+  text-align: left;
+}
+
+.progress-bar {
+  display: flex;
+  width: 100%;
+  height: 35px;
+  background: #3A4CA4;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  overflow: hidden;
+  margin: 10px 0px;
+}
+
+.progress-text {
+  position: absolute;
+  font-size: 14px;
   color: white;
+  font-weight: bold;
 }
 
+.agree-bar {
+  height: 100%;
+  background: #3A4CA4; /* 파란색 (찬성) */
+  transition: width 0.3s ease;
+}
+
+.disagree-bar {
+  height: 100%;
+  background: #FF4C4C; /* 빨간색 (반대) */
+  transition: width 0.3s ease;
+}
+
+/* 댓글 */
 .comments-section {
-  margin-top: 20px;
+  margin-top: 50px;
   text-align: left;
   font-size: 14px;
 }

@@ -5,6 +5,7 @@ import BoardList from '@/views/board/BoardList.vue'
 import BoardWrite from "@/views/board/BoardWrite.vue";
 import BoardDetail from '@/views/board/BoardDetail.vue';
 import UserRegister from '@/views/UserRegister.vue';
+import UserLogin from '@/views/UserLogin.vue'
 
 const routes = [
     {
@@ -50,7 +51,13 @@ const routes = [
         path: '/register',
         name: 'UserRegister',
         component: UserRegister,
-        meta: { title: 'UserRegiser' }
+        meta: { title: '' }
+    },
+    {
+        path: '/login',
+        name: 'UserLogin',
+        component: UserLogin,
+        meta: { title: '로그인하기' }
     }
 
 ]
