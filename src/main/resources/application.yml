@@ -1,3 +1,6 @@
+server:
+  port: 8081
+
 # JPA
 spring:
   datasource:
@@ -8,7 +11,7 @@ spring:
 
   web:
     cors:
-      allowed-origins: "http://localhost:5173"
+      allowed-origins: "http://localhost:8080"
       allowed-methods: "GET,POST"
 
 
