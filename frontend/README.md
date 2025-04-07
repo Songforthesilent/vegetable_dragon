@@ -1,4 +1,5 @@
-# maza-front
+# vegetable_dragon frontend
+
 
 ## Project setup
 ```
