@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -21,11 +23,12 @@ public class UserFeedback {
 
     @ManyToOne
     @JoinColumn(name="post_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private User user;  
 
     @Column(nullable = false)
     private boolean isFakeNews; // true면 가짜뉴스, false면 진짜뉴스

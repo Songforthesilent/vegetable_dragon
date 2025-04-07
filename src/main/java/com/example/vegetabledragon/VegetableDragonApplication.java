@@ -14,7 +14,7 @@ import java.util.Map;
 public class VegetableDragonApplication {
 
     public static void main(String[] args) {
-        // 🔹 Spring Boot 애플리케이션 실행
+        // Spring Boot 애플리케이션 실행
         SpringApplication.run(VegetableDragonApplication.class, args);
     }
 }

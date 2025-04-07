@@ -3,6 +3,7 @@ package com.example.vegetabledragon.service;
 import com.example.vegetabledragon.exception.MLServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @RequiredArgsConstructor
+@Slf4j
 public class MLServiceImpl implements MLService {
     // flask 연결
     // https 로 설정해야 한다.
@@ -25,7 +27,7 @@ public class MLServiceImpl implements MLService {
 
     @Override
     public Map<String, Object> predict(String text) {
-        System.out.println("[Spring Boot] MLService, predict 실행 응답: " + text);
+        log.info("[Spring Boot] MLService, predict 실행 응답: " + text);
 
 
         // Header 설정
@@ -40,7 +42,7 @@ public class MLServiceImpl implements MLService {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonBody = objectMapper.writeValueAsString(requestBody);
-            System.out.println("Generated Request Body: " + jsonBody);
+            log.info("Generated Request Body: " + jsonBody);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -50,12 +52,12 @@ public class MLServiceImpl implements MLService {
 
         // Flask API 호출 (POST 요청)
         try {
-            System.out.println("[Spring Boot] Flask로 요청을 보냅니다: " + flaskApiUrl);
+            log.debug("[Spring Boot] Flask로 요청을 보냅니다: " + flaskApiUrl);
             Map response = restTemplate.postForObject(flaskApiUrl, request, Map.class);
-            System.out.println("[Spring Boot] Flask 응답: " + response);
+            log.info("[Spring Boot] Flask 응답: " + response);
             return response;
         } catch (Exception e) {
-            System.out.println("[Spring Boot] Flask 요청 실패: " + e.getMessage());
+            log.warn("[Spring Boot] Flask 요청 실패: " + e.getMessage());
             throw new MLServiceException("Flask 요청 실패", e);
         }
     }
