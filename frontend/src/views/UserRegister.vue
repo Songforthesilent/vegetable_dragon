@@ -41,6 +41,7 @@
 
 <script>
 import {registerUser} from '@/api/user';
+
 export default {
   name: 'UserRegister',
   data() {

@@ -7,7 +7,7 @@
         <div class="search-container">
           <input type="text" v-model="searchQuery" placeholder="Search" class="search-input" />
           <button @click="search" class="search-button">
-            <i class="fas fa-search search-icon"></i> <!-- 돋보기 아이콘 -->
+            <i class="fas fa-search search-icon"></i>
           </button>
         </div>
       </section>
@@ -35,7 +35,7 @@
           <h2 class="recent-posts-title">최근 게시글</h2>
           <router-link to="/board/list" class="more-link">
             <i class="fas fa-chevron-right"></i>
-          </router-link> <!-- 전체보기 아이콘 -->
+          </router-link>
         </div>
 
         <!-- 카테고리 버튼 -->
@@ -53,7 +53,6 @@
             <tr v-for="article in filteredArticles" :key="article.id" class="table-row">
               <td class="category">{{ article.category }}</td>
               <td class="title">
-                <!-- 제목 클릭 시 상세 페이지로 이동 -->
                 <router-link :to="'/board/view/' + article.id" class="title-link">
                   {{ article.title }}
                 </router-link>
@@ -65,36 +64,22 @@
     </article>
 
     <!-- 로그인 배너 영역 -->
-    <aside class="login-panel">
-      <div class="login-box">
-        <i class="fas fa-user-circle user-icon"></i>
-        <h3>Sign In</h3>
-        <div class="input-container">
-          <i class="fas fa-user icon"></i>
-          <input type="text" placeholder="username" class="input-field username" />
-        </div>
-
-        <div class="input-container">
-          <i class="fas fa-lock icon"></i>
-          <input type="password" placeholder="password" class="input-field password" />
-        </div>
-        <button class="login-button">로그인</button>
-        <div class="links">
-          <router-link to="/register">회원가입하기</router-link>>
-          <a href="#">비밀번호찾기</a>
-        </div>
-      </div>
-    </aside>
+    <LoginBanner />
   </div>
 </template>
 
 <script>
+import LoginBanner from '@/components/LoginBanner.vue';
+
 export default {
+  components: {
+    LoginBanner
+  },
   data() {
     return {
       searchQuery: '',
       categories: ['경제', '연예', '정치', '사회', '국제', '문화'],
-      selectedCategory: '전체', // 초기값 '전체'
+      selectedCategory: '전체',
       bestTopics: [
         {
           id: 1,
@@ -113,11 +98,11 @@ export default {
         }
       ],
       recentArticles: [
-        {id: 1, category: '경제', title: 'Vuex는 Vue의 상태 관리를 위한 라이브러리입니다.'},
-        {id: 2, category: '문화', title: 'Vue 3에서 추가된 새로운 기능들을 살펴봅니다.'},
-        {id: 3, category: '문화', title: 'Composition API는 Vue 3에서 새로 도입된 기능입니다.'},
-        {id: 4, category: '연예', title: '인기 드라마 배우들의 인터뷰' },
-        {id: 5, category: '정치', title: '대선 후보들의 공약 분석' }
+        { id: 1, category: '경제', title: 'Vuex는 Vue의 상태 관리를 위한 라이브러리입니다.' },
+        { id: 2, category: '문화', title: 'Vue 3에서 추가된 새로운 기능들을 살펴봅니다.' },
+        { id: 3, category: '문화', title: 'Composition API는 Vue 3에서 새로 도입된 기능입니다.' },
+        { id: 4, category: '연예', title: '인기 드라마 배우들의 인터뷰' },
+        { id: 5, category: '정치', title: '대선 후보들의 공약 분석' }
       ]
     };
   },
@@ -134,10 +119,7 @@ export default {
       this.selectedCategory = category;
     },
     search() {
-      alert('검색어: ${this.searchQuery}');
-    },
-    login() {
-      alert("로그인 버튼이 클릭되었습니다.");
+      alert(`검색어: ${this.searchQuery}`);
     }
   }
 };
@@ -383,18 +365,18 @@ h3 {
   color: #939393;
 }
 
-/* ✅ 제목 스타일 수정 */
+/* 제목 스타일 수정 */
 .title {
   padding: 5px;
 }
 
 .title-link {
-  text-decoration: none; /* ✅ 밑줄 제거 */
-  color: #333; /* ✅ 제목 색상 변경 */
+  text-decoration: none; /* 밑줄 제거 */
+  color: #333; /* 제목 색상 변경 */
   font-weight: bold;
 }
 
 .title-link:hover {
-  color: #3A4CA4; /* ✅ 마우스 오버 시 색상 변경 */
+  color: #3A4CA4; /* 마우스 오버 시 색상 변경 */
 }
 </style>

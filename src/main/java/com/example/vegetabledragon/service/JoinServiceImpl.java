@@ -26,7 +26,7 @@ public class JoinServiceImpl implements JoinService {
         // 새 사용자 생성
         User newUser = User.builder()
                 .username(user.getUsername())
-                .password(user.getPassword())
+                .password(encryptedPassword) // 수정(암호화된 비밀번호 사용)
                 .email(user.getEmail())
                 .anonymousName(user.getAnonymousName())
                 .birthday(user.getBirthday())
