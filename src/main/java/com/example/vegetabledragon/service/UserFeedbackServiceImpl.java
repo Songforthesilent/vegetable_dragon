@@ -36,14 +36,17 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
 
-        // 기존 피드백이 있는지 확인
-        Optional<UserFeedback> exisitngFeedback = userFeedbackRepository.findByPostAndUser(post, user);
+        // 실제 서비스 시에는 허용시켜야 할 부분
+        // Test 시에는 많은 사용자가 없기 때문에 하나의 계정으로 처리할 예정.
 
-        if (exisitngFeedback.isPresent()) {
-            UserFeedback feedback = exisitngFeedback.get();
-            feedback.setFakeNews(request.isFakeNews()); // 기존 피드백 수정
-            return userFeedbackRepository.save(feedback);
-        }
+//        // 기존 피드백이 있는지 확인
+//        Optional<UserFeedback> exisitngFeedback = userFeedbackRepository.findByPostAndUser(post, user);
+//
+//        if (exisitngFeedback.isPresent()) {
+//            UserFeedback feedback = exisitngFeedback.get();
+//            feedback.setFakeNews(request.isFakeNews()); // 기존 피드백 수정
+//            return userFeedbackRepository.save(feedback);
+//        }
 
         // 새 피드백 저장
         UserFeedback newFeedback = new UserFeedback(post, user, request.isFakeNews());
