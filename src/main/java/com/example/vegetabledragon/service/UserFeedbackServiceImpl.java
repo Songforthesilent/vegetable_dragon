@@ -5,6 +5,7 @@ import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.domain.UserFeedback;
 import com.example.vegetabledragon.dto.FakeNewsFeedbackRatioResponse;
 import com.example.vegetabledragon.dto.FeedbackRequest;
+import com.example.vegetabledragon.dto.UserFeedbackResponse;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.repository.PostRepository;
@@ -29,7 +30,7 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
     @Override
     @Transactional
-    public UserFeedback saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
+    public UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
         log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
@@ -50,15 +51,23 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
         // 새 피드백 저장
         UserFeedback newFeedback = new UserFeedback(post, user, request.isFakeNews());
-        return userFeedbackRepository.save(newFeedback);
+        UserFeedback saved = userFeedbackRepository.save(newFeedback);
+
+        // Hibernate 로그를 줄이고, 스프링 로그로 생성
+        log.info("[UserfeedbackService_vote] User '{}' voted on Post {} -> fakeNews = {}", user.getUsername(), post.getId(), request.isFakeNews());
+
+        return UserFeedbackResponse.from(saved);
     }
 
     @Override
-    public List<UserFeedback> getFeedbacksByPost(Long postId) throws PostNotFoundException {
+    public List<UserFeedbackResponse> getFeedbacksByPost(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        return userFeedbackRepository.findByPost(post);
+        return userFeedbackRepository.findByPost(post).
+                stream()
+                .map(UserFeedbackResponse::from)
+                .toList();
     }
 
     @Override
