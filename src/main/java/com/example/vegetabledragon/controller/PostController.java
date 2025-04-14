@@ -23,9 +23,9 @@ public class PostController {
     public ResponseEntity<Post> createPost(@RequestBody PostRequest request, HttpSession session) throws InvalidPostFieldException, UserNotFoundException {
         String loggedInUser = (String) session.getAttribute("loggedInUser");
 
-        log.debug("[PostController] createPost() 실행됨");  // 디버깅 로그
+//        log.debug("[PostController] createPost() 실행됨");  // 디버깅 로그
         Post savedPost = postService.createPost(loggedInUser, request);
-        log.info("[PostController] 저장된 Post ID: " + savedPost.getId());
+//        log.info("[PostController] 저장된 Post ID: " + savedPost.getId());
         return ResponseEntity.ok(savedPost);
     }
 
