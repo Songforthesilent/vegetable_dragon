@@ -31,7 +31,7 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
     @Override
     @Transactional
     public UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
-        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
+//        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
         User user = userRepository.findByUsername(username)
@@ -54,7 +54,7 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
         UserFeedback saved = userFeedbackRepository.save(newFeedback);
 
         // Hibernate 로그를 줄이고, 스프링 로그로 생성
-        log.info("[UserfeedbackService_vote] User '{}' voted on Post {} -> fakeNews = {}", user.getUsername(), post.getId(), request.isFakeNews());
+//        log.info("[UserfeedbackService_vote] User '{}' voted on Post {} -> fakeNews = {}", user.getUsername(), post.getId(), request.isFakeNews());
 
         return UserFeedbackResponse.from(saved);
     }

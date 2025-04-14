@@ -6,10 +6,12 @@ import com.example.vegetabledragon.service.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
+@EnableAspectJAutoProxy // AOP 활성화
 public class AppConfig {
     @Bean
     public PostService postService(PostRepository postRepository, UserRepository userRepository) {

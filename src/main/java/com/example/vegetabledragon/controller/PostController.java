@@ -34,14 +34,14 @@ public class PostController {
     public ResponseEntity<Page<Post>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) throws InvalidPageSizeException {
-        log.info("[PostController] 게시글 목록 조회 - 페이지 : {}, 사이즈 : {}", page, size);
+//        log.info("[PostController] 게시글 목록 조회 - 페이지 : {}, 사이즈 : {}", page, size);
         return ResponseEntity.ok(postService.getAllPosts(page, size));
     }
 
     // 특정 게시글 조회
     @GetMapping("/{postId}")
     public ResponseEntity<Post> getPostById(@PathVariable Long postId) throws PostNotFoundException {
-        log.info("[PostController] 특정 게시글 조회 - 게시글 ID: {}", postId);
+//        log.info("[PostController] 특정 게시글 조회 - 게시글 ID: {}", postId);
         return postService.getPostById(postId)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new PostNotFoundException(postId));
@@ -50,18 +50,18 @@ public class PostController {
     // 게시글 삭제
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePostById(@PathVariable Long postId, HttpSession session) throws PostNotFoundException, UnauthorizedException {
-        log.info("[PostController] 게시글 삭제 - 게시글 ID: {}", postId);
+//        log.info("[PostController] 게시글 삭제 - 게시글 ID: {}", postId);
         postService.deletePostById(postId, session);
-        log.info("[PostController] 게시글 삭제 완료");
+//        log.info("[PostController] 게시글 삭제 완료");
         return ResponseEntity.noContent().build();
     }
 
     // 게시글 수정
     @PutMapping("/{postId}")
     public ResponseEntity<Post> updatePostById(@PathVariable Long postId, @RequestBody PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException {
-        log.info("[PostController] 게시글 수정 - 게시글 ID: {}", postId);
+//        log.info("[PostController] 게시글 수정 - 게시글 ID: {}", postId);
         Post updatedPost = postService.updatePost(postId, request, session);
-        log.info("[PostController] 게시글 수정 완료");
+//        log.info("[PostController] 게시글 수정 완료");
         return ResponseEntity.ok(updatedPost);
     }
 
