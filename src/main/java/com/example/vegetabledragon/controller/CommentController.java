@@ -59,12 +59,12 @@ public class CommentController {
         String sessionsUsername = (String) session.getAttribute("loggedInUser");
 
         try {
-            log.info("[CommentController] 댓글 번호 - {} 삭제, 권한 요청 사용자 - {}", commentId, sessionsUsername);
+//            log.info("[CommentController] 댓글 번호 - {} 삭제, 권한 요청 사용자 - {}", commentId, sessionsUsername);
             commentService.deleteComment(commentId, sessionsUsername, request.getPassword());
-            log.info("[CommentController] 댓글 번호 - {} 성공적으로 삭제", commentId);
+//            log.info("[CommentController] 댓글 번호 - {} 성공적으로 삭제", commentId);
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } catch (CommentNotPermissionException e) {
-            log.error("[CommentController] 댓글 번호 - {} 소유자가 아닌 사용자가 삭제 시도 - {}", commentId, sessionsUsername);
+//            log.error("[CommentController] 댓글 번호 - {} 소유자가 아닌 사용자가 삭제 시도 - {}", commentId, sessionsUsername);
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
