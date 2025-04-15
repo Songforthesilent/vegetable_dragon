@@ -27,11 +27,11 @@ public class MLController {
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
         String postContent = post.getContent();
-        log.info("[MLController] 게시글 내용 : {}", postContent);
+//        log.info("[MLController] 게시글 내용 : {}", postContent);
 
         // Flask API 호출
         Map<String, Object> result = mlService.predict(postContent);
-        log.debug("[MLController] Flask 응답: " + result);
+//        log.debug("[MLController] Flask 응답: " + result);
 
         return ResponseEntity.ok(result);
     }
