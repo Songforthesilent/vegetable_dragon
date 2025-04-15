@@ -8,5 +8,8 @@ import lombok.Setter;
 public class PostRequest {
     private String title;
     private String content;
+
+    public PostRequest(String postTitle, String postContent) {
+    }
 //    private String anonymousName; 직접 테이블에서 찾아오기로 수정
 }
