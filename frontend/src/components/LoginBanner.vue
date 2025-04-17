@@ -35,7 +35,7 @@ export default {
         email: '',
         password: ''
       },
-      userName: localStorage.getItem("username") || ''
+      userName: ''
     };
   },
   computed: {
@@ -44,8 +44,8 @@ export default {
     }
   },
   methods: {
-    login() {
-      fetch("http://localhost:8080/login", {
+    login() { // 8080 -> 8081로 변경
+      fetch("http://localhost:8081/join/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -61,17 +61,36 @@ export default {
           })
           .then((username) => {
             this.userName = username;
-            localStorage.setItem("username", username);
+            localStorage.setItem("username", username); // localstorage를 써서, UserLogin 에서도 username을 가져올 수 있도록 함.
             alert(`환영합니다, ${username}님!`);
           })
           .catch((err) => {
             alert("로그인 실패: " + err.message);
           });
     },
-    logout() {
-      localStorage.removeItem("username");
-      this.userName = '';
+    logout() { // 로그아웃 연결
+      fetch("http://localhost:8081/join/logout", {
+        method: "POST",
+        credentials: "include"
+      })
+      .then(() => {
+        localStorage.removeItem("username");
+        this.userName = '';
+      })
+
+    },
+    syncUserName() {
+      this.userName = localStorage.getItem("username") || '';
+
     }
+  },
+  mounted() {
+    this.syncUserName();
+    window.addEventListener("storage", this.syncUserName);
+
+  },
+  beforeMount() {
+    window.removeEventListener("storage", this.syncUserName);
   }
 };
 </script>
