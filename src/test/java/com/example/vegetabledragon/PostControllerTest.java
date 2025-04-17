@@ -3,6 +3,7 @@ package com.example.vegetabledragon;
 import com.example.vegetabledragon.controller.PostController;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.dto.PostRequest;
+import com.example.vegetabledragon.exception.InvalidPageSizeException;
 import com.example.vegetabledragon.service.PostService;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,13 +13,24 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
+
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -70,6 +82,68 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.authorUsername").value(loggedInUser));
 
         verify(postService, times(1)).createPost(eq(loggedInUser), any(PostRequest.class));
+
+    }
+
+    @Test
+    @DisplayName("게시글 리스트를 반환하는지 확인")
+    void getAllPosts_shoudReturnOKwithPosts() throws Exception{
+        // Given : 게시글 목록 임의 생성
+        List<Post>posts = List.of(
+                new Post("Post Title1", "Post Content1", "user1"),
+                new Post("Post Title2","Post Content2", "user2")
+        );
+        Page<Post> page = new PageImpl<>(posts, PageRequest.of(0, 10), posts.size());
+
+        // when : postService가 해당 page를 반환
+        given(postService.getAllPosts(0, 10)).willReturn(page);
+
+        // then
+        mockMvc.perform(get("/posts")
+                .param("page", "0")
+                .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].title").value("Post Title1"))
+                .andExpect(jsonPath("$.content[1].title").value("Post Title2"));
+    }
+
+    @Test
+    @DisplayName("페이지네이션으로 각각 다른 페이지의 게시글을 반환하는지 확인")
+    void getAllPosts_shoudReturnDifferentPages() throws Exception{
+        List<Post> allPosts = List.of(
+                new Post("Post Title1", "Post Content1", "user1"),
+                new Post("Post Title2","Post Content2", "user2")
+        );
+
+        int size = 1;
+
+        int page0 = 0;
+        List<Post> contentPage0 = allPosts.subList(page0, size);
+        Page<Post> pageResult0 = new PageImpl<>(contentPage0, PageRequest.of(page0, size), allPosts.size());
+
+        given(postService.getAllPosts(page0, size)).willReturn(pageResult0);
+
+        mockMvc.perform(get("/posts")
+                .param("page", String.valueOf(page0))
+                .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Post Title1"))
+                .andExpect(jsonPath("$.content.length()").value(1));
+
+        int page1 = 1;
+        List<Post> contentPage1 = allPosts.subList(page1, size + 1);
+        Page<Post> pageResult1 = new PageImpl<>(contentPage1, PageRequest.of(page1, size), allPosts.size());
+
+        given(postService.getAllPosts(page1, size)).willReturn(pageResult1);
+
+        mockMvc.perform(get("/posts")
+                        .param("page", String.valueOf(page1))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Post Title2"))
+                .andExpect(jsonPath("$.content.length()").value(1));
+
 
     }
 
