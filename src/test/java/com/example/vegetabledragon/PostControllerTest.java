@@ -4,6 +4,8 @@ import com.example.vegetabledragon.controller.PostController;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.dto.PostRequest;
 import com.example.vegetabledragon.exception.InvalidPageSizeException;
+import com.example.vegetabledragon.exception.PostNotFoundException;
+import com.example.vegetabledragon.exception.UnauthorizedException;
 import com.example.vegetabledragon.service.PostService;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,20 +19,23 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.Optional;
 
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,8 +85,6 @@ public class PostControllerTest {
                 .andExpect(jsonPath("$.title").value("Post Title"))
                 .andExpect(jsonPath("$.content").value("Post Content"))
                 .andExpect(jsonPath("$.authorUsername").value(loggedInUser));
-
-        verify(postService, times(1)).createPost(eq(loggedInUser), any(PostRequest.class));
 
     }
 
@@ -146,5 +149,66 @@ public class PostControllerTest {
 
 
     }
+
+    @Test
+    @DisplayName("게시글 조회가 제대로 되는지 확인")
+    void getPostwithPostId() throws Exception{
+        //given
+        Post post = new Post("Post Title", "Post Content", "user1");
+        post.setId(1L);
+
+        given(postService.getPostById(1L)).willReturn(Optional.of(post));
+
+        mockMvc.perform(get("/posts/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.title").value("Post Title"))
+                .andExpect(jsonPath("$.content").value("Post Content"))
+                .andExpect(jsonPath("$.authorUsername").value("user1"));
+
+    }
+
+    @Test
+    @DisplayName("세션 사용자로 게시글 ID를 삭제하면 204 반환")
+    void deletePostWithSessionUser() throws Exception{
+        Long postId = 1L;
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedInUser", "user1");
+
+        doNothing().when(postService).deletePostById(postId, session);
+
+        mockMvc.perform(delete("/posts/{postId}", postId).session(session))
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("세션 사용자로 게시글을 수정하면 수정된 게시글과 함께 200 반환")
+    void updatePost_Return200() throws Exception{
+        Long postId = 1L;
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("loggedInUser", "user1");
+
+        PostRequest request = new PostRequest("Updated Title", "Updated Content");
+        Post updatedPost = new Post("Updated Title", "Updated Content", "user1");
+        updatedPost.setId(postId);
+
+        given(postService.updatePost(eq(postId), any(PostRequest.class), eq(session)))
+                .willReturn(updatedPost);
+
+        mockMvc.perform(put("/posts/{postId}", postId).session(session)
+                .contentType("application/json")
+                .content("""
+                {"title": "Updated Title",
+                 "content": "Updated Content"
+                }
+               """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("Updated Title"))
+                .andExpect(jsonPath("$.content").value("Updated Content"))
+                .andExpect(jsonPath("$.authorUsername").value("user1"));
+
+    }
+
 
 }

@@ -12,10 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.context.bean.override.convention.TestBean;
 
 import java.util.Optional;
 
-
+// 예외도 발생하는지 처리해야한다.
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
@@ -92,4 +93,5 @@ public class PostServiceImpl implements PostService {
         // 업데이트된 게시물 저장
         return postRepository.save(post);
     }
+
 }
