@@ -46,6 +46,8 @@ export default {
 
         // 서버 응답이 성공 형태인지 확인 (서버 응답 구조에 따라 조정)
         if (result.success !== false) {
+          const username = result.username || this.email;
+          localStorage.setItem('username', username);
           alert('로그인 성공!');
           this.$router.push('/');
         } else {
@@ -99,7 +101,7 @@ p {
   justify-content: center;
 }
 
-.form-wrapper{
+.form-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;

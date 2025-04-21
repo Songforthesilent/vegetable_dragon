@@ -43,6 +43,16 @@ public class JoinController {
             return ResponseEntity.ok("로그아웃 성공");
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인 상태가 아닙니다.");
+    }
 
+    // 로그인 세션 확인 API(프론트에서 앱 시작 시 호출)
+    @GetMapping("/session")
+    public ResponseEntity<String> getSessionUser(HttpSession session) {
+        String username = (String) session.getAttribute("loggedInUser");
+        if (username != null) {
+            return ResponseEntity.ok(username);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 실패");
+        }
     }
 }
