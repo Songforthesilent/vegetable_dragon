@@ -35,7 +35,7 @@ export default {
         email: '',
         password: ''
       },
-      userName: localStorage.getItem("username") || ''
+      userName: ''
     };
   },
   computed: {
@@ -44,8 +44,8 @@ export default {
     }
   },
   methods: {
-    login() {
-      fetch("http://localhost:8080/login", {
+    login() { // 8080 -> 8081로 변경
+      fetch("http://localhost:8081/join/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -61,17 +61,36 @@ export default {
           })
           .then((username) => {
             this.userName = username;
-            localStorage.setItem("username", username);
+            localStorage.setItem("username", username); // localstorage를 써서, UserLogin 에서도 username을 가져올 수 있도록 함.
             alert(`환영합니다, ${username}님!`);
           })
           .catch((err) => {
             alert("로그인 실패: " + err.message);
           });
     },
-    logout() {
-      localStorage.removeItem("username");
-      this.userName = '';
+    logout() { // 로그아웃 연결
+      fetch("http://localhost:8081/join/logout", {
+        method: "POST",
+        credentials: "include"
+      })
+          .then(() => {
+            localStorage.removeItem("username");
+            this.userName = '';
+          })
+
+    },
+    syncUserName() {
+      this.userName = localStorage.getItem("username") || '';
+
     }
+  },
+  mounted() {
+    this.syncUserName();
+    window.addEventListener("storage", this.syncUserName);
+
+  },
+  beforeMount() {
+    window.removeEventListener("storage", this.syncUserName);
   }
 };
 </script>
@@ -100,7 +119,7 @@ export default {
 
 .user-icon {
   font-size: 80px;
-  color:#3A4CA4;
+  color: #3A4CA4;
   margin-top: 30px;
 }
 
@@ -116,10 +135,10 @@ h3 {
 
 .icon {
   position: absolute;
-  left: 10px;  /* 아이콘을 input의 왼쪽에 배치 */
+  left: 10px; /* 아이콘을 input의 왼쪽에 배치 */
   top: 50%;
   transform: translateY(-85%); /* 수직 가운데 정렬 */
-  color: #939393;  /* 아이콘 색상 */
+  color: #939393; /* 아이콘 색상 */
 }
 
 .input-field {
@@ -137,6 +156,7 @@ h3 {
 .password {
   color: #939393;
 }
+
 .login-button {
   background-color: #3A4CA4;
   color: white;
