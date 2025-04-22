@@ -27,7 +27,7 @@ public class MLServiceImpl implements MLService {
 
     @Override
     public Map<String, Object> predict(String text) {
-        log.info("[Spring Boot] MLService, predict 실행 응답: " + text);
+//        log.info("[Spring Boot] MLService, predict 실행 응답: " + text);
 
 
         // Header 설정
@@ -42,7 +42,7 @@ public class MLServiceImpl implements MLService {
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonBody = objectMapper.writeValueAsString(requestBody);
-            log.info("Generated Request Body: " + jsonBody);
+//            log.info("Generated Request Body: " + jsonBody);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -52,12 +52,12 @@ public class MLServiceImpl implements MLService {
 
         // Flask API 호출 (POST 요청)
         try {
-            log.debug("[Spring Boot] Flask로 요청을 보냅니다: " + flaskApiUrl);
+//            log.debug("[Spring Boot] Flask로 요청을 보냅니다: " + flaskApiUrl);
             Map response = restTemplate.postForObject(flaskApiUrl, request, Map.class);
-            log.info("[Spring Boot] Flask 응답: " + response);
+//            log.info("[Spring Boot] Flask 응답: " + response);
             return response;
         } catch (Exception e) {
-            log.warn("[Spring Boot] Flask 요청 실패: " + e.getMessage());
+//            log.warn("[Spring Boot] Flask 요청 실패: " + e.getMessage());
             throw new MLServiceException("Flask 요청 실패", e);
         }
     }

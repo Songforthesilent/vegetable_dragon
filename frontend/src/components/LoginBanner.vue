@@ -73,11 +73,10 @@ export default {
         method: "POST",
         credentials: "include"
       })
-          .then(() => {
-            localStorage.removeItem("username");
-            this.userName = '';
-          })
-
+      .then(() => {
+        localStorage.removeItem("username");
+        this.userName = '';
+      }) 
     },
     syncUserName() {
       this.userName = localStorage.getItem("username") || '';

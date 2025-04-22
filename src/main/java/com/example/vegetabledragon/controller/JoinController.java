@@ -30,7 +30,7 @@ public class JoinController {
         String username = joinService.login(loginForm);
         if (username != null) {
             session.setAttribute("loggedInUser", username); // 세션에 로그인한 사용자 저장
-            return ResponseEntity.ok("로그인 성공");
+            return ResponseEntity.ok(username);
         }
         return ResponseEntity.status(401).body("로그인 실패");
     }
