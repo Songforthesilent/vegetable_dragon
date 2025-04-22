@@ -101,7 +101,7 @@ p {
   justify-content: center;
 }
 
-.form-wrapper{
+.form-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;

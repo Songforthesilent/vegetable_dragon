@@ -76,8 +76,7 @@ export default {
       .then(() => {
         localStorage.removeItem("username");
         this.userName = '';
-      })
-
+      }) 
     },
     syncUserName() {
       this.userName = localStorage.getItem("username") || '';
@@ -119,7 +118,7 @@ export default {
 
 .user-icon {
   font-size: 80px;
-  color:#3A4CA4;
+  color: #3A4CA4;
   margin-top: 30px;
 }
 
@@ -135,10 +134,10 @@ h3 {
 
 .icon {
   position: absolute;
-  left: 10px;  /* 아이콘을 input의 왼쪽에 배치 */
+  left: 10px; /* 아이콘을 input의 왼쪽에 배치 */
   top: 50%;
   transform: translateY(-85%); /* 수직 가운데 정렬 */
-  color: #939393;  /* 아이콘 색상 */
+  color: #939393; /* 아이콘 색상 */
 }
 
 .input-field {
@@ -156,6 +155,7 @@ h3 {
 .password {
   color: #939393;
 }
+
 .login-button {
   background-color: #3A4CA4;
   color: white;
