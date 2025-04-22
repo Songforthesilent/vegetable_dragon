@@ -35,7 +35,6 @@
         </button>
       </div>
 
-
       <p>투표 결과</p>
       <!-- 투표 퍼센트 바 (클릭 가능) -->
       <div class="progress-bar" @click="handleVote">
@@ -173,7 +172,7 @@ export default {
       const dummyData = {
         id: this.$route.params.id,
         title: "Vue.js 게시판 상세 페이지",
-        content: "이 글은 Vue.js 게시판 상세 페이지를 설명합니다.",
+        content: "이 글은 Vue.js 게aa시판 상세 페이지를 설명합니다.",
         author: "관리자",
         created_at: "2025-03-19",
         profileImage: "https://via.placeholder.com/50",
