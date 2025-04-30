@@ -1,139 +1,153 @@
 <template>
   <div class="board-detail">
-    <!-- 작성자 정보 -->
-    <div class="author-info">
-      <img :src="article.profileImage" alt="Profile" class="profile-img" />
-      <div>
-        <h4 class="author-name">{{ article.author }}</h4>
-        <p class="date">{{ article.created_at }}</p>
-      </div>
-
-      <!-- 더보기 버튼 -->
-      <div class="more-options">
-        <button @click="toggleMoreOptions">⋮</button>
-        <div v-if="showMoreOptions" class="options-dropdown">
-          <button @click="openEditPostPasswordModal">수정</button>
-          <button @click="openDeletePostPasswordModal">삭제</button>
-        </div>
-      </div>
+    <!-- 로딩 인디케이터 -->
+    <div v-if="loading" class="loading-indicator">
+      데이터를 불러오는 중입니다...
     </div>
 
-    <!-- 제목 및 내용 -->
-    <div class="article-content">
-      <h2>{{ article.title }}</h2>
-      <p>{{ article.content }}</p>
-      <a :href="article.link" target="_blank" class="article-link">기사 원문 보기</a>
-    </div>
-
-    <div class="vote-section">
-      <div class="vote-button">
-        <button @click="vote('agree')" :class="{ 'active-agree': voteType === 'agree' }">
-          👍 진짜뉴스이다. ({{ getVotePercentage(agreeVotes) }}%)
-        </button>
-        <button @click="vote('disagree')" :class="{ 'active-disagree': voteType === 'disagree' }">
-          👎 가짜뉴스이다. ({{ getVotePercentage(disagreeVotes) }}%)
-        </button>
-      </div>
-
-      <p>투표 결과</p>
-      <!-- 투표 퍼센트 바 (클릭 가능) -->
-      <div class="progress-bar" @click="handleVote">
-        <div
-            class="agree-bar"
-            :style="{ width: getVotePercentage(agreeVotes) + '%' }"
-            data-vote="agree">
-          <span v-if="agreeVotes > 0" class="progress-text">
-            {{ getVotePercentage(agreeVotes) }}%
-          </span>
+    <div v-else>
+      <!-- 작성자 정보 -->
+      <div class="author-info">
+        <img src="https://via.placeholder.com/50" alt="Profile" class="profile-img" />
+        <div>
+          <h4 class="author-name">{{ article.authorUsername }}</h4>
+          <p class="date">{{ formatDate(article.createdAt) }}</p>
         </div>
 
-        <div
-            class="disagree-bar"
-            :style="{ width: getVotePercentage(disagreeVotes) + '%' }"
-            data-vote="disagree">
-              <span v-if="disagreeVotes > 0" class="progress-text">
-                {{ getVotePercentage(disagreeVotes) }}%
-              </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 댓글 -->
-    <div class="comments-section">
-      <h3>댓글</h3>
-      <div class="comment-input">
-        <textarea v-model="newComment" placeholder="댓글을 입력하세요"></textarea>
-        <div class="comment-actions">
-          <input type="password" v-model="commentPassword" placeholder="비밀번호 입력" />
-          <button @click="addComment">등록</button>
-        </div>
-      </div>
-
-      <ul>
-        <li v-for="(comment, index) in comments" :key="index">
-          <div class="comment-text">
-            <strong>{{ comment.user }}</strong>: {{ comment.text }}
-            <span class="comment-timestamp">{{ comment.timestamp }}</span>
+        <!-- 더보기 버튼 -->
+        <div class="more-options">
+          <button @click="toggleMoreOptions">⋮</button>
+          <div v-if="showMoreOptions" class="options-dropdown">
+            <button @click="openEditPostPasswordModal">수정</button>
+            <button @click="openDeletePostPasswordModal">삭제</button>
           </div>
-          <div class="comment-buttons">
-            <button @click="openEditCommentModal(index)">수정</button>
-            <button @click="openDeleteCommentModal(index)">삭제</button>
+        </div>
+      </div>
+
+      <!-- 제목 및 내용 -->
+      <div class="article-content">
+        <h2>{{ article.title }}</h2>
+        <p>{{ article.content }}</p>
+        <a :href="article.link" target="_blank" class="article-link" v-if="article.link">기사 원문 보기</a>
+      </div>
+
+      <div class="vote-section">
+        <div class="vote-button">
+          <button @click="vote('agree')" :class="{ 'active-agree': voteType === 'agree' }">
+            👍 진짜뉴스이다. ({{ getVotePercentage(agreeVotes) }}%)
+          </button>
+          <button @click="vote('disagree')" :class="{ 'active-disagree': voteType === 'disagree' }">
+            👎 가짜뉴스이다. ({{ getVotePercentage(disagreeVotes) }}%)
+          </button>
+        </div>
+
+        <p>투표 결과</p>
+        <!-- 투표 퍼센트 바 (클릭 가능) -->
+        <div class="progress-bar" @click="handleVote">
+          <div
+              class="agree-bar"
+              :style="{ width: getVotePercentage(agreeVotes) + '%' }"
+              data-vote="agree">
+            <span v-if="agreeVotes > 0" class="progress-text">
+              {{ getVotePercentage(agreeVotes) }}%
+            </span>
           </div>
-        </li>
-      </ul>
-    </div>
 
-    <!-- 비밀번호 입력 모달 (게시글 수정) -->
-    <div v-if="editPostPasswordModal" class="modal">
-      <p>게시글 수정 비밀번호 입력</p>
-      <input type="password" v-model="editPostPassword" placeholder="비밀번호 입력" />
-      <button @click="confirmEditPost">확인</button>
-      <button @click="closeEditPostPasswordModal">취소</button>
-    </div>
-
-    <!-- 게시글 수정 모달 -->
-    <div v-if="editPostModal" class="modal">
-      <p>게시글 수정</p>
-      <input type="text" v-model="article.title" placeholder="제목 입력" />
-      <textarea v-model="article.content" placeholder="내용 입력"></textarea>
-      <button @click="saveEditPost">저장</button>
-      <button @click="editPostModal = false">취소</button>
-    </div>
-
-    <!-- 비밀번호 입력 모달 (게시글 삭제) -->
-    <div v-if="deletePostPasswordModal" class="modal">
-      <p>게시글 삭제 비밀번호 입력</p>
-      <input type="password" v-model="deletePostPassword" placeholder="비밀번호 입력" />
-      <button @click="confirmDeletePost">삭제</button>
-      <button @click="deletePostPasswordModal = false">취소</button>
-    </div>
-
-    <!-- 댓글 수정 비밀번호 입력 모달 -->
-    <div v-if="editingCommentIndex !== null && !confirmingEditComment" class="modal">
-      <p>수정할 댓글의 비밀번호를 입력하세요</p>
-      <input type="password" v-model="editCommentPassword" placeholder="비밀번호 입력" />
-      <div>
-        <button class="confirm-btn" @click="confirmEditComment">확인</button>
-        <button class="cancel-btn" @click="cancelEditComment">취소</button>
+          <div
+              class="disagree-bar"
+              :style="{ width: getVotePercentage(disagreeVotes) + '%' }"
+              data-vote="disagree">
+                <span v-if="disagreeVotes > 0" class="progress-text">
+                  {{ getVotePercentage(disagreeVotes) }}%
+                </span>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- 댓글 수정 모달 -->
-    <div v-if="confirmingEditComment && editingCommentIndex !== null" class="modal">
-      <p>수정할 댓글 내용을 입력하세요:</p>
-      <textarea v-model="editCommentText" placeholder="수정할 댓글 내용"></textarea>
-      <div>
-        <button class="confirm-btn" @click="saveEditComment">수정 저장</button>
-        <button class="cancel-btn" @click="cancelEditComment">취소</button>
+      <!-- 댓글 -->
+      <div class="comments-section">
+        <h3>댓글</h3>
+        <div class="comment-input">
+          <textarea v-model="newComment" placeholder="댓글을 입력하세요"></textarea>
+          <div class="comment-actions">
+            <input type="password" v-model="commentPassword" placeholder="비밀번호 입력" />
+            <button @click="addComment">등록</button>
+          </div>
+        </div>
+
+        <ul>
+          <li v-for="(comment, index) in comments" :key="comment.id || index">
+            <div class="comment-text">
+              <strong>{{ comment.user }}</strong>: {{ comment.text }}
+              <span class="comment-timestamp">{{ comment.timestamp }}</span>
+            </div>
+            <div class="comment-buttons">
+              <button @click="openEditCommentModal(index)">수정</button>
+              <button @click="openDeleteCommentModal(index)">삭제</button>
+            </div>
+          </li>
+        </ul>
       </div>
-    </div>
 
-    <!-- 댓글 삭제 확인 모달 -->
-    <div v-if="deletingCommentIndex !== null" class="modal">
-      <p>댓글 삭제 비밀번호를 입력하세요</p>
-      <input type="password" v-model="deleteCommentPassword" placeholder="비밀번호 입력" />
-      <button @click="confirmDeleteComment">삭제</button>
-      <button @click="cancelDeleteComment">취소</button>
+      <!-- 비밀번호 입력 모달 (게시글 수정) -->
+      <div v-if="editPostPasswordModal" class="modal">
+        <p>게시글 수정 비밀번호 입력</p>
+        <input type="password" v-model="editPostPassword" placeholder="비밀번호 입력" />
+        <button @click="confirmEditPost">확인</button>
+        <button @click="closeEditPostPasswordModal">취소</button>
+      </div>
+
+      <!-- 게시글 수정 모달 -->
+      <div v-if="editPostModal" class="modal">
+        <p>게시글 수정</p>
+        <input type="text" v-model="article.title" placeholder="제목 입력" />
+        <textarea v-model="article.content" placeholder="내용 입력"></textarea>
+        <button @click="saveEditPost">저장</button>
+        <button @click="editPostModal = false">취소</button>
+      </div>
+
+      <!-- 비밀번호 입력 모달 (게시글 삭제) -->
+      <div v-if="deletePostPasswordModal" class="modal">
+        <p>게시글 삭제 비밀번호 입력</p>
+        <input type="password" v-model="deletePostPassword" placeholder="비밀번호 입력" />
+        <button @click="confirmDeletePost">삭제</button>
+        <button @click="deletePostPasswordModal = false">취소</button>
+      </div>
+
+      <!-- 댓글 수정 비밀번호 입력 모달 -->
+      <div v-if="editingCommentIndex !== null && !confirmingEditComment" class="modal">
+        <p>수정할 댓글의 비밀번호를 입력하세요</p>
+        <input type="password" v-model="editCommentPassword" placeholder="비밀번호 입력" />
+        <div>
+          <button class="confirm-btn" @click="confirmEditComment">확인</button>
+          <button class="cancel-btn" @click="cancelEditComment">취소</button>
+        </div>
+      </div>
+
+      <!-- 댓글 수정 모달 -->
+      <div v-if="confirmingEditComment && editingCommentIndex !== null" class="modal">
+        <p>수정할 댓글 내용을 입력하세요:</p>
+        <textarea v-model="editCommentText" placeholder="수정할 댓글 내용"></textarea>
+        <div>
+          <button class="confirm-btn" @click="saveEditComment">수정 저장</button>
+          <button class="cancel-btn" @click="cancelEditComment">취소</button>
+        </div>
+      </div>
+
+      <!-- 댓글 삭제 확인 모달 -->
+      <div v-if="deletingCommentIndex !== null" class="modal">
+        <p>댓글 삭제 비밀번호를 입력하세요</p>
+        <input type="password" v-model="deleteCommentPassword" placeholder="비밀번호 입력" />
+        <div>
+          <button class="confirm-btn" @click="confirmDeleteComment">삭제</button>
+          <button class="cancel-btn" @click="cancelDeleteComment">취소</button>
+        </div>
+      </div>
+
+      <!-- API 작업 중 로딩 오버레이 -->
+      <div v-if="apiLoading" class="api-loading-overlay">
+        <div class="api-loading-spinner">처리 중...</div>
+      </div>
     </div>
   </div>
 </template>
@@ -144,6 +158,10 @@ export default {
   data() {
     return {
       article: {},
+      loading: true,
+      apiLoading: false, // API 요청 중 로딩 상태
+      error: null,
+      showMoreOptions: false, // 더보기 옵션 표시 여부
       voteType: null,
       newComment: "",
       commentPassword: "",
@@ -162,7 +180,8 @@ export default {
       deleteCommentPassword: "",
       agreeVotes: 0,
       disagreeVotes: 0,
-      totalVotes: 0
+      totalVotes: 0,
+      apiBaseUrl: "http://localhost:8081" // API 기본 URL
     };
   },
   mounted() {
@@ -171,12 +190,16 @@ export default {
     this.fetchComments(); // 게시글에 대한 댓글 목록 가져오기
   },
   methods: {
+    toggleMoreOptions() {
+      this.showMoreOptions = !this.showMoreOptions;
+    },
     async fetchComments(){
       try {
         const postId = this.$route.params.id;
-        const response = await axios.get(`/posts/${postId}/comments`);
+        const response = await axios.get(`${this.apiBaseUrl}/posts/${postId}/comments`);
 
         this.comments = response.data.map(comment => ({
+          id: comment.id, // 댓글 ID 추가
           user: comment.writer,
           text: comment.comment,
           timestamp: new Date(comment.createdAt).toLocaleString(),
@@ -184,19 +207,64 @@ export default {
         }));
       } catch (error){
         console.error("댓글 불러오기 실패 : ", error);
+        // 댓글 불러오기 실패 시 빈 배열로 초기화
+        this.comments = [];
       }
     },
-    getArticleDetail() {
-      const dummyData = {
-        id: this.$route.params.id,
-        title: "Vue.js 게시판 상세 페이지",
-        content: "이 글은 Vue.js 게aa시판 상세 페이지를 설명합니다.",
-        author: "관리자",
-        created_at: "2025-03-19",
-        profileImage: "https://via.placeholder.com/50",
-        link: "https://example.com"
-      };
-      this.article = dummyData;
+    async getArticleDetail() {
+      this.loading = true;
+      try {
+        const postId = this.$route.params.id;
+        const response = await axios.get(`${this.apiBaseUrl}/posts/${postId}`);
+
+        // API 응답 데이터를 article 객체에 매핑
+        this.article = {
+          id: response.data.id,
+          title: response.data.title,
+          content: response.data.content,
+          authorUsername: response.data.authorUsername,
+          createdAt: response.data.createdAt
+        };
+
+        this.loading = false;
+      } catch (error) {
+        console.error("게시글 상세 정보 불러오기 실패:", error);
+        this.error = "게시글을 불러오는 중 오류가 발생했습니다.";
+
+        // API 호출 실패 시 더미 데이터 사용
+        this.article = {
+          id: this.$route.params.id,
+          title: "게시글을 불러올 수 없습니다.",
+          content: "서버에서 게시글 정보를 가져오는 중 오류가 발생했습니다.",
+          authorUsername: "알 수 없음",
+          createdAt: new Date().toISOString()
+        };
+
+        this.loading = false;
+      }
+    },
+    formatDate(dateString) {
+      if (!dateString) return '';
+
+      try {
+        const date = new Date(dateString);
+
+        // 유효한 날짜인지 확인
+        if (isNaN(date.getTime())) {
+          return dateString;
+        }
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+      } catch (e) {
+        console.error('날짜 형식 변환 오류:', e);
+        return dateString;
+      }
     },
     vote(type) {
       if (type === "agree") {
@@ -215,32 +283,46 @@ export default {
       }
     },
     getVotePercentage(voteCount) {
-      if (this.totalVotes === 0) return "50%";
+      if (this.totalVotes === 0) return 50;
       return ((voteCount / this.totalVotes) * 100).toFixed(1);
     },
     addComment() {
-      if (!this.newComment.trim() || !this.commentPassword.trim()) {
-        alert("댓글과 비밀번호를 입력하세요!");
+      if (!this.newComment.trim()) {
+        alert("댓글을 입력하세요!");
         return;
       }
 
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, "0");
-      const day = String(now.getDate()).padStart(2, "0");
-      const hours = String(now.getHours()).padStart(2, "0");
-      const minutes = String(now.getMinutes()).padStart(2, "0");
-      const seconds = String(now.getSeconds()).padStart(2, "0");
+      // 로그인된 경우: anonymousName 사용, 비밀번호 입력 무시
+      if (this.isLoggedIn) {
+        const now = new Date();
+        const formattedDate = now.toISOString().replace("T", " ").slice(0, 19);
 
-      const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        this.comments.push({
+          user: this.user.anonymousName || "익명",
+          text: this.newComment,
+          password: null, // 비밀번호 저장 안 함
+          timestamp: formattedDate
+        });
 
-      this.comments.push({
-        user: "익명",
-        text: this.newComment,
-        password: this.commentPassword,
-        timestamp: formattedDate
-      });
+      } else {
+        // 비로그인: 비밀번호 필수
+        if (!this.commentPassword.trim()) {
+          alert("비밀번호를 입력하세요!");
+          return;
+        }
 
+        const now = new Date();
+        const formattedDate = now.toISOString().replace("T", " ").slice(0, 19);
+
+        this.comments.push({
+          user: "익명",
+          text: this.newComment,
+          password: this.commentPassword,
+          timestamp: formattedDate
+        });
+      }
+
+      // 입력값 초기화
       this.newComment = "";
       this.commentPassword = "";
     },
@@ -301,12 +383,59 @@ export default {
       this.deletingCommentIndex = index;
       this.deleteCommentPassword = "";
     },
-    confirmDeleteComment() {
-      if (this.deleteCommentPassword === this.comments[this.deletingCommentIndex].password) {
-        this.comments.splice(this.deletingCommentIndex, 1);
+    async confirmDeleteComment() {
+      try {
+        const commentIndex = this.deletingCommentIndex;
+        const comment = this.comments[commentIndex];
+
+        // 댓글 ID가 없는 경우 (로컬에서만 추가된 댓글)
+        if (!comment.id) {
+          if (this.deleteCommentPassword === comment.password) {
+            this.comments.splice(commentIndex, 1);
+            this.cancelDeleteComment();
+          } else {
+            alert("비밀번호가 일치하지 않습니다!");
+          }
+          return;
+        }
+
+        // API 호출 시작 - 로딩 상태 활성화
+        this.apiLoading = true;
+
+        const postId = this.$route.params.id;
+        const commentId = comment.id;
+
+        // 익명 사용자는 비밀번호 전송
+        const requestBody = { password: this.deleteCommentPassword };
+
+        // DELETE 요청 보내기
+        await axios.delete(`${this.apiBaseUrl}/posts/${postId}/comments/${commentId}`, {
+          data: requestBody // DELETE 요청의 body는 data 속성으로 전달
+        });
+
+        // 성공 시 UI에서 댓글 제거
+        this.comments.splice(commentIndex, 1);
+        alert("댓글이 삭제되었습니다.");
+
+      } catch (error) {
+        console.error("댓글 삭제 실패:", error);
+
+        // 서버 응답에 따른 에러 메시지 표시
+        if (error.response) {
+          if (error.response.status === 401 || error.response.status === 403) {
+            alert("비밀번호가 일치하지 않거나 삭제 권한이 없습니다.");
+          } else if (error.response.status === 404) {
+            alert("댓글을 찾을 수 없습니다.");
+          } else {
+            alert(`댓글 삭제 중 오류가 발생했습니다: ${error.response.data.message || '알 수 없는 오류'}`);
+          }
+        } else {
+          alert("서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.");
+        }
+      } finally {
+        // API 호출 종료 - 로딩 상태 비활성화
+        this.apiLoading = false;
         this.cancelDeleteComment();
-      } else {
-        alert("비밀번호가 일치하지 않습니다!");
       }
     },
     cancelDeleteComment() {

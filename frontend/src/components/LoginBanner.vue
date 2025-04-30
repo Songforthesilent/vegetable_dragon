@@ -78,7 +78,7 @@ export default {
       .then(() => {
         localStorage.removeItem("username");
         this.userName = '';
-      }) 
+      })
     },
     syncUserName() {
       this.userName = localStorage.getItem("username") || '';
