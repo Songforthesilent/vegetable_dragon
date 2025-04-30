@@ -139,6 +139,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -165,9 +166,26 @@ export default {
     };
   },
   mounted() {
+    console.log("[DEBUG] 현재 게시글 ID: ", this.$route.params.id);
     this.getArticleDetail();
+    this.fetchComments(); // 게시글에 대한 댓글 목록 가져오기
   },
   methods: {
+    async fetchComments(){
+      try {
+        const postId = this.$route.params.id;
+        const response = await axios.get(`/posts/${postId}/comments`);
+
+        this.comments = response.data.map(comment => ({
+          user: comment.writer,
+          text: comment.comment,
+          timestamp: new Date(comment.createdAt).toLocaleString(),
+          password: ""
+        }));
+      } catch (error){
+        console.error("댓글 불러오기 실패 : ", error);
+      }
+    },
     getArticleDetail() {
       const dummyData = {
         id: this.$route.params.id,

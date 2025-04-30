@@ -48,6 +48,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   data() {
     return {
@@ -62,8 +63,13 @@ export default {
     };
   },
   methods: {
-    fnSubmit() {
+    async fnSubmit() {
       // 익명 작성 시 작성자 필드를 '익명'으로 ㅓㄹ정
+      if (!this.post.title.trim() || !this.post.content.trim()){
+        alert("제목과 내용을 입력해주세요!");
+        return;
+      }
+
       if (this.post.isAnonymous) {
         this.post.author ='익명';
       }
@@ -73,13 +79,35 @@ export default {
         alert("비밀번호를 입력해주세요!");
         return;
       }
+      // 비로그인 사용자는 작성 불가(세션 기반)
+      try{
+        // 게시글 등록 요청
+        const response = await axios.post(
+            "http://localhost:8081/posts",
+            {
+              title: this.post.title,
+              content: this.post.content
+            },
+            {
+              withCredentials: true // 세션 쿠키
+            }
+        );
+        // 백엔드에 게시글 저장 요청을 보내는 코드 (추후 API 연동 필요)
+        const createdPost = response.data;
+        console.log("게시글 데이터:", this.post);
+        alert('게시글이 등록되었습니다!');
+        // 게시글 작성 완료 후 목록 페이지로 이동
+        this.$router.push(`/board/view/${createdPost.id}`);
+      }
+      catch(error){
+        if (error.response?.status === 401){
+          alert("로그인이 필요합니다.");
+        } else{
+          console.error("게시글 작성 실패 : ", error);
+          alert("게시글 등록에 실패했습니다.");
+        }
+      }
 
-      // 백엔드에 게시글 저장 요청을 보내는 코드 (추후 API 연동 필요)
-      console.log("게시글 데이터:", this.post);
-
-      // 게시글 작성 완료 후 목록 페이지로 이동
-      alert('게시글이 등록되었습니다!');
-      this.$router.push('/board/list');
     },
     fnCancel() {
       // 취소 버튼 클릭 시 게시글 목록 페이지로 이동
