@@ -37,33 +37,33 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(row, idx) in list" :key="idx">
-              <td>{{ row.idx }}</td>
-              <td><a @click="fnView(row.idx)">{{ row.title }}</a></td>
-              <td>{{ row.author }}</td>
-              <td>{{ row.created_at }}</td>
-            </tr>
+              <tr v-for="post in posts" :key="post.id">
+                <td>{{ post.id }}</td>
+                <td><a @click="fnView(post.id)">{{ post.title }}</a></td>
+                <td>{{ post.authorUsername }}</td>
+                <td>{{ formatDate(post.createdAt) }}</td>
+              </tr>
             </tbody>
           </table>
         </section>
 
         <!-- 페이지네이션 -->
-        <div class="pagination w3-bar w3-padding-16 w3-small" v-if="paging.total_list_cnt > 0">
+        <div class="pagination w3-bar w3-padding-16 w3-small" v-if="totalElements > 0">
           <span class="pg">
-            <a href="javascript:;" @click="fnPage(1)" class="first w3-button w3-border">&lt;&lt;</a>
-            <a href="javascript:;" v-if="paging.start_page > 10" @click="fnPage(paging.start_page - 1)"
+            <a href="javascript:;" @click="fnPage(0)" class="first w3-button w3-border">&lt;&lt;</a>
+            <a href="javascript:;" v-if="currentPage > 0" @click="fnPage(currentPage - 1)"
                class="prev w3-button w3-border">&lt;</a>
-            <template v-for="(n, index) in pagination()">
-              <template v-if="paging.page == n">
-                <strong class="w3-button w3-border w3-green" :key="index">{{ n }}</strong>
+            <template v-for="n in pagination">
+              <template v-if="currentPage === n">
+                <strong class="w3-button w3-border w3-green" :key="n">{{ n + 1 }}</strong>
               </template>
               <template v-else>
-                <a class="w3-button w3-border" href="javascript:;" @click="fnPage(n)" :key="index">{{ n }}</a>
+                <a class="w3-button w3-border" href="javascript:;" @click="fnPage(n)" :key="n">{{ n + 1 }}</a>
               </template>
             </template>
-            <a href="javascript:;" v-if="paging.total_page_cnt > paging.end_page" @click="fnPage(paging.end_page + 1)"
+            <a href="javascript:;" v-if="currentPage < totalPages - 1" @click="fnPage(currentPage + 1)"
                class="next w3-button w3-border">&gt;</a>
-            <a href="javascript:;" @click="fnPage(paging.total_page_cnt)" class="last w3-button w3-border">&gt;&gt;</a>
+            <a href="javascript:;" @click="fnPage(totalPages - 1)" class="last w3-button w3-border">&gt;&gt;</a>
           </span>
         </div>
       </article>
@@ -72,92 +72,100 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
-      list: [], // 게시글 목록
-      paging: {
-        block: 0,
-        end_page: 0,
-        next_block: 0,
-        page: 1, // 기본 페이지
-        page_size: 10, // 기본 페이지 크기
-        prev_block: 0,
-        start_index: 0,
-        start_page: 0,
-        total_block_cnt: 0,
-        total_list_cnt: 0,
-        total_page_cnt: 0,
-      },
+      posts: [], // 게시글 목록
+      currentPage: 0, // 현재 페이지 (0부터 시작)
+      pageSize: 10, // 페이지 크기
+      totalPages: 0, // 전체 페이지 수
+      totalElements: 0, // 전체 게시글 수
       selectedCategory: '',
       searchQuery: '',
     };
+  },
+  computed: {
+    pagination() {
+      // 페이지네이션 버튼 계산
+      const pageButtons = [];
+      const startPage = Math.floor(this.currentPage / 10) * 10;
+      const endPage = Math.min(startPage + 9, this.totalPages - 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        pageButtons.push(i);
+      }
+
+      return pageButtons;
+    }
   },
   mounted() {
     this.fnGetList(); // 페이지 로딩 시 목록 호출
   },
   methods: {
-    /*fnGetList() {
-      const requestBody = {
-        keyword: this.searchQuery,
-        category: this.selectedCategory,
-        page: this.paging.page,
-        size: this.paging.page_size,
+    fnGetList() {
+      // API 호출 파라미터 설정
+      const params = {
+        page: this.currentPage,
+        size: this.pageSize
       };
 
-      this.$axios
-          .get(this.$serverUrl + "/board/list", { params: requestBody })
-          .then((res) => {
-            this.list = res.data.items; // 서버에서 받은 게시글 목록
-            this.paging.total_list_cnt = res.data.total_list_cnt;
-            this.paging.total_page_cnt = Math.ceil(this.paging.total_list_cnt / this.paging.page_size);
-            this.paging.start_page = Math.floor((this.paging.page - 1) / 10) * 10 + 1;
-            this.paging.end_page = Math.min(this.paging.start_page + 9, this.paging.total_page_cnt);
+      // 카테고리나 검색어가 있는 경우 파라미터 추가
+      if (this.selectedCategory) {
+        params.category = this.selectedCategory;
+      }
+
+      if (this.searchQuery) {
+        params.keyword = this.searchQuery;
+      }
+
+      // API 호출
+      axios.get("http://localhost:8081/posts", { params })
+          .then(response => {
+            // API 응답 데이터 처리
+            this.posts = response.data.content;
+            this.totalPages = response.data.totalPages;
+            this.totalElements = response.data.totalElements;
           })
-          .catch((err) => {
-            if (err.message.includes('Network Error')) {
-              alert('네트워크가 원활하지 않습니다. 잠시 후 다시 시도해주세요.');
-              console.error('Captured in errorCaptured hook:', err);
-            } else if (err.response) {
+          .catch(error => {
+            console.error('게시글 목록을 불러오는 중 오류가 발생했습니다:', error);
+            if (error.response) {
               // 서버에서 응답한 경우 (HTTP 상태 코드 포함)
-              console.error('Error response:', err.response);
-              alert(`서버 오류 발생: ${err.response.status} - ${err.response.data.message || '알 수 없는 오류'}`);
+              console.error('Error response:', error.response);
+              alert(`서버 오류 발생: ${error.response.status} - ${error.response.data.message || '알 수 없는 오류'}`);
+            } else if (error.message.includes('Network Error')) {
+              alert('네트워크가 원활하지 않습니다. 잠시 후 다시 시도해주세요.');
             } else {
-              // 기타 오류 (예: 요청 설정 문제 등)
-              console.error('Error:', err);
+              // 기타 오류
               alert('알 수 없는 오류가 발생했습니다.');
             }
-          });*/
-
-
+          });
+    },
+    search() {
+      this.currentPage = 0; // 검색 시 첫 페이지로 이동
+      this.fnGetList();
+    },
     fnWrite() {
       this.$router.push('/board/write');
     },
-    fnView(idx) {
-      this.$router.push(`/board/view/${idx}`);
+    fnView(id) {
+      // id 파라미터를 사용하여 상세 페이지로 이동
+      this.$router.push(`/board/view/${id}`);
     },
     fnPage(page) {
-      this.paging.page = page;
+      this.currentPage = page;
       this.fnGetList(); // 페이지 변경 시 목록 다시 호출
     },
-    pagination() {
-      let pageNumber = [];
-      for (let i = this.paging.start_page; i <= this.paging.end_page; i++) {
-        pageNumber.push(i);
-      }
-      return pageNumber;
-    },
-    // 게시글 목록 불러오기 (임시 데이터)
-    fnGetList() {
-      this.list = [
-        { idx: 1, title: '제목1', author: '작성자1', created_at: '작성일시1' },
-        { idx: 2, title: '제목2', author: '작성자2', created_at: '작성일시2' },
-        { idx: 3, title: '제목3', author: '작성자3', created_at: '작성일시3' }
-      ];
-      this.paging.total_list_cnt = this.list.length;
-      this.paging.total_page_cnt = Math.ceil(this.list.length / this.paging.page_size);
-      this.paging.start_page = 1;
-      this.paging.end_page = this.paging.total_page_cnt;
+    formatDate(dateString) {
+      // ISO 형식의 날짜를 사용자 친화적인 형식으로 변환
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+
+      return `${year}-${month}-${day} ${hours}:${minutes}`;
     }
   },
 };
