@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,10 @@ public class PostController {
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody PostRequest request, HttpSession session) throws InvalidPostFieldException, UserNotFoundException {
         String loggedInUser = (String) session.getAttribute("loggedInUser");
-
+        if (loggedInUser == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 반환
 //        log.debug("[PostController] createPost() 실행됨");  // 디버깅 로그
+        }
         Post savedPost = postService.createPost(loggedInUser, request);
 //        log.info("[PostController] 저장된 Post ID: " + savedPost.getId());
         return ResponseEntity.ok(savedPost);
