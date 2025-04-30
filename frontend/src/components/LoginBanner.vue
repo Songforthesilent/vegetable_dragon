@@ -50,6 +50,7 @@ export default {
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify(this.loginForm)
       })
           .then(async (res) => {
