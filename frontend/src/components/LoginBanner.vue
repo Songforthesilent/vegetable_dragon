@@ -20,8 +20,9 @@
       </template>
 
       <template v-else>
-        <h3>환영합니다, {{ userName }} 님!</h3>
-        <button class="login-button" @click="logout">로그아웃</button>
+        <h3>{{ userName }} 님</h3>
+        <button class="login-button" @click="fnWrite">글 등록하기</button>
+        <button class="link2" @click="logout">로그아웃</button>
       </template>
     </div>
   </aside>
@@ -63,7 +64,7 @@ export default {
           .then((username) => {
             this.userName = username;
             localStorage.setItem("username", username); // localstorage를 써서, UserLogin 에서도 username을 가져올 수 있도록 함.
-            alert(`환영합니다, ${username}님!`);
+            alert(`${username}님`);
           })
           .catch((err) => {
             alert("로그인 실패: " + err.message);
@@ -81,8 +82,10 @@ export default {
     },
     syncUserName() {
       this.userName = localStorage.getItem("username") || '';
-
-    }
+    },
+    fnWrite() {
+      this.$router.push('/board/write');
+    },
   },
   mounted() {
     this.syncUserName();
@@ -100,11 +103,12 @@ export default {
 .login-panel {
   width: 20%;
   height: 980px;
-  background-color: #f4f4f4;
-  padding: 20px;
-  border-radius: 10px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
   text-align: center;
   position: sticky;
+  margin-top: 40px;
   top: 20%;
 }
 
@@ -112,8 +116,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius: 15px;
-  background-color: #f9f9f9;
+  border-radius: 8px;
+  background-color: #ffffff;
   padding: 20px 10px;
 }
 
@@ -124,8 +128,10 @@ export default {
 }
 
 h3 {
+  font-size: 18px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-top: 20px;
+  margin-bottom: 50px;
 }
 
 .input-container {
@@ -162,15 +168,26 @@ h3 {
   color: white;
   padding: 12px;
   border: 1px solid #3A4CA4;
-  border-radius: 25px;
+  border-radius: 10px;
   cursor: pointer;
-  width: 100%;
+  width: 95%;
   margin-top: 10px;
 }
 
 .links {
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  font-size: 10px;
+  margin-top: 10px;
+  color: #939393;
+}
+
+.link2 {
+  display: flex;
+  background: none;
+  border: none;
+  text-align: right;
   width: 100%;
   font-size: 10px;
   margin-top: 10px;
