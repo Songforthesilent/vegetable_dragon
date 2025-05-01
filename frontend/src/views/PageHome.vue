@@ -145,6 +145,7 @@ export default {
 }
 
 .search-section {
+  margin-top: 40px;
   text-align: left;
   background-color: #ffffff;
 }
@@ -252,8 +253,8 @@ export default {
 .category-button {
   background-color: #8994c8;
   border: none;
-  padding: 5px 25px;
-  border-radius: 20px;
+  padding: 6px 23px;
+  border-radius: 7px;
   font-size: 13px;
   font-weight: bold;
   color: white;
@@ -269,7 +270,7 @@ export default {
 
 .recent-posts-container {
   display: flex;
-  gap: 18px;
+  gap: 15px;
   margin-top: 10px;
   text-align: left; /* 왼쪽 정렬 */
 }

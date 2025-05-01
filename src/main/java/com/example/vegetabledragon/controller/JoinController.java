@@ -40,6 +40,8 @@ public class JoinController {
     public ResponseEntity<String> logout(HttpSession session) {
         if (session.getAttribute("loggedInUser") != null) {
             session.invalidate(); // 세션 무효화
+
+
             return ResponseEntity.ok("로그아웃 성공");
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("로그인 상태가 아닙니다.");
