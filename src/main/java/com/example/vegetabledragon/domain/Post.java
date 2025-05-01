@@ -31,12 +31,17 @@ public class Post {
     @Column(nullable = false)
     private String authorUsername;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id", nullable = true)
+    private Category category;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public Post(String title, String content, String authorUsername) {
+    public Post(String title, String content, String authorUsername, Category category) {
         this.title = title;
         this.content = content;
         this.authorUsername = authorUsername;
+        this.category =  category;
     }
 }
