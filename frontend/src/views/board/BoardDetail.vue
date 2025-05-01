@@ -203,6 +203,7 @@
       this.checkLoginStatus();
       this.getArticleDetail();
       this.fetchComments(); // 게시글에 대한 댓글 목록 가져오기
+      this.fetchFeedbackRatio();
     },
     methods: {
       async checkLoginStatus() {
@@ -292,24 +293,22 @@
         }
       },
       vote(type) {
-        if (type === "agree") {
-          this.agreeVotes++;
-          this.voteType = "agree";
-        } else {
-          this.disagreeVotes++;
-          this.voteType = "disagree";
-        }
-        this.totalVotes = this.agreeVotes + this.disagreeVotes;
+        // 중복 투표를 허용하므로 체크하지 않고 바로 투표 처리
+        const isFakeNews = (type === "disagree"); // disagree는 가짜 뉴스, agree는 진짜 뉴스로 판단
+
+        this.submitFeedback(isFakeNews);
       },
+
       handleVote(event) {
         const voteType = event.target.getAttribute("data-vote");
         if (voteType) {
           this.vote(voteType);
         }
       },
+      // 투표 비율 계산 함수 수정
       getVotePercentage(voteCount) {
-        if (this.totalVotes === 0) return 50;
-        return ((voteCount / this.totalVotes) * 100).toFixed(1);
+        if (this.totalVotes === 0) return 0; // totalVotes가 0일 때는 0% 반환
+        return ((voteCount / this.totalVotes) * 100).toFixed(1); // 정상적으로 비율 계산
       },
       addComment() {
         if (!this.newComment.trim()) {
@@ -370,121 +369,163 @@
       openEditPostPasswordModal() {
         this.editPostPasswordModal = true;
       },
-    confirmEditPost() {
-      if (this.editPostPassword === "correct_password") {
-        this.editPostModal = true;
-        this.closeEditPostPasswordModal();
-      } else {
-        alert("비밀번호가 일치하지 않습니다.");
-      }
-    },
-    closeEditPostPasswordModal() {
-      this.editPostPasswordModal = false;
-    },
-    saveEditPost() {
-      // 게시글 수정 저장 로직
-      this.editPostModal = false;
-    },
-    openDeletePostPasswordModal() {
-      this.deletePostPasswordModal = true;
-    },
-    async confirmDeleteComment() {
-      try {
-        const commentIndex = this.deletingCommentIndex;
-        const comment = this.comments[commentIndex];
-        const postId = this.$route.params.id;
+      confirmEditPost() {
+        if (this.editPostPassword === "correct_password") {
+          this.editPostModal = true;
+          this.closeEditPostPasswordModal();
+        } else {
+          alert("비밀번호가 일치하지 않습니다.");
+        }
+      },
+      closeEditPostPasswordModal() {
+        this.editPostPasswordModal = false;
+      },
+      saveEditPost() {
+        // 게시글 수정 저장 로직
+        this.editPostModal = false;
+      },
+      openDeletePostPasswordModal() {
+        this.deletePostPasswordModal = true;
+      },
+      async confirmDeleteComment() {
+        try {
+          const commentIndex = this.deletingCommentIndex;
+          const comment = this.comments[commentIndex];
+          const postId = this.$route.params.id;
+          const commentId = comment.id;
+
+          this.apiLoading = true;
+
+          // 로그인 여부에 따라 body 설정
+          const requestBody = {
+            password: this.isLoggedIn ? "LOGIN_USER" : this.deleteCommentPassword
+          };
+
+          await axios.delete(`http://localhost:8081/posts/${postId}/comments/${commentId}`, {
+            data: requestBody,
+            withCredentials: true
+          });
+
+          this.comments.splice(commentIndex, 1);
+          alert("댓글이 삭제되었습니다.");
+        } catch (error) {
+          console.error("댓글 삭제 실패:", error);
+          if (error.response) {
+            if (error.response.status === 401 || error.response.status === 403) {
+              alert("비밀번호가 일치하지 않거나 삭제 권한이 없습니다.");
+            } else if (error.response.status === 404) {
+              alert("댓글을 찾을 수 없습니다.");
+            } else {
+              alert(`댓글 삭제 중 오류: ${error.response.data.message || "알 수 없는 오류"}`);
+            }
+          } else {
+            alert("서버 연결에 실패했습니다.");
+          }
+        } finally {
+          this.apiLoading = false;
+          this.cancelDeleteComment();
+        }
+      },
+      openEditCommentModal(index) {
+        this.editingCommentIndex = index;
+        this.editCommentText = this.comments[index].text;
+        this.editCommentPassword = "";
+        this.confirmingEditComment = this.isLoggedIn;  // 로그인 사용자는 비밀번호 없이 바로 수정 가능
+      },
+      confirmEditComment() {
+        const comment = this.comments[this.editingCommentIndex];
+        if (!this.editCommentPassword.trim()) {
+          alert("비밀번호를 입력하세요.");
+          return;
+        }
+        if (this.editCommentPassword === comment.password) {
+          this.confirmingEditComment = true;
+        } else {
+          alert("비밀번호가 일치하지 않거나 삭제 권한이 없습니다.");
+        }
+      },
+      async saveEditComment() {
+        const comment = this.comments[this.editingCommentIndex];
+        const postId = this.article.id;
         const commentId = comment.id;
 
-        this.apiLoading = true;
-
-        // 로그인 여부에 따라 body 설정
         const requestBody = {
-          password: this.isLoggedIn ? "LOGIN_USER" : this.deleteCommentPassword
+          comment: this.editCommentText,
+          password: this.isLoggedIn ? "LOGIN_USER" : this.editCommentPassword
         };
 
-        await axios.delete(`http://localhost:8081/posts/${postId}/comments/${commentId}`, {
-          data: requestBody,
-          withCredentials: true
-        });
+        try {
+          await axios.put(
+              `http://localhost:8081/posts/${postId}/comments/${commentId}`,
+              requestBody,
+              {withCredentials: true}
+          );
 
-        this.comments.splice(commentIndex, 1);
-        alert("댓글이 삭제되었습니다.");
-      } catch (error) {
-        console.error("댓글 삭제 실패:", error);
-        if (error.response) {
-          if (error.response.status === 401 || error.response.status === 403) {
-            alert("비밀번호가 일치하지 않거나 삭제 권한이 없습니다.");
-          } else if (error.response.status === 404) {
-            alert("댓글을 찾을 수 없습니다.");
-          } else {
-            alert(`댓글 삭제 중 오류: ${error.response.data.message || "알 수 없는 오류"}`);
-          }
-        } else {
-          alert("서버 연결에 실패했습니다.");
+          this.comments[this.editingCommentIndex].text = this.editCommentText;
+          alert("댓글이 수정되었습니다.");
+          this.cancelEditComment();
+        } catch (error) {
+          console.error("댓글 수정 실패:", error);
+          alert("수정 실패: " + (error.response?.data?.message || "알 수 없는 오류"));
         }
-      } finally {
-        this.apiLoading = false;
-        this.cancelDeleteComment();
-      }
-    },
-    openEditCommentModal(index) {
-      this.editingCommentIndex = index;
-      this.editCommentText = this.comments[index].text;
-      this.editCommentPassword = "";
-      this.confirmingEditComment = this.isLoggedIn;  // 로그인 사용자는 비밀번호 없이 바로 수정 가능
-    },
-    confirmEditComment() {
-      const comment = this.comments[this.editingCommentIndex];
-      if (!this.editCommentPassword.trim()) {
-        alert("비밀번호를 입력하세요.");
-        return;
-      }
-      if (this.editCommentPassword === comment.password) {
-        this.confirmingEditComment = true;
-      } else {
-        alert("비밀번호가 일치하지 않거나 삭제 권한이 없습니다.");
-      }
-    },
-    async saveEditComment() {
-      const comment = this.comments[this.editingCommentIndex];
-      const postId = this.article.id;
-      const commentId = comment.id;
+      },
+      cancelEditComment() {
+        this.editingCommentIndex = null;
+        this.editCommentText = "";
+        this.editCommentPassword = "";
+        this.confirmingEditComment = false;
+      },
+      openDeleteCommentModal(index) {
+        this.deletingCommentIndex = index;
+        this.deleteCommentPassword = "";
+      },
+      cancelDeleteComment() {
+        this.deletingCommentIndex = null;
+        this.deleteCommentPassword = "";
+      },
+      // 투표 후 비율 업데이트
+      async submitFeedback(isFakeNews) {
+        if (!this.isLoggedIn) {
+          alert("로그인이 필요합니다.");
+          return;
+        }
 
-      const requestBody = {
-        comment: this.editCommentText,
-        password: this.isLoggedIn ? "LOGIN_USER" : this.editCommentPassword
-      };
+        try {
+          const postId = this.$route.params.id;
+          const body = {fakeNews: isFakeNews}; // true 또는 false
 
-      try {
-        await axios.put(
-            `http://localhost:8081/posts/${postId}/comments/${commentId}`,
-            requestBody,
-            { withCredentials: true }
-        );
+          // 백엔드에 투표 요청
+          await axios.post(`http://localhost:8081/feedback/${postId}`, body, {
+            withCredentials: true
+          });
 
-        this.comments[this.editingCommentIndex].text = this.editCommentText;
-        alert("댓글이 수정되었습니다.");
-        this.cancelEditComment();
-      } catch (error) {
-        console.error("댓글 수정 실패:", error);
-        alert("수정 실패: " + (error.response?.data?.message || "알 수 없는 오류"));
+          // 버튼 상태 변경
+          this.voteType = isFakeNews ? "disagree" : "agree"; // 클릭한 버튼에 따라 voteType 설정
+
+          // 투표 후 최신 비율 가져오기
+          await this.fetchFeedbackRatio();
+          alert("투표가 반영되었습니다.");
+        } catch (err) {
+          console.error("투표 실패", err);
+          alert("투표에 실패했습니다.");
+        }
+      },
+      // 투표 비율 가져오는 함수
+      async fetchFeedbackRatio() {
+        try {
+          const postId = this.$route.params.id;
+          const res = await axios.get(`http://localhost:8081/feedback/${postId}/ratio`);
+
+          // 서버에서 받은 비율 사용
+          this.agreeVotes = res.data.trueNewsRatio * 100;  // 진짜 뉴스 비율 (퍼센트로 변환)
+          this.disagreeVotes = res.data.fakeNewsRatio * 100; // 가짜 뉴스 비율 (퍼센트로 변환)
+          this.totalVotes = this.agreeVotes + this.disagreeVotes;
+        } catch (error) {
+          console.error("투표 비율 가져오기 실패:", error);
+        }
       }
-    },
-    cancelEditComment() {
-      this.editingCommentIndex = null;
-      this.editCommentText = "";
-      this.editCommentPassword = "";
-      this.confirmingEditComment = false;
-    },
-    openDeleteCommentModal(index) {
-      this.deletingCommentIndex = index;
-      this.deleteCommentPassword = "";
-    },
-    cancelDeleteComment() {
-      this.deletingCommentIndex = null;
-      this.deleteCommentPassword = "";
     }
-  }};
+    };
   </script>
 
   <style scoped>
