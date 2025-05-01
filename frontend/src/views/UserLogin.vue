@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import {loginUser} from '@/api/auth';
+// import {loginUser} from '@/api/auth';
 
 export default {
   data() {
@@ -40,26 +40,37 @@ export default {
     };
   },
   methods: {
-    async login() {
-      try {
-        const result = await loginUser(this.email, this.password);
-
-        // 서버 응답이 성공 형태인지 확인 (서버 응답 구조에 따라 조정)
-        if (result.success !== false) {
-          const username = result.username || this.email;
-          localStorage.setItem('username', username);
-          alert('로그인 성공!');
-          this.$router.push('/');
-        } else {
-          alert('로그인 실패! 이메일 또는 비밀번호를 확인하세요.');
-        }
-      } catch (error) {
-        console.error('로그인 실패:', error);
-        alert('로그인 중 오류가 발생했습니다.');
-      }
+    login() {
+      fetch("http://localhost:8081/join/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: this.email,
+          password: this.password
+        })
+      })
+          .then(async (res) => {
+            if (!res.ok) {
+              const error = await res.text();
+              throw new Error(error);
+            }
+            return res.text(); // username 반환됨
+          })
+          .then((username) => {
+            this.userName = username;
+            localStorage.setItem("username", username);
+            alert(`환영합니다, ${username}님!`);
+            this.$router.push('/');
+          })
+          .catch((err) => {
+            alert("로그인 실패: " + err.message);
+          });
     }
-  }
-};
+  },
+}
 </script>
 
 <style scoped>
