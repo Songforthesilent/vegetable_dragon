@@ -62,7 +62,6 @@ public class PostController {
     }
 
     // 카테고리별 게시글 조회
-    // 카테고리별 게시글 조회
     @GetMapping("/category/{categoryName}")
     public ResponseEntity<List<Post>> getPostsByCategory(
             @PathVariable String categoryName,
