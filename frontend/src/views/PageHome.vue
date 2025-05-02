@@ -15,7 +15,7 @@
       <!-- Best Topics 영역 -->
       <section class="article-section">
         <div class="section-header">
-          <h2 class="best-topics-title">Best Topics</h2>
+          <h2 class="section-title">Best Topics</h2>
           <router-link to="/best-topics" class="more-link">
             <i class="fas fa-chevron-right"></i>
           </router-link>
@@ -34,14 +34,17 @@
       <!-- 최근 게시글 영역 -->
       <section class="article-section">
         <div class="section-header">
-          <h2 class="recent-posts-title">최근 게시글</h2>
+          <h2 class="section-title">최근 게시글</h2>
           <router-link to="/board/list" class="more-link">
-            <i class="fas fa-chevron-right"></i>
+            더보기
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </router-link>
         </div>
 
         <!-- 카테고리 버튼 -->
-        <div class="recent-posts-container">
+        <div class="category-filter">
           <button v-for="category in ['전체', ...categories]"
                   :key="category"
                   :class="['category-button', { active: selectedCategory === category }]"
@@ -50,17 +53,14 @@
           </button>
         </div>
 
-        <div class="recent-table">
-          <table>
-            <tr v-for="article in filteredArticles" :key="article.id" class="table-row">
-              <td class="category">{{ article.category ? article.category.name : '없음' }}</td> <!-- 카테고리 이름 출력 -->
-              <td class="title">
-                <router-link :to="'/board/view/' + article.id" class="title-link">
+        <!-- 게시글 목록 -->
+        <div class="recent-posts-list">
+          <div v-for="article in filteredArticles" :key="article.id" class="post-item">
+              <span class="post-category">{{ article.category ? article.category.name : '없음' }}</span> <!-- 카테고리 이름 출력 -->
+              <router-link :to="'/board/view/' + article.id" class="post-title-link">
                   {{ article.title }}
-                </router-link>
-              </td>
-            </tr>
-          </table>
+              </router-link>
+          </div>
         </div>
       </section>
     </article>
@@ -176,6 +176,34 @@ export default {
   background-color: #ffffff;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+  position: relative;
+  padding-left: 14px;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background-color: #3A4CA4;
+  border-radius: 2px;
+}
+
 .search-container {
   position: relative;
   width: 100%;
@@ -187,6 +215,29 @@ export default {
   border: 1px solid #999FBB;
   border-radius: 5px;
   color: #989595;
+}
+
+.more-link {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3A4CA4;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.more-link:hover {
+  color: #2d3a7c;
+}
+
+.more-link svg {
+  margin-left: 4px;
+  transition: transform 0.2s ease;
+}
+
+.more-link:hover svg {
+  transform: translateX(3px);
 }
 
 .search-button {
@@ -269,82 +320,117 @@ export default {
   color: #3A4CA4;
 }
 
-/* 최근 게시글 */
-.recent-posts-title {
-  text-align: left;
-  font-weight: bold;
-  font-size: 18px;
+/* 최근 게시글 섹션 */
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .category-button {
-  background-color: #8994c8;
+  padding: 8px 16px;
+  background-color: #f1f5f9;
+  color: #475569;
   border: none;
-  padding: 6px 23px;
-  border-radius: 7px;
-  font-size: 13px;
-  font-weight: bold;
-  color: white;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-button:hover {
+  background-color: #e2e8f0;
+  color: #1e293b;
 }
 
 .category-button.active {
   background-color: #3A4CA4;
-}
-.category-button:hover {
-  background-color: #3A4CA4;
-  cursor: pointer;
+  color: white;
 }
 
-.recent-posts-container {
+.recent-posts-list {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
-  text-align: left; /* 왼쪽 정렬 */
+  flex-direction: column;
 }
 
-.recent-table {
-  width: 100%;
-  background: white;
-  border-radius: 10px;
-  padding: 10px;
+.post-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.recent-table table {
-  width: 100%;
-  border-collapse: collapse;
+.post-item:last-child {
+  border-bottom: none;
 }
 
-.category {
+.post-category {
+  display: inline-block;
+  padding: 4px 10px;
+  background-color: #f1f5f9;
+  color: #475569;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-right: 12px;
+  min-width: 50px;
+  text-align: center;
+}
+
+.post-title-link {
+  font-size: 15px;
+  color: #1e293b;
+  text-decoration: none;
   text-align: left;
-  font-weight: bold;
-  padding: 5px;
+  margin-left: 15px;
+  font-weight: 450;
+  transition: color 0.2s ease;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/*최근게시글리스트*/
-.table-row {
-  border-bottom: 1px solid #ddd;
-  color: #939393;
-  font-size: 14px;
-  text-align: left;
+.post-title-link:hover {
+  color: #3A4CA4;
 }
 
-h3 {
-  font-weight: bold;
-  margin-bottom: 20px;
-  font-size: 14px;
+/* 반응형 디자인 */
+@media (max-width: 1024px) {
+  .main-container {
+    flex-direction: column;
+    padding: 0 16px;
+  }
+
+  .sidebar {
+    width: 100%;
+    margin-top: 30px;
+  }
+
+  .best-topics-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* 제목 스타일 수정 */
-.title {
-  padding: 5px;
-}
+@media (max-width: 768px) {
+  .best-topics-container {
+    grid-template-columns: 1fr;
+  }
 
-.title-link {
-  text-decoration: none; /* 밑줄 제거 */
-  color: #333; /* 제목 색상 변경 */
-  font-weight: bold;
-}
+  .category-filter {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    flex-wrap: nowrap;
+  }
 
-.title-link:hover {
-  color: #3A4CA4; /* 마우스 오버 시 색상 변경 */
+  .category-button {
+    white-space: nowrap;
+  }
+
+  .section-card {
+    padding: 20px;
+  }
 }
 </style>
