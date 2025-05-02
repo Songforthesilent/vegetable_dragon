@@ -64,14 +64,15 @@ export default {
   },
   methods: {
     async fnSubmit() {
-      // 익명 작성 시 작성자 필드를 '익명'으로 ㅓㄹ정
+      // 제목과 내용이 비어있는지 체크
       if (!this.post.title.trim() || !this.post.content.trim()){
         alert("제목과 내용을 입력해주세요!");
         return;
       }
 
+      // 익명 작성 시 작성자 필드를 '익명'으로 설정
       if (this.post.isAnonymous) {
-        this.post.author ='익명';
+        this.post.author = '익명';
       }
 
       // 비밀번호가 입력되지 않은 경우 경고
@@ -79,35 +80,39 @@ export default {
         alert("비밀번호를 입력해주세요!");
         return;
       }
+
       // 비로그인 사용자는 작성 불가(세션 기반)
-      try{
-        // 게시글 등록 요청
+      try {
+        // 게시글 등록 요청을 보낼 때 category를 포함
         const response = await axios.post(
-            "http://localhost:8081/posts",
+            "http://localhost:8081/posts",  // 백엔드 URL
             {
               title: this.post.title,
-              content: this.post.content
+              content: this.post.content,
+              category: this.post.category,  // 카테고리 추가
+              author: this.post.author,      // 작성자 (익명/로그인 사용자)
+              password: this.post.password  // 비밀번호
             },
             {
               withCredentials: true // 세션 쿠키
             }
         );
-        // 백엔드에 게시글 저장 요청을 보내는 코드 (추후 API 연동 필요)
+
+        // 백엔드에서 게시글 저장 요청을 보내고, 응답 받은 데이터로 화면 처리
         const createdPost = response.data;
-        console.log("게시글 데이터:", this.post);
         alert('게시글이 등록되었습니다!');
-        // 게시글 작성 완료 후 목록 페이지로 이동
+
+        // 게시글 작성 완료 후 해당 게시글 페이지로 이동
         this.$router.push(`/board/view/${createdPost.id}`);
       }
-      catch(error){
-        if (error.response?.status === 401){
+      catch (error) {
+        if (error.response?.status === 401) {
           alert("로그인이 필요합니다.");
-        } else{
+        } else {
           console.error("게시글 작성 실패 : ", error);
           alert("게시글 등록에 실패했습니다.");
         }
       }
-
     },
     fnCancel() {
       // 취소 버튼 클릭 시 게시글 목록 페이지로 이동
