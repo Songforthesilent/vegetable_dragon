@@ -53,7 +53,7 @@
         <div class="recent-table">
           <table>
             <tr v-for="article in filteredArticles" :key="article.id" class="table-row">
-              <td class="category">{{ article.category }}</td>
+              <td class="category">{{ article.category ? article.category.name : '없음' }}</td> <!-- 카테고리 이름 출력 -->
               <td class="title">
                 <router-link :to="'/board/view/' + article.id" class="title-link">
                   {{ article.title }}
@@ -72,7 +72,7 @@
 
 <script>
 import LoginBanner from '@/components/LoginBanner.vue';
-
+import axios from 'axios';
 export default {
   components: {
     LoginBanner
@@ -81,51 +81,77 @@ export default {
     return {
       searchQuery: '',
       categories: ['경제', '연예', '정치', '사회', '국제', '문화'],
-      selectedCategory: '전체',
-      bestTopics: [ //예시
-        {
-          id: 1,
-          title: 'Vue.js 소개',
-          content: 'Vue.js는 최신 JavaScript 프레임워크입니다.',
-          image: 'https://via.placeholder.com/150'
-        },
-        {
-          id: 2,
-          title: 'Vue Router 이해하기',
-          content: 'Vue Router는 SPA 구현을 위한 라우터입니다.',
-          image: 'https://via.placeholder.com/150'
-        },
-        {
-          id: 3,
-          title: 'Vuex 활용법',
-          content: 'Vuex는 Vue의 상태 관리를 위한 라이브러리입니다.',
-          image: 'https://via.placeholder.com/150'
-        }
-      ],
-      recentArticles: [ // 예시
-        { id: 1, category: '경제', title: 'Vuex는 Vue의 상태 관리를 위한 라이브러리입니다.' },
-        { id: 2, category: '문화', title: 'Vue 3에서 추가된 새로운 기능들을 살펴봅니다.' },
-        { id: 3, category: '문화', title: 'Composition API는 Vue 3에서 새로 도입된 기능입니다.' },
-        { id: 4, category: '연예', title: '인기 드라마 배우들의 인터뷰' },
-        { id: 5, category: '정치', title: '대선 후보들의 공약 분석' }
-      ]
+      selectedCategory: '전체',  // 기본 카테고리
+      bestTopics: [], // 예시로 남겨놓은 Best Topics
+      recentArticles: [],  // 백엔드에서 받아올 최신 게시글
+      page: 0, // 현재 페이지 (기본은 첫 번째 페이지)
+      size: 5, // 한 페이지에 표시할 게시글 수
     };
   },
   computed: {
     filteredArticles() {
-      if (this.selectedCategory === '전체') {
-        return this.recentArticles;
+      if (Array.isArray(this.recentArticles) && this.recentArticles.length > 0) {
+        const categoryToCompare = this.selectedCategory.toLowerCase().trim();  // 소문자, 공백 제거
+        if (this.selectedCategory === '전체') {
+          return this.recentArticles;
+        } else {
+          return this.recentArticles.filter(article =>
+              article.category && article.category.name.toLowerCase().trim() === categoryToCompare
+          );
+        }
       }
-      return this.recentArticles.filter(article => article.category === this.selectedCategory);
+      return [];  // 최근 게시글이 없다면 빈 배열 반환
     }
   },
   methods: {
+    // 카테고리 클릭 시 호출
     filterCategory(category) {
       this.selectedCategory = category;
+      this.fetchRecentPosts();  // 카테고리 변경 시 게시글을 다시 불러옴
     },
+
+    // 검색 기능 (예시로 alert로 검색어 출력)
     search() {
       alert(`검색어: ${this.searchQuery}`);
+    },
+
+    // 최근 게시글을 백엔드에서 불러오는 메소드
+    async fetchRecentPosts() {
+      if (this.selectedCategory === "전체"){
+        try {
+          const response = await axios.get("http://localhost:8081/posts", {
+            params: {
+              page: this.page, // 현재 페이지
+              size: this.size, // 한 페이지에 표시할 게시글 수
+            },
+          });
+          this.recentArticles = response.data.content; // 페이지네이션이 포함된 응답의 내용
+        } catch (error) {
+          console.error("게시글을 불러오는 데 실패했습니다.", error);
+        }
+      } else {
+        try {
+          // const encodedCategory = encodeURIComponent(this.selectedCategory);
+          const url = `http://localhost:8081/posts/category/${this.selectedCategory}`;
+          console.log("Request URL:", url); // 요청 URL 확인용 로그
+          const response = await axios.get(url, {
+            params: {
+              page: this.page,
+              size: this.size,
+            },
+          });
+          console.log(response.data);
+          this.recentArticles = response.data;
+          console.log("Fetched articles:", this.recentArticles); // 데이터 확인용 로그
+        } catch (error) {
+          console.error("카테고리별 게시글을 불러오는 데 실패했습니다.", error);
+        }
+      }
+
     }
+  },
+  created() {
+    this.fetchRecentPosts();  // 페이지가 로드되면 최근 게시글을 불러옴
   }
 };
 </script>
