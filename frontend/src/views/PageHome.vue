@@ -104,7 +104,7 @@ export default {
     }
   },
   methods: {
-    // 카테고리 클릭 시 호출
+// 카테고리 클릭 시 호출
     filterCategory(category) {
       this.selectedCategory = category;
       this.fetchRecentPosts();  // 카테고리 변경 시 게시글을 다시 불러옴
@@ -114,7 +114,6 @@ export default {
     search() {
       alert(`검색어: ${this.searchQuery}`);
     },
-
     // 최근 게시글을 백엔드에서 불러오는 메소드
     async fetchRecentPosts() {
       if (this.selectedCategory === "전체"){
@@ -147,11 +146,42 @@ export default {
           console.error("카테고리별 게시글을 불러오는 데 실패했습니다.", error);
         }
       }
+    },
+    async fetchBestTopics() {
+      try {
+        const res = await axios.get("http://localhost:8081/posts", {
+          params: { page: 0, size: 50 },
+        });
 
-    }
+        const posts = res.data.content;
+
+        const ratioPromises = posts.map(post =>
+            axios.get(`http://localhost:8081/feedback/${post.id}/ratio`)
+                .then(r => ({ ...post, ratio: r.data }))
+                .catch(() => null)
+        );
+
+        const postsWithRatio = (await Promise.all(ratioPromises)).filter(Boolean);
+
+        const filtered = postsWithRatio.filter(p => {
+          const r = p.ratio.trueNewsRatio;
+          return Math.abs(r - 0.5) <= 0.05;
+        });
+
+        filtered.sort((a, b) =>
+            Math.abs(a.ratio.trueNewsRatio - 0.5) - Math.abs(b.ratio.trueNewsRatio - 0.5)
+        );
+
+        this.bestTopics = filtered.slice(0, 3);
+      } catch (error) {
+        console.error("Best Topics 불러오기 실패", error);
+      }
+    },
   },
+
   created() {
-    this.fetchRecentPosts();  // 페이지가 로드되면 최근 게시글을 불러옴
+    this.fetchRecentPosts();
+    this.fetchBestTopics();
   }
 };
 </script>

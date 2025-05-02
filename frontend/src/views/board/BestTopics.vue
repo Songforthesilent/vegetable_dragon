@@ -4,89 +4,79 @@
     <article class="content">
       <div class="best-topics-container">
         <h1 class="page-title">Best Topics</h1>
-
         <section class="topics-grid">
-          <div v-for="topic in bestTopics" :key="topic.id" class="topic-card">
-            <img :src="topic.image" :alt="topic.title" class="topic-image" />
+          <router-link
+              v-for="topic in bestTopics"
+              :key="topic.id"
+              :to="'/board/view/' + topic.id"
+              class="topic-card"
+          >
+            <img :src="topic.image || 'https://via.placeholder.com/300'" :alt="topic.title" class="topic-image" />
             <div class="topic-info">
-              <p class="topic-author">{{ topic.author }}</p> <!-- 작성자 추가 -->
+              <p class="topic-author">{{ topic.author }}</p>
               <h3 class="topic-title">{{ topic.title }}</h3>
             </div>
-          </div>
+          </router-link>
         </section>
       </div>
     </article>
 
     <!-- 로그인 배너 영역 -->
-    <aside class="login-panel">
-      <div class="login-box">
-        <i class="fas fa-user-circle user-icon"></i>
-        <h3>Sign In</h3>
-        <div class="input-container">
-          <i class="fas fa-user icon"></i>
-          <input type="text" placeholder="username" class="input-field username" />
-        </div>
-
-        <div class="input-container">
-          <i class="fas fa-lock icon"></i>
-          <input type="password" placeholder="password" class="input-field password" />
-        </div>
-        <button class="login-button">로그인</button>
-        <div class="links">
-          <a href="#">회원가입하기</a>
-          <a href="#">비밀번호찾기</a>
-        </div>
-      </div>
-    </aside>
+    <LoginBanner />
   </div>
 </template>
-
 <script>
+import axios from "axios";
+import LoginBanner from "@/components/LoginBanner.vue";
+
 export default {
+  components: {
+    LoginBanner
+  },
   data() {
     return {
-      bestTopics: [
-        {
-          id: 1,
-          author: "김철수",
-          title: "Vue.js는 무엇인가?",
-          image: "https://via.placeholder.com/300"
-        },
-        {
-          id: 2,
-          author: "이영희",
-          title: "Vue Router 사용법",
-          image: "https://via.placeholder.com/300"
-        },
-        {
-          id: 3,
-          author: "박민수",
-          title: "Vuex 상태관리",
-          image: "https://via.placeholder.com/300"
-        },
-        {
-          id: 4,
-          author: "정다은",
-          title: "Composition API 소개",
-          image: "https://via.placeholder.com/300"
-        },
-        {
-          id: 5,
-          author: "손흥민",
-          title: "Pinia 상태관리",
-          image: "https://via.placeholder.com/300"
-        },
-        {
-          id: 6,
-          author: "유재석",
-          title: "Vue와 TypeScript",
-          image: "https://via.placeholder.com/300"
-        }
-      ]
+      bestTopics: []
     };
+  },
+  created() {
+    this.fetchBestTopics();
+  },
+  methods: {
+    async fetchBestTopics() {
+      try {
+        const postRes = await axios.get("http://localhost:8081/posts", {
+          params: { page: 0, size: 100 }
+        });
+        const posts = postRes.data.content;
+
+        const ratioPromises = posts.map(post =>
+            axios.get(`http://localhost:8081/feedback/${post.id}/ratio`)
+                .then(ratioRes => ({
+                  ...post,
+                  ratio: ratioRes.data
+                }))
+                .catch(() => null)
+        );
+
+        const postsWithRatio = (await Promise.all(ratioPromises)).filter(Boolean);
+
+        const filtered = postsWithRatio.filter(p =>
+            Math.abs(p.ratio.trueNewsRatio - 0.5) <= 0.05
+        );
+
+        filtered.sort((a, b) =>
+            Math.abs(a.ratio.trueNewsRatio - 0.5) - Math.abs(b.ratio.trueNewsRatio - 0.5)
+        );
+
+        this.bestTopics = filtered.slice(0, 10);
+      } catch (err) {
+        console.error("Best Topics 로딩 실패", err);
+      }
+    }
   }
 };
 </script>
+
 
 <style scoped>
 /* 전체 레이아웃 설정 */
