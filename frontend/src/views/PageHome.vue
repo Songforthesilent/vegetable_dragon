@@ -115,6 +115,39 @@ export default {
       alert(`검색어: ${this.searchQuery}`);
     },
 
+    async fetchBestTopics() {
+      try {
+        const res = await axios.get("http://localhost:8081/posts", {
+          params: { page: 0, size: 100 }
+        });
+
+        const posts = res.data.content;
+
+        const ratioPromises = posts.map(post =>
+            axios.get(`http://localhost:8081/feedback/${post.id}/ratio`)
+                .then(ratioRes => ({
+                  ...post,
+                  ratio: ratioRes.data
+                }))
+                .catch(() => null)
+        );
+
+        const postsWithRatio = (await Promise.all(ratioPromises)).filter(Boolean);
+
+        const filtered = postsWithRatio.filter(p =>
+            Math.abs(p.ratio.trueNewsRatio - 0.5) <= 0.05
+        );
+
+        filtered.sort((a, b) =>
+            Math.abs(a.ratio.trueNewsRatio - 0.5) - Math.abs(b.ratio.trueNewsRatio - 0.5)
+        );
+
+        this.bestTopics = filtered.slice(0, 3); // 또는 10개 원하면 .slice(0, 10)
+      } catch (error) {
+        console.error("Best Topics 불러오기 실패", error);
+      }
+    },
+
     // 최근 게시글을 백엔드에서 불러오는 메소드
     async fetchRecentPosts() {
       if (this.selectedCategory === "전체"){
@@ -152,6 +185,7 @@ export default {
   },
   created() {
     this.fetchRecentPosts();  // 페이지가 로드되면 최근 게시글을 불러옴
+    this.fetchBestTopics();
   }
 };
 </script>
