@@ -45,14 +45,19 @@
       />
 
       <!-- 모달 컴포넌트들 -->
-      <!-- 게시글 수정 비밀번호 모달 -->
+      <!-- 게시글 삭제 비밀번호 모달 -->
       <ModalContainer
-          :show="editPostPasswordModal"
-          title="게시글 수정 비밀번호 입력"
-          @confirm="confirmEditPost"
-          @cancel="closeEditPostPasswordModal"
+          :show="deletePostPasswordModal"
+          :title="isPostAuthor ? '게시글을 삭제하시겠습니까?' : '게시글 삭제 비밀번호 입력'"
+          @confirm="confirmDeletePost"
+          @cancel="deletePostPasswordModal = false"
       >
-        <input type="password" v-model="editPostPassword" placeholder="비밀번호 입력" />
+        <input
+            v-if="!isPostAuthor"
+            type="password"
+            v-model="deletePostPassword"
+            placeholder="비밀번호 입력"
+        />
       </ModalContainer>
 
       <!-- 게시글 수정 모달 -->
@@ -65,6 +70,22 @@
         <input type="text" v-model="article.title" placeholder="제목 입력" />
         <textarea v-model="article.content" placeholder="내용 입력"></textarea>
       </ModalContainer>
+
+      <!-- 게시글 수정 비밀번호 모달 -->
+      <ModalContainer
+          :show="editPostPasswordModal"
+          :title="isPostAuthor ? '게시글을 수정하시겠습니까?' : '게시글 수정 비밀번호 입력'"
+          @confirm="confirmEditPost"
+          @cancel="closeEditPostPasswordModal"
+      >
+        <input
+            v-if="!isPostAuthor"
+            type="password"
+            v-model="editPostPassword"
+            placeholder="비밀번호 입력"
+        />
+      </ModalContainer>
+
 
       <!-- 게시글 삭제 비밀번호 모달 -->
       <ModalContainer
@@ -164,6 +185,15 @@ export default {
     };
   },
   computed: {
+    isPostAuthor() {
+      return (
+          this.loggedInUser &&
+          this.article &&
+          this.loggedInUser.email &&
+          this.article.authorEmail &&
+          this.loggedInUser.email === this.article.authorEmail
+      );
+    },
     // 로그인 상태 확인
     isLoggedIn() {
       return this.loggedInUser !== null;
@@ -176,6 +206,30 @@ export default {
     this.fetchComments(); // 게시글에 대한 댓글 목록 가져오기
   },
   methods: {
+    async confirmDeletePost() {
+      try {
+        this.apiLoading = true;
+        const postId = this.article.id;
+
+        const requestBody = this.isPostAuthor
+            ? {} // 본인은 비밀번호 없이 삭제
+            : { password: this.deletePostPassword };
+
+        await axios.delete(`http://localhost:8081/posts/${postId}`, {
+          data: requestBody,
+          withCredentials: true
+        });
+
+        alert("게시글이 삭제되었습니다.");
+        this.$router.push("/board/list");
+      } catch (error) {
+        console.error("게시글 삭제 실패:", error);
+        alert("삭제 실패: " + (error.response?.data?.message || "알 수 없는 오류"));
+      } finally {
+        this.apiLoading = false;
+        this.deletePostPasswordModal = false;
+      }
+    },
     async checkLoginStatus() {
       try {
         const res = await axios.get("http://localhost:8081/join/session", {withCredentials: true});
@@ -216,6 +270,7 @@ export default {
           title: response.data.title,
           content: response.data.content,
           authorUsername: response.data.authorUsername,
+          authorEmail: response.data.authorEmail,
           createdAt: response.data.createdAt,
           link: response.data.link
         };
@@ -286,22 +341,52 @@ export default {
       }
     },
     openEditPostPasswordModal() {
-      this.editPostPasswordModal = true;
+      // 작성자라면 비밀번호 없이 바로 수정 모달 오픈
+      if (this.isPostAuthor) {
+        this.editPostModal = true;
+      } else {
+        this.editPostPasswordModal = true;
+      }
     },
     confirmEditPost() {
-      if (this.editPostPassword === "correct_password") {
+      if (this.isPostAuthor) {
         this.editPostModal = true;
         this.closeEditPostPasswordModal();
-      } else {
-        alert("비밀번호가 일치하지 않습니다.");
+        return;
+      }
+
+      if (!this.editPostPassword.trim()) {
+        alert("비밀번호를 입력하세요.");
+        return;
       }
     },
     closeEditPostPasswordModal() {
       this.editPostPasswordModal = false;
     },
-    saveEditPost() {
-      // 게시글 수정 저장 로직
-      this.editPostModal = false;
+    async saveEditPost() {
+      try {
+        this.apiLoading = true;
+        const postId = this.article.id;
+
+        const requestBody = {
+          title: this.article.title,
+          content: this.article.content,
+          category: this.article.category,  // 혹시 바꾸게 된다면 포함
+          // password: this.isPostAuthor ? "LOGIN_USER" : this.editPostPassword
+        };
+
+        await axios.put(`http://localhost:8081/posts/${postId}`, requestBody, {
+          withCredentials: true
+        });
+
+        alert("게시글이 수정되었습니다.");
+        this.editPostModal = false;
+      } catch (error) {
+        console.error("게시글 수정 실패:", error);
+        alert("수정 실패: " + (error.response?.data?.message || "알 수 없는 오류"));
+      } finally {
+        this.apiLoading = false;
+      }
     },
     openDeletePostPasswordModal() {
       this.deletePostPasswordModal = true;
