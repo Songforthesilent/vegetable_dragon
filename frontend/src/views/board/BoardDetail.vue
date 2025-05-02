@@ -249,6 +249,7 @@
             title: response.data.title,
             content: response.data.content,
             authorUsername: response.data.authorUsername,
+            username: response.data.username,  // 여기에서 실제 로그인한 username을 가져옵니다.
             createdAt: response.data.createdAt
           };
 
@@ -263,6 +264,7 @@
             title: "게시글을 불러올 수 없습니다.",
             content: "서버에서 게시글 정보를 가져오는 중 오류가 발생했습니다.",
             authorUsername: "알 수 없음",
+            username: "알 수 없음",  // 이 값도 비슷하게 넣어야 합니다.
             createdAt: new Date().toISOString()
           };
 
@@ -370,18 +372,15 @@
         this.editPostPasswordModal = true;
       },
       // 게시글 수정 함수
+      // 게시글 수정 함수
       async openEditPostModal() {
-        // const postId = this.article.id;
-
         try {
           // 로그인된 사용자 확인
-          const res = await axios.get("http://localhost:8081/join/session", {withCredentials: true});
-          const loggedInUser = res.data;
+          const res = await axios.get("http://localhost:8081/join/session", { withCredentials: true });
+          const loggedInUser = res.data; // 세션에서 로그인된 사용자 가져오기
 
           // 로그인된 사용자와 게시글 작성자 확인
-          if (this.article.authorUsername !== loggedInUser) {
-            console.log(this.article.authorUsername);
-            console.log(loggedInUser);
+          if (this.article.username !== loggedInUser) {  // 실제로 비교할 값은 `username`
             alert("게시글 작성자만 수정할 수 있습니다.");
             return;
           }
@@ -417,17 +416,17 @@
 
         try {
           // 로그인된 사용자 확인
-          const res = await axios.get("http://localhost:8081/join/session", {withCredentials: true});
+          const res = await axios.get("http://localhost:8081/join/session", { withCredentials: true });
           const loggedInUser = res.data;
 
           // 로그인된 사용자와 게시글 작성자 확인
-          if (this.article.authorUsername !== loggedInUser) {
+          if (this.article.username !== loggedInUser) {  // 실제로 비교할 값은 `username`
             alert("게시글 작성자만 삭제할 수 있습니다.");
             return;
           }
 
           // 삭제 요청
-          await axios.delete(`http://localhost:8081/posts/${postId}`, {withCredentials: true});
+          await axios.delete(`http://localhost:8081/posts/${postId}`, { withCredentials: true });
           alert("게시글이 삭제되었습니다.");
           // 게시글 삭제 후 리디렉션
           this.$router.push("/board/list");  // 게시글 목록 페이지로 리디렉션

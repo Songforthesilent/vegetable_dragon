@@ -35,13 +35,12 @@
 
       <!-- 버튼 영역 -->
       <div class="form-actions">
-        <input type="password" id="password" v-model="post.password" placeholder="비밀번호 입력" class="password-input" required />
+        <input type="password" id="password" v-model="post.password" placeholder="비밀번호 입력" class="password-input" v-if="post.isAnonymous" required />
 
         <div class="buttons">
           <button type="button" class="cancel-button" @click="fnCancel">취소</button>
           <button type="submit" class="submit-button">글 등록하기</button>
         </div>
-
       </div>
     </form>
   </div>
@@ -65,7 +64,7 @@ export default {
   methods: {
     async fnSubmit() {
       // 제목과 내용이 비어있는지 체크
-      if (!this.post.title.trim() || !this.post.content.trim()){
+      if (!this.post.title.trim() || !this.post.content.trim()) {
         alert("제목과 내용을 입력해주세요!");
         return;
       }
@@ -73,17 +72,27 @@ export default {
       // 익명 작성 시 작성자 필드를 '익명'으로 설정
       if (this.post.isAnonymous) {
         this.post.author = '익명';
+        if (!this.post.password.trim()) {
+          alert("비밀번호를 입력해주세요!");
+          return;
+        }
+      } else {
+        try {
+          // 로그인된 사용자 확인
+          const res = await axios.get("http://localhost:8081/join/session", {withCredentials: true});
+          const loggedInUser = res.data;
+
+          // 로그인된 사용자의 username을 author에 설정
+          this.post.author = loggedInUser;
+        } catch (e) {
+          console.log("로그인되지 않음");
+          alert("로그인 후 작성 가능합니다.");
+          return;
+        }
       }
 
-      // 비밀번호가 입력되지 않은 경우 경고
-      if (!this.post.password.trim()) {
-        alert("비밀번호를 입력해주세요!");
-        return;
-      }
-
-      // 비로그인 사용자는 작성 불가(세션 기반)
+      // 게시글 등록 요청을 보낼 때 category를 포함
       try {
-        // 게시글 등록 요청을 보낼 때 category를 포함
         const response = await axios.post(
             "http://localhost:8081/posts",  // 백엔드 URL
             {
@@ -104,8 +113,7 @@ export default {
 
         // 게시글 작성 완료 후 해당 게시글 페이지로 이동
         this.$router.push(`/board/view/${createdPost.id}`);
-      }
-      catch (error) {
+      } catch (error) {
         if (error.response?.status === 401) {
           alert("로그인이 필요합니다.");
         } else {
@@ -191,7 +199,7 @@ textarea {
 }
 
 
-/* 익명 체크바그 */
+/* 익명 체크박스 */
 .anonymous-box {
   display: flex;
   align-items: center;
