@@ -12,7 +12,6 @@
         <div class="vote-percent">{{ getVotePercentage(agreeVotes) }}%</div>
       </button>
 
-      <!-- VS element -->
       <div class="vote-vs">
         <div class="vs-circle">VS</div>
         <div class="vs-line"></div>
@@ -30,7 +29,6 @@
 
     <div class="vote-result">
       <p>투표 결과</p>
-      <!-- 투표 퍼센트 바 (클릭 가능) -->
       <div class="progress-container">
         <div class="progress-bar" @click="handleVote">
           <div
@@ -63,6 +61,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   props: {
     initialAgreeVotes: {
@@ -76,13 +75,17 @@ export default {
     initialVoteType: {
       type: String,
       default: null
+    },
+    postId: {
+      type: Number,  // 게시글 ID는 반드시 전달받아야 합니다.
+      required: true
     }
   },
   data() {
     return {
       agreeVotes: this.initialAgreeVotes,
       disagreeVotes: this.initialDisagreeVotes,
-      voteType: this.initialVoteType
+      voteType: this.initialVoteType,
     };
   },
   computed: {
@@ -92,15 +95,6 @@ export default {
   },
   methods: {
     vote(type) {
-      if (this.voteType === type) return;
-
-      // 이전 투표 취소
-      if (this.voteType === 'agree') {
-        this.agreeVotes--;
-      } else if (this.voteType === 'disagree') {
-        this.disagreeVotes--;
-      }
-
       // 새 투표 추가
       if (type === 'agree') {
         this.agreeVotes++;
@@ -109,21 +103,63 @@ export default {
       }
 
       this.voteType = type;
-      this.$emit('vote', { type, agreeVotes: this.agreeVotes, disagreeVotes: this.disagreeVotes });
+
+      // 백엔드로 투표 요청 보내기
+      this.submitVote(type);
     },
+
+    async submitVote(type) {
+      try {
+        const response = await axios.post(
+            `http://localhost:8081/feedback/${this.postId}`,
+            { fakeNews: type === 'disagree' }, // 가짜뉴스일 경우 true
+            { withCredentials: true }
+        );
+        console.log('투표 성공:', response.data);
+        // 투표 후 비율 가져오기
+        this.fetchVoteRatio();
+      } catch (error) {
+        console.error('투표 실패:', error);
+        alert('투표 실패');
+      }
+    },
+
+    async fetchVoteRatio() {
+      try {
+        const response = await axios.get(
+            `http://localhost:8081/feedback/${this.postId}/ratio`,
+            { withCredentials: true }
+        );
+
+        // 투표 비율 업데이트
+        this.agreeVotes = response.data.trueNewsCount;
+        this.disagreeVotes = response.data.fakeNewsCount;
+      } catch (error) {
+        console.error('비율 가져오기 실패:', error);
+        alert('투표 비율을 가져오는 데 실패했습니다.');
+      }
+    },
+
     handleVote(event) {
       const voteType = event.target.getAttribute('data-vote');
       if (voteType) {
         this.vote(voteType);
       }
     },
+
     getVotePercentage(voteCount) {
-      if (this.totalVotes === 0) return 50;
-      return ((voteCount / this.totalVotes) * 100).toFixed(1);
+      if (this.totalVotes === 0) return 50;  // 투표가 없으면 50%로 표시
+      return ((voteCount / this.totalVotes) * 100).toFixed(1);  // 비율 계산
     }
+  },
+
+  mounted() {
+    // 컴포넌트가 마운트될 때 비율 가져오기
+    this.fetchVoteRatio();
   }
 };
 </script>
+
 
 <style scoped>
 .vote-section {
