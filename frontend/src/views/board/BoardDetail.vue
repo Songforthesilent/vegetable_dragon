@@ -31,6 +31,7 @@
           :initial-agree-votes="agreeVotes"
           :initial-disagree-votes="disagreeVotes"
           :initial-vote-type="voteType"
+          :post-id="article.id"
           @vote="handleVoteUpdate"
       />
 
