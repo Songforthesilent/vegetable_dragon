@@ -1,5 +1,6 @@
 package com.example.vegetabledragon.config;
 
+import com.example.vegetabledragon.repository.CategoryRepository;
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserRepository;
 import com.example.vegetabledragon.service.*;
@@ -14,8 +15,8 @@ import org.springframework.web.client.RestTemplate;
 @EnableAspectJAutoProxy // AOP 활성화
 public class AppConfig {
     @Bean
-    public PostService postService(PostRepository postRepository, UserRepository userRepository) {
-        return new PostServiceImpl(postRepository, userRepository);
+    public PostService postService(PostRepository postRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
+        return new PostServiceImpl(postRepository, userRepository, categoryRepository);
     }
 
     @Bean

@@ -78,6 +78,8 @@ export default {
       .then(() => {
         localStorage.removeItem("username");
         this.userName = '';
+
+        window.location.reload();  // 페이지 새로 고침
       })
     },
     syncUserName() {
