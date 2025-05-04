@@ -27,19 +27,19 @@ const routes = [
         path: '/board/list',
         name: 'BoardList',
         component: BoardList,
-        meta: { title: '게시판' }
+        meta: { title: '게시판', content: '다양한 주제의 게시글을 확인하세요'}
     },
     {
         path: '/board/write',
         name: 'BoardWrite',
         component: BoardWrite,
-        meta: { title: '게시글 작성' }
+        meta: { title: '게시글 작성', content: '' }
     },
     {
         path: '/best-topics',
         name: 'BestTopics',
         component: BestTopics,
-        meta: { title: 'BestTopics' }
+        meta: { title: 'Best Topics', content: '가장 인기 있는 게시글을 확인하세요'}
     },
     {
         path: '/board/view/:id',
