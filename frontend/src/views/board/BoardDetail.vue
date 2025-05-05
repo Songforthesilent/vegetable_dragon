@@ -201,9 +201,10 @@ export default {
   },
   mounted() {
     console.log("[DEBUG] 현재 게시글 ID: ", this.$route.params.id);
-    this.checkLoginStatus();
-    this.getArticleDetail();
-    this.fetchComments(); // 게시글에 대한 댓글 목록 가져오기
+    this.checkLoginStatus().then(() => {
+      this.getArticleDetail();
+      this.fetchComments();
+    });
   },
   methods: {
     async confirmDeletePost() {
@@ -341,6 +342,10 @@ export default {
       }
     },
     openEditPostPasswordModal() {
+
+      console.log("loggedInUser.email:", this.loggedInUser?.email);
+      console.log("article.authorEmail:", this.article?.authorEmail);
+      console.log("isPostAuthor:", this.isPostAuthor);
       // 작성자라면 비밀번호 없이 바로 수정 모달 오픈
       if (this.isPostAuthor) {
         this.editPostModal = true;
