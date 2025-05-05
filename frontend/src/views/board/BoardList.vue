@@ -1,70 +1,152 @@
 <template>
   <div class="main-container">
-    <!-- 게시글 영역 -->
     <div class="content">
-      <article class="board-list">
-        <section class="common-buttons">
-          <!-- 왼쪽 정렬: 카테고리 선택과 검색창 -->
-          <div class="left-controls">
-            <select v-model="selectedCategory" class="category-select">
-              <option value="">전체</option>
-              <option value="vue">사회</option>
-              <option value="react">정치</option>
-              <option value="angular">문화</option>
-            </select>
-            <div>
-              <input v-model="searchQuery" type="text" placeholder="검색어 입력" class="search-input" />
+      <article class="board-list-container">
+        <!-- 페이지 제목 -->
+        <!--<div class="page-header">
+          <p class="page-description">다양한 주제의 게시글을 확인하세요</p>
+        </div>-->
+
+        <!-- 검색 및 필터 영역 -->
+        <section class="filter-section">
+          <div class="filter-controls">
+            <div class="select-wrapper">
+              <select v-model="selectedCategory" class="category-select" @change="search">
+                <option value="">전체</option>
+                <option value="v1">경제</option>
+                <option value="v2">연예</option>
+                <option value="v3">정치</option>
+                <option value="v4">사회</option>
+                <option value="v5">국제</option>
+                <option value="v6">문화</option>
+              </select>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-icon">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+
+            <div class="search-container">
+              <input
+                  v-model="searchQuery"
+                  type="text"
+                  placeholder="검색어를 입력하세요"
+                  class="search-input"
+                  @keyup.enter="search"
+              />
               <button @click="search" class="search-button">
-                <i class="fas fa-search search-icon"></i> <!-- 돋보기 아이콘 -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
               </button>
             </div>
           </div>
 
-          <!-- 오른쪽 정렬: 등록 버튼 -->
-          <div class="write-controls">
-            <button type="button" class="w3-button w3-round w3-blue-gray" @click="fnWrite">등록</button>
+          <button @click="fnWrite" class="write-button">
+            글 등록하기
+          </button>
+        </section>
+
+        <!-- 게시글 목록 -->
+        <section class="board-card">
+          <div class="board-table-container">
+            <table class="board-table">
+              <thead>
+              <tr>
+                <th class="col-id">No</th>
+                <th class="col-title">제목</th>
+                <th class="col-author">작성자</th>
+                <th class="col-date">등록일시</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="post in posts" :key="post.id" @click="fnView(post.id)" class="post-row">
+                <td class="col-id">{{ post.id }}</td>
+                <td class="col-title">
+                  <div class="post-title-container">
+                    <span class="post-title">{{ post.title }}</span>
+                  </div>
+                </td>
+                <td class="col-author">{{ post.authorUsername }}</td>
+                <td class="col-date">{{ formatDate(post.createdAt) }}</td>
+              </tr>
+              <tr v-if="posts.length === 0" class="empty-row">
+                <td colspan="4">
+                  <div class="empty-message">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <p>게시글이 없습니다</p>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
           </div>
         </section>
 
-        <section>
-          <table class="w3-table-all">
-            <thead>
-            <tr>
-              <th>No</th>
-              <th>제목</th>
-              <th>작성자</th>
-              <th>등록일시</th>
-            </tr>
-            </thead>
-            <tbody>
-              <tr v-for="post in posts" :key="post.id">
-                <td>{{ post.id }}</td>
-                <td><a @click="fnView(post.id)">{{ post.title }}</a></td>
-                <td>{{ post.authorUsername }}</td>
-                <td>{{ formatDate(post.createdAt) }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
         <!-- 페이지네이션 -->
-        <div class="pagination w3-bar w3-padding-16 w3-small" v-if="totalElements > 0">
-          <span class="pg">
-            <a href="javascript:;" @click="fnPage(0)" class="first w3-button w3-border">&lt;&lt;</a>
-            <a href="javascript:;" v-if="currentPage > 0" @click="fnPage(currentPage - 1)"
-               class="prev w3-button w3-border">&lt;</a>
-            <template v-for="n in pagination">
-              <template v-if="currentPage === n">
-                <strong class="w3-button w3-border w3-green" :key="n">{{ n + 1 }}</strong>
-              </template>
-              <template v-else>
-                <a class="w3-button w3-border" href="javascript:;" @click="fnPage(n)" :key="n">{{ n + 1 }}</a>
-              </template>
-            </template>
-            <a href="javascript:;" v-if="currentPage < totalPages - 1" @click="fnPage(currentPage + 1)"
-               class="next w3-button w3-border">&gt;</a>
-            <a href="javascript:;" @click="fnPage(totalPages - 1)" class="last w3-button w3-border">&gt;&gt;</a>
-          </span>
+        <div class="pagination-container" v-if="totalElements > 0">
+          <div class="pagination">
+            <button
+                @click="fnPage(0)"
+                class="page-button first-button"
+                :disabled="currentPage === 0"
+                title="첫 페이지"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="11 17 6 12 11 7"></polyline>
+                <polyline points="18 17 13 12 18 7"></polyline>
+              </svg>
+            </button>
+
+            <button
+                @click="fnPage(currentPage - 1)"
+                class="page-button prev-button"
+                :disabled="currentPage === 0"
+                title="이전 페이지"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+            </button>
+
+            <div class="page-numbers">
+              <button
+                  v-for="n in pagination"
+                  :key="n"
+                  @click="fnPage(n)"
+                  :class="['page-number', { active: currentPage === n }]"
+              >
+                {{ n + 1 }}
+              </button>
+            </div>
+
+            <button
+                @click="fnPage(currentPage + 1)"
+                class="page-button next-button"
+                :disabled="currentPage >= totalPages - 1"
+                title="다음 페이지"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </button>
+
+            <button
+                @click="fnPage(totalPages - 1)"
+                class="page-button last-button"
+                :disabled="currentPage >= totalPages - 1"
+                title="마지막 페이지"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="13 17 18 12 13 7"></polyline>
+                <polyline points="6 17 11 12 6 7"></polyline>
+              </svg>
+            </button>
+          </div>
         </div>
       </article>
     </div>
@@ -172,84 +254,350 @@ export default {
 </script>
 
 <style scoped>
-.board-list {
-  width: 1050px;
-  margin: auto;
+/* 전체 레이아웃 */
+.main-container {
+  display: flex;
+  justify-content: center;
+  padding: 0 20px;
+  margin-top: 30px;
 }
 
-.w3-table-all {
+.content {
   width: 100%;
-  border-collapse: collapse;
-  border: none;
+  max-width: 1200px;
 }
 
-.w3-table-all th {
-  border-top: 1px solid #939393;
-  border-bottom: 1px solid #939393;
-  background-color: #f1f1f1;
-  color: black;
-  text-align: center;
-  font-size: 15px;
-  font-weight: bold;
+.board-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 
-.w3-table-all td {
-  border-top: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
-  text-align: center;
-  color: #939393;
-  font-size: 15px;
-}
-
-.w3-table-all td a {
-  text-decoration: none;
-}
-
-.w3-table-all tr:nth-child(even) {
-  background-color: transparent;
-}
-
-.w3-table-all tr:hover {
-  background-color: #f1f1f1;
-}
-
-.common-buttons {
+/* 필터 섹션 */
+.filter-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 13px;
-  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-.left-controls {
+.filter-controls {
   display: flex;
-  gap: 10px;
+  gap: 15px;
+  flex-wrap: wrap;
 }
 
-.write-controls {
-  display: flex;
-}
-
-.category-select,
-.search-input {
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+.select-wrapper {
+  position: relative;
 }
 
 .category-select {
-  width: 70px;
+  appearance: none;
+  padding: 12px 40px 12px 16px;
+  border: 1px solid #3A4CA4;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 90px;
+}
+
+.category-select:focus {
+  outline: none;
+  border-color: #3A4CA4;
+  box-shadow: 0 0 0 2px rgba(58, 76, 164, 0.1);
+}
+
+.select-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+}
+
+.search-container {
+  position: relative;
+  flex-grow: 1;
+  min-width: 250px;
 }
 
 .search-input {
-  width: 200px;
+  width: 100%;
+  padding: 12px 45px 12px 16px;
+  border: 1px solid #3A4CA4;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3A4CA4;
+  box-shadow: 0 0 0 2px rgba(58, 76, 164, 0.1);
 }
 
 .search-button {
-  padding: 8px 15px;
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #3A4CA4;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: #2d3a7c;
+}
+
+.write-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: #3A4CA4;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.write-button:hover {
+  background-color: #2d3a7c;
+  transform: translateY(-2px);
+}
+
+.button-icon {
+  stroke: white;
+}
+
+/* 게시글 목록 테이블 */
+.board-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.board-card:hover {
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+}
+
+.board-table-container {
+  overflow-x: auto;
+}
+
+.board-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.board-table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  padding: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.board-table td {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+.col-id {
+  width: 80px;
+  text-align: center;
+}
+
+.col-title {
+  min-width: 300px;
+}
+
+.col-author {
+  width: 120px;
+  text-align: center;
+}
+
+.col-date {
+  width: 150px;
+  text-align: center;
+}
+
+.post-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.post-row:hover {
+  background-color: #f8fafc;
+}
+
+.post-title-container {
+  display: flex;
+  align-items: center;
+}
+
+.post-title {
+  font-weight: 500;
+  color: #1e293b;
+  transition: color 0.2s ease;
+}
+
+.post-row:hover .post-title {
+  color: #3A4CA4;
+}
+
+.empty-row td {
+  padding: 40px 0;
+}
+
+.empty-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #94a3b8;
+}
+
+.empty-message svg {
+  stroke: #94a3b8;
+}
+
+.empty-message p {
+  margin: 0;
+  font-size: 15px;
+}
+
+/* 페이지네이션 */
+.pagination-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-button:hover:not(:disabled) {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.page-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 5px;
+}
+
+.page-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-number:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.page-number.active {
+  background-color: #3A4CA4;
+  color: white;
+  border-color: #3A4CA4;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #64748b;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .filter-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
+  .write-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .col-id, .col-date {
+    display: none;
+  }
+
+  .page-numbers {
+    max-width: 250px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 </style>

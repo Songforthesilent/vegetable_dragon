@@ -5,9 +5,18 @@
       <!-- 검색창 영역 -->
       <section class="search-section">
         <div class="search-container">
-          <input type="text" v-model="searchQuery" placeholder="Search" class="search-input" />
+          <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="검색어를 입력하세요"
+              class="search-input"
+              @keyup.enter="search"
+          />
           <button @click="search" class="search-button">
-            <i class="fas fa-search search-icon"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
           </button>
         </div>
       </section>
@@ -17,18 +26,63 @@
         <div class="section-header">
           <h2 class="section-title">Best Topics</h2>
           <router-link to="/best-topics" class="more-link">
-            <i class="fas fa-chevron-right"></i>
+            더보기
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
           </router-link>
         </div>
-        <div class="best-topics-container">
-          <div v-for="article in bestTopics" :key="article.id" class="best-topic">
-            <img :src="article.image" alt="Best Topic Image" class="best-topic-img" />
-            <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
-              <h3>{{ article.title }}</h3>
-            </router-link>
-            <p>{{ article.content }}</p>
+          <div class="best-topics-container">
+            <div v-for="article in bestTopics" :key="article.id" class="best-topic-card">
+              <div class="best-topic-vote-container">
+                <div class="vote-circle-container">
+                  <div class="vote-circle">
+                    <svg viewBox="0 0 36 36" class="vote-chart">
+                      <!-- 배경 원 -->
+                      <path class="vote-circle-bg"
+                            d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <!-- 찬성 부분 (파란색) -->
+                      <path class="vote-circle-true"
+                            :stroke-dasharray="`${(article.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
+                            d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <!-- 반대 부분 (빨간색) -->
+                      <path class="vote-circle-false"
+                            :stroke-dasharray="`${(1 - (article.ratio?.trueNewsRatio || 0.5)) * 100}, 100`"
+                            :stroke-dashoffset="-1 * (article.ratio?.trueNewsRatio || 0.5) * 100"
+                            d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <div class="vote-percentage">
+                      <div class="vote-vs">VS</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="vote-labels">
+                  <div class="vote-label true">
+                    <span class="vote-percent">{{ Math.round((article.ratio?.trueNewsRatio || 0.5) * 100) }}%</span>
+                  </div>
+                  <div class="vote-label false">
+                    <span class="vote-percent">{{ Math.round((1 - (article.ratio?.trueNewsRatio || 0.5)) * 100) }}%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="best-topic-content">
+                <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
+                  <h3 class="best-topic-title">{{ article.title }}</h3>
+                </router-link>
+                <p class="best-topic-excerpt">{{ article.content }}</p>
+              </div>
+            </div>
           </div>
-        </div>
       </section>
 
       <!-- 최근 게시글 영역 -->
@@ -56,8 +110,8 @@
         <!-- 게시글 목록 -->
         <div class="recent-posts-list">
           <div v-for="article in filteredArticles" :key="article.id" class="post-item">
-              <span class="post-category">{{ article.category ? article.category.name : '없음' }}</span> <!-- 카테고리 이름 출력 -->
-              <router-link :to="'/board/view/' + article.id" class="post-title-link">
+            <span class="post-category">{{ article.category ? article.category.name : '없음' }}</span> <!-- 카테고리 이름 출력 -->
+            <router-link :to="'/board/view/' + article.id" class="post-title-link">
                   {{ article.title }}
               </router-link>
           </div>
@@ -86,6 +140,15 @@ export default {
       recentArticles: [],  // 백엔드에서 받아올 최신 게시글
       page: 0, // 현재 페이지 (기본은 첫 번째 페이지)
       size: 5, // 한 페이지에 표시할 게시글 수
+      categoryMap: {
+        "vue": "사회",
+        "react": "정치",
+        "angular": "문화",
+        "economy": "경제",
+        "entertainment": "연예",
+        "international": "국제",
+        "": "기타"
+      }
     };
   },
   computed: {
@@ -194,20 +257,60 @@ export default {
 .main-container {
   display: flex;
   justify-content: space-between;
-  padding: 0 150px;
+  padding: 0 250px;
+  margin-top: 30px;
 }
 
 .content {
-  width: 75%;
+  width: 74%;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.search-section {
-  margin-top: 40px;
-  text-align: left;
+.search-container {
+  position: relative;
+  flex-grow: 1;
+  min-width: 250px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 45px 12px 16px;
+  border: 1px solid #3A4CA4;
+  border-radius: 10px;
   background-color: #ffffff;
+  color: #1e293b;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3A4CA4;
+  box-shadow: 0 0 0 2px rgba(58, 76, 164, 0.1);
+}
+
+.search-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #3A4CA4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: #2d3a7c;
 }
 
 .section-header {
@@ -238,19 +341,6 @@ export default {
   border-radius: 2px;
 }
 
-.search-container {
-  position: relative;
-  width: 100%;
-}
-
-.search-input {
-  padding: 10px;
-  width: 100%;
-  border: 1px solid #999FBB;
-  border-radius: 5px;
-  color: #989595;
-}
-
 .more-link {
   display: flex;
   align-items: center;
@@ -274,31 +364,12 @@ export default {
   transform: translateX(3px);
 }
 
-.search-button {
-  position: absolute;
-  right: 6px;
-  top: 6px;
-  padding: 6px 12px;
-  background-color: white;
-  color: #989595;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
 /* Best Topics */
 .article-section {
   width: 100%;
   padding: 0px;
-  margin-top: 20px;
+  margin: 20px 0 30px 0;
   background-color: #ffffff;
-}
-
-.article {
-  border-bottom: 1px solid #ddd;
-  padding: 10px;
-  margin-bottom: 10px;
 }
 
 .section-header {
@@ -307,51 +378,156 @@ export default {
   align-items: center;
 }
 
-.best-topics-title {
-  text-align: left;
-  font-weight: bold;
-  font-size: 18px;
-}
-
-.more-link {
-  font-size: 14px;
-  color: #3A4CA4;
-  text-decoration: none;
-}
-
-.more-link:hover {
-  text-decoration: underline;
-}
-
-.best-topics-container {
+/* 투표 시각화 스타일 */
+.best-topic-vote-container {
+  padding: 15px;
+  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
+  border-bottom: 1px solid #e2e8f0;
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
-  padding: 0px;
+  flex-direction: column;
+  align-items: center;
 }
 
-.best-topic {
-  width: 50%;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border-radius: 5px;
+.vote-circle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.vote-circle {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.vote-chart {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.vote-circle-bg {
+  fill: none;
+  stroke: #e2e8f0;
+  stroke-width: 3.8;
+}
+
+.vote-circle-true {
+  fill: none;
+  stroke: #3A4CA4;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+}
+
+.vote-circle-false {
+  fill: none;
+  stroke: #ef4444;
+  stroke-width: 3.8;
+  stroke-linecap: round;
+}
+
+.vote-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
 }
 
-.best-topic-img {
+.vote-vs {
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+  background: linear-gradient(135deg, #3A4CA4, #ef4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.vote-labels {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
-  height: auto;
-  border-radius: 8px;
+}
+
+.vote-label {
+  display: flex;
+  justify-content: center;
+  width: 45%;
+}
+
+.vote-label.true {
+  color: #3A4CA4;
+}
+
+.vote-label.false {
+  color: #ef4444;
+}
+
+.vote-percent {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Best Topics 섹션 */
+.best-topics-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* 기존 best-topic-image-container 스타일 제거 및 best-topic-card 수정 */
+.best-topic-card {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+}
+
+.best-topic-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.best-topic-card:hover {
+  transform: scale(1.05);
+}
+
+.best-topic-content {
+  padding: 16px;
+}
+
+.best-topic-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+  transition: color 0.2s ease;
 }
 
 .best-topic-title-link {
   text-decoration: none;
-  color: #333;
-  font-weight: bold;
 }
 
-.best-topic-title-link:hover {
+.best-topic-card:hover .best-topic-title {
   color: #3A4CA4;
+}
+
+.best-topic-excerpt {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* 최근 게시글 섹션 */
@@ -438,11 +614,6 @@ export default {
     padding: 0 16px;
   }
 
-  .sidebar {
-    width: 100%;
-    margin-top: 30px;
-  }
-
   .best-topics-container {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -461,10 +632,6 @@ export default {
 
   .category-button {
     white-space: nowrap;
-  }
-
-  .section-card {
-    padding: 20px;
   }
 }
 </style>
