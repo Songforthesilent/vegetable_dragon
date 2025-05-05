@@ -103,15 +103,13 @@ export default {
 <style scoped>
 /*로그인*/
 .login-panel {
-  width: 20%;
+  width: 23%;
   height: 980px;
   background-color: #f9f9f9;
   padding: 15px;
   border-radius: 8px;
   text-align: center;
   position: sticky;
-  margin-top: 40px;
-  top: 20%;
 }
 
 .login-box {
