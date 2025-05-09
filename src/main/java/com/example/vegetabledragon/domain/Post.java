@@ -29,7 +29,10 @@ public class Post {
     private String content;
 
     @Column(nullable = false)
-    private String authorUsername;
+    private String authorUsername; // 로그인한 사용자의 익명 이름
+
+    @Column(nullable = true)
+    private String authorEmail; // 해당 사용자의 이메일
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = true)
@@ -38,10 +41,11 @@ public class Post {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public Post(String title, String content, String authorUsername, Category category) {
+    public Post(String title, String content, String authorUsername, Category category, String authorEmail) {
         this.title = title;
         this.content = content;
         this.authorUsername = authorUsername;
         this.category =  category;
+        this.authorEmail = authorEmail;
     }
 }
