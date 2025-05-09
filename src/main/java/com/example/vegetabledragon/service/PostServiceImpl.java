@@ -46,7 +46,7 @@ public class PostServiceImpl implements PostService {
         // 카테고리 이름으로 Category 객체를 찾음
         Category category = categoryRepository.findByName(request.getCategory());
 
-        Post post = new Post(request.getTitle(), request.getContent(), username, category);
+        Post post = new Post(request.getTitle(), request.getContent(), username, category, user.get().getEmail());
         post.setAuthorUsername(user.get().getAnonymousName()); // 로그인된 사용자의 annonymousName을 넣어준다.
 
         return postRepository.save(post);
@@ -75,11 +75,11 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePostById(Long postId, HttpSession session) throws PostNotFoundException, UnauthorizedException {
         String loggedInUsername = (String) session.getAttribute("loggedInUser");
-
+        String userEmail = (String) session.getAttribute("loggedInEmail");
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        if (!post.getAuthorUsername().equals(loggedInUsername))
+        if (!post.getAuthorEmail().equals(userEmail))
             throw new UnauthorizedException();
 
         postRepository.deleteById(postId); // postRepository가 JpaRepository를 확장하고 있으므로, CrudRepository에 있는 deleteById(ID id)를 사용할 수 있다.
@@ -89,11 +89,12 @@ public class PostServiceImpl implements PostService {
     public Post updatePost(Long postId, PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException {
         // 게시물 존재 확인
         String loggedInUsername = (String) session.getAttribute("loggedInUser");
+        String userEmail = (String) session.getAttribute("loggedInEmail");
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        if (!post.getAuthorUsername().equals(loggedInUsername))
+        if (!post.getAuthorEmail().equals(userEmail))
             throw new UnauthorizedException();
 
         // 수정할 필드의 유효성 검사
