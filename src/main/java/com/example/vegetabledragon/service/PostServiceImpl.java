@@ -46,8 +46,8 @@ public class PostServiceImpl implements PostService {
         // 카테고리 이름으로 Category 객체를 찾음
         Category category = categoryRepository.findByName(request.getCategory());
 
-        Post post = new Post(request.getTitle(), request.getContent(), username, category, user.get().getEmail());
-        post.setAuthorUsername(user.get().getAnonymousName()); // 로그인된 사용자의 annonymousName을 넣어준다.
+        Post post = new Post(request.getTitle(), request.getContent(), user.get().getAnonymousName(), category, user.get().getEmail());
+//        post.setAuthorUsername(user.get().getAnonymousName()); // 로그인된 사용자의 annonymousName을 넣어준다.
 
         return postRepository.save(post);
     }
@@ -107,12 +107,12 @@ public class PostServiceImpl implements PostService {
         // 카테고리 수정
         if (request.getCategory() != null){
             Category category = categoryRepository.findByName(request.getCategory());
-            post.setCategory(category); // 카테고리 변경
+            post.updateCategory(category); // 카테고리 변경
         }
 
         // 필드 업데이트
-        post.setTitle(request.getTitle());
-        post.setContent(request.getContent());
+        post.updateTitle(request.getTitle());
+        post.updateContent(request.getContent());
 
         // 업데이트된 게시물 저장
         return postRepository.save(post);
