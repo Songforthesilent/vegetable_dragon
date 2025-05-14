@@ -1,6 +1,7 @@
 package com.example.vegetabledragon.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,8 +12,7 @@ import org.hibernate.annotations.OnDeleteAction;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Comment {
     @Id
@@ -39,4 +39,16 @@ public class Comment {
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public Comment(Post post, User user, String writer, String comment, String password){
+        this.post = post;
+        this.user = user;
+        this.writer = writer;
+        this.comment = comment;
+        this.password = password;
+    }
+
+    public void updateComment(String newComment){
+        this.comment = newComment;
+    }
 }

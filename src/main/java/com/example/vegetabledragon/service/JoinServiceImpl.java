@@ -26,14 +26,16 @@ public class JoinServiceImpl implements JoinService {
         String encryptedPassword = passwordEncoder.encode(user.getPassword());
 
         // 새 사용자 생성
-        User newUser = User.builder()
-                .username(user.getUsername())
-                .password(encryptedPassword) // 수정(암호화된 비밀번호 사용)
-                .email(user.getEmail())
-                .anonymousName(user.getAnonymousName())
-                .birthday(user.getBirthday())
-                .realName(user.getRealName())
-                .build();
+        User newUser = new User(
+                null,
+                user.getRealName(),
+                user.getUsername(),
+                user.getEmail(),
+                encryptedPassword,
+                user.getBirthday(),
+                user.getAnonymousName(),
+                null
+        );
 
         // 저장
         return userRepository.save(newUser);
