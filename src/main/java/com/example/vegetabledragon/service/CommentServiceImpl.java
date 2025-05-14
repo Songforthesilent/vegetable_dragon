@@ -30,25 +30,29 @@ public class CommentServiceImpl implements CommentService {
     public Comment saveComment(Long postId, HttpSession session, CommentRequest request) throws PostNotFoundException, UserNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
+        // set을 쓰는 것보다, 변수에 저장해서 한 번에 생성자 부르는 게 나아보인다.
 
-        Comment comment = new Comment();
-        comment.setPost(post);
-        comment.setComment(request.getComment());
+        User user = null;
+        String writer;
+        String password = null;
+
+//        Comment comment = new Comment();
+//        comment.setPost(post);
+//        comment.setComment(request.getComment());
 
         String sessionUsername = (String) session.getAttribute("loggedInUser");
 
         // Session 이 다른 거하고 유지되는지를 확인해야 한다.
         if (sessionUsername != null) {
-            User user = userRepository.findByUsername(sessionUsername)
+            user = userRepository.findByUsername(sessionUsername)
                     .orElseThrow(() -> new UserNotFoundException(sessionUsername));
-            comment.setUser(user);
-            comment.setWriter(user.getAnonymousName());
+            writer = user.getAnonymousName();
         } else {
-            comment.setUser(null);
-            comment.setWriter("익명");
-            comment.setPassword(request.getPassword());
+            writer = "익명";
+            password = request.getPassword();
         }
 
+        Comment comment = new Comment(post, user, writer, request.getComment(), password);
         return commentRepository.save(comment);
     }
 
@@ -73,7 +77,7 @@ public class CommentServiceImpl implements CommentService {
         checkPermissionService.validateCommentPermission(comment, sessionUsername, request.getPassword());
 
         // 댓글 수정
-        comment.setComment(request.getComment());
+        comment.updateComment(request.getComment());
 
         return commentRepository.save(comment);
     }
