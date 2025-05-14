@@ -1,10 +1,7 @@
 package com.example.vegetabledragon.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Service;
 
@@ -12,9 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
-
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name="posts")
 public class Post {
@@ -47,5 +42,17 @@ public class Post {
         this.authorUsername = authorUsername;
         this.category =  category;
         this.authorEmail = authorEmail;
+    }
+
+    public void updateCategory(Category category) {
+        this.category = category;
+    }
+
+    public void updateTitle(String title) {
+        this.title = title;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 }
