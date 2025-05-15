@@ -3,6 +3,7 @@ package com.example.vegetabledragon.service;
 import com.example.vegetabledragon.domain.Comment;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
+import com.example.vegetabledragon.domain.UserType;
 import com.example.vegetabledragon.dto.CommentRequest;
 import com.example.vegetabledragon.exception.CommentNotPermissionException;
 import com.example.vegetabledragon.exception.PostNotFoundException;
@@ -35,6 +36,7 @@ public class CommentServiceImpl implements CommentService {
         User user = null;
         String writer;
         String password = null;
+        UserType userType;
 
 //        Comment comment = new Comment();
 //        comment.setPost(post);
@@ -47,12 +49,15 @@ public class CommentServiceImpl implements CommentService {
             user = userRepository.findByUsername(sessionUsername)
                     .orElseThrow(() -> new UserNotFoundException(sessionUsername));
             writer = user.getAnonymousName();
+            userType = UserType.REGISTERED;
+
         } else {
             writer = "익명";
             password = request.getPassword();
+            userType = UserType.ANONYMOUS;
         }
 
-        Comment comment = new Comment(post, user, writer, request.getComment(), password);
+        Comment comment = new Comment(post, user, writer, request.getComment(), password, userType);
         return commentRepository.save(comment);
     }
 

@@ -1,6 +1,7 @@
 package com.example.vegetabledragon.service;
 
 import com.example.vegetabledragon.domain.Comment;
+import com.example.vegetabledragon.domain.UserType;
 import com.example.vegetabledragon.exception.CommentNotPermissionException;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +12,7 @@ public class CheckPermissionServiceImpl {
 
     // 익명 댓글의 경우 비밀번호 검증
     public void checkPermissionForAnonymous(Comment comment, String sessionUsername, String password) throws CommentNotPermissionException {
-        if (comment.getWriter().equals("익명")){
+        if (comment.getUserType() == UserType.ANONYMOUS) { // 기존에 writer == "익명" 으로 비교했었는데, 하드코딩으로 비교하는 게 적절하지 않다고 생각해서 수정함.
             if (!comment.getPassword().equals(password)){
                 throw new CommentNotPermissionException(password);
             }
