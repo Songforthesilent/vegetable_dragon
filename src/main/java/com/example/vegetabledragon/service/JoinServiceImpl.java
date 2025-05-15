@@ -6,8 +6,10 @@ import com.example.vegetabledragon.exception.InvalidLoginException;
 import com.example.vegetabledragon.exception.UserAlreadyExistsException;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
 public class JoinServiceImpl implements JoinService {
@@ -24,14 +26,16 @@ public class JoinServiceImpl implements JoinService {
         String encryptedPassword = passwordEncoder.encode(user.getPassword());
 
         // 새 사용자 생성
-        User newUser = User.builder()
-                .username(user.getUsername())
-                .password(encryptedPassword) // 수정(암호화된 비밀번호 사용)
-                .email(user.getEmail())
-                .anonymousName(user.getAnonymousName())
-                .birthday(user.getBirthday())
-                .realName(user.getRealName())
-                .build();
+        User newUser = new User(
+                null,
+                user.getRealName(),
+                user.getUsername(),
+                user.getEmail(),
+                encryptedPassword,
+                user.getBirthday(),
+                user.getAnonymousName(),
+                null
+        );
 
         // 저장
         return userRepository.save(newUser);
@@ -39,9 +43,14 @@ public class JoinServiceImpl implements JoinService {
     }
     @Override
     public String login(LoginForm loginForm) throws InvalidLoginException {
+        User user;
         // 이메일로 사용자 조회
-        User user = userRepository.findByEmail(loginForm.getEmail())
-                .orElseThrow(() -> new InvalidLoginException("The email does not exist"));
+        try {
+            user = userRepository.findByEmail(loginForm.getEmail())
+                    .orElseThrow(() -> new InvalidLoginException("The email does not exist"));
+        } catch(InvalidLoginException e){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
+        }
 
         // 비밀번호 검증
         if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {

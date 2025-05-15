@@ -20,15 +20,17 @@ public class CheckPermissionServiceImpl {
 
     // 일반 댓글의 경우 작성자와 login한 User가 일치하는지 확인
     public void checkPermissionForAuthenticatedUser(Comment comment, String sessionUsername) throws CommentNotPermissionException {
-        if (!comment.getWriter().equals(sessionUsername)){
+        if (comment.getUser() == null || !comment.getUser().getUsername().equals(sessionUsername)) {
             throw new CommentNotPermissionException(sessionUsername);
         }
     }
 
+
     public void validateCommentPermission(Comment comment, String sessionUsername, String password) throws CommentNotPermissionException {
-        if (comment.getWriter().equals("익명"))
+        if (comment.getUser() == null) {
             checkPermissionForAnonymous(comment, sessionUsername, password);
-        else
+        } else {
             checkPermissionForAuthenticatedUser(comment, sessionUsername);
+        }
     }
 }

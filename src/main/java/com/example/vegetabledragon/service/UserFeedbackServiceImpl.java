@@ -5,6 +5,7 @@ import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.domain.UserFeedback;
 import com.example.vegetabledragon.dto.FakeNewsFeedbackRatioResponse;
 import com.example.vegetabledragon.dto.FeedbackRequest;
+import com.example.vegetabledragon.dto.UserFeedbackResponse;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.repository.PostRepository;
@@ -29,33 +30,44 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
     @Override
     @Transactional
-    public UserFeedback saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
-        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
+    public UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
+//        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
 
-        // 기존 피드백이 있는지 확인
-        Optional<UserFeedback> exisitngFeedback = userFeedbackRepository.findByPostAndUser(post, user);
+        // 실제 서비스 시에는 허용시켜야 할 부분
+        // Test 시에는 많은 사용자가 없기 때문에 하나의 계정으로 처리할 예정.
 
-        if (exisitngFeedback.isPresent()) {
-            UserFeedback feedback = exisitngFeedback.get();
-            feedback.setFakeNews(request.isFakeNews()); // 기존 피드백 수정
-            return userFeedbackRepository.save(feedback);
-        }
+//        // 기존 피드백이 있는지 확인
+//        Optional<UserFeedback> exisitngFeedback = userFeedbackRepository.findByPostAndUser(post, user);
+//
+//        if (exisitngFeedback.isPresent()) {
+//            UserFeedback feedback = exisitngFeedback.get();
+//            feedback.setFakeNews(request.isFakeNews()); // 기존 피드백 수정
+//            return userFeedbackRepository.save(feedback);
+//        }
 
         // 새 피드백 저장
         UserFeedback newFeedback = new UserFeedback(post, user, request.isFakeNews());
-        return userFeedbackRepository.save(newFeedback);
+        UserFeedback saved = userFeedbackRepository.save(newFeedback);
+
+        // Hibernate 로그를 줄이고, 스프링 로그로 생성
+//        log.info("[UserfeedbackService_vote] User '{}' voted on Post {} -> fakeNews = {}", user.getUsername(), post.getId(), request.isFakeNews());
+
+        return UserFeedbackResponse.from(saved);
     }
 
     @Override
-    public List<UserFeedback> getFeedbacksByPost(Long postId) throws PostNotFoundException {
+    public List<UserFeedbackResponse> getFeedbacksByPost(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
 
-        return userFeedbackRepository.findByPost(post);
+        return userFeedbackRepository.findByPost(post).
+                stream()
+                .map(UserFeedbackResponse::from)
+                .toList();
     }
 
     @Override

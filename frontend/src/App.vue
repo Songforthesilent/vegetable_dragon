@@ -7,12 +7,23 @@
 <script>
 import PageHeader from '@/components/PageHeader'
 import PageFooter from '@/components/PageFooter'
+import { useUserStore } from '@/stores/user'
+import { getSessionUser } from "@/api/auth";
 
 export default {
   name: 'App',
   components: {
     PageFooter,
     PageHeader,
+  },
+  async mounted() {
+    try {
+      const res = await getSessionUser(); // 세션 확인
+      const store = useUserStore();
+      store.setUsername(res.data); // 세션에 저장된 사용자 이름 저장
+    } catch (error) {
+      console.log('세션 없음 또는 만료됨');
+    }
   }
 }
 </script>
