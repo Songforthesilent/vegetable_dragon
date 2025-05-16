@@ -31,6 +31,9 @@ public class Comment {
     @Column(nullable = false)
     private String writer; // anonymouseName, "익명"
 
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
+
     @Column(nullable = false)
     private String comment;
 
@@ -40,12 +43,13 @@ public class Comment {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public Comment(Post post, User user, String writer, String comment, String password){
+    public Comment(Post post, User user, String writer, String comment, String password, UserType userType) {
         this.post = post;
         this.user = user;
         this.writer = writer;
         this.comment = comment;
         this.password = password;
+        this.userType = userType;
     }
 
     public void updateComment(String newComment){
