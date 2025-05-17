@@ -23,6 +23,7 @@
 
       <!-- AI 분석 섹션 -->
       <AIAnalysis
+          :post-id="article.id"
           :article-content="article.content"
           :article-title="article.title"
       />
