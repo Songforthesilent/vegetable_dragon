@@ -51,19 +51,20 @@ public class PostServiceImpl implements PostService {
         Post post = new Post(request.getTitle(), request.getContent(), user.get().getAnonymousName(), category, user.get().getEmail());
 //        post.setAuthorUsername(user.get().getAnonymousName()); // 로그인된 사용자의 annonymousName을 넣어준다.
 
-        Post savedPost = postRepository.save(post);
 
         try {
-            Map<String, Object> result = mlService.predict(savedPost.getContent());
-            Double prediction = (Double) result.get("prediction");
+            Map<String, Object> result = mlService.predict(post.getContent());
 
-            savedPost.updatePrediction(prediction);       // prediction 필드 설정
-            postRepository.save(savedPost);            // 다시 저장 (update)
+            Map<String, Object> probabilities = (Map<String, Object>) result.get("probabilities");
+            Double probClass1 = ((Number) probabilities.get("class_1")).doubleValue();
+
+
+            post.updatePrediction(probClass1); // 다시 저장 (update)
         } catch (Exception e) {
             // 예측 실패 시 무시하고 저장은 유지
         }
 
-        return savedPost;
+        return postRepository.save(post);
     }
     @Override
     public Page<Post> getAllPosts(int page, int size) throws InvalidPageSizeException {
@@ -130,6 +131,11 @@ public class PostServiceImpl implements PostService {
 
         // 업데이트된 게시물 저장
         return postRepository.save(post);
+    }
+
+    @Override
+    public List<Post> searchPostsByTitle(String title) {
+        return postRepository.findByTitleContainingIgnoreCase(title);
     }
 
 }

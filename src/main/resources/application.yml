@@ -49,6 +49,6 @@ logging:
 
 flask:
   api:
-    url: "https://44a7-218-237-232-179.ngrok-free.app/predict"
+    url: "https://1989-218-237-232-179.ngrok-free.app/predict"
 
     # 절대 url 에서 s를 빼먹어선 안돼.
