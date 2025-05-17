@@ -3,23 +3,7 @@
     <!-- 게시글 영역 -->
     <article class="content">
       <!-- 검색창 영역 -->
-      <section class="search-section">
-        <div class="search-container">
-          <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="검색어를 입력하세요"
-              class="search-input"
-              @keyup.enter="search"
-          />
-          <button @click="search" class="search-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </button>
-        </div>
-      </section>
+      <SearchBar @search="search" />
 
       <!-- Best Topics 영역 -->
       <section class="article-section">
@@ -32,57 +16,60 @@
             </svg>
           </router-link>
         </div>
-          <div class="best-topics-container">
-            <div v-for="article in bestTopics" :key="article.id" class="best-topic-card">
-              <div class="best-topic-vote-container">
-                <div class="vote-circle-container">
-                  <div class="vote-circle">
-                    <svg viewBox="0 0 36 36" class="vote-chart">
-                      <!-- 배경 원 -->
-                      <path class="vote-circle-bg"
-                            d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                      <!-- 찬성 부분 (파란색) -->
-                      <path class="vote-circle-true"
-                            :stroke-dasharray="`${(article.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
-                            d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                      <!-- 반대 부분 (빨간색) -->
-                      <path class="vote-circle-false"
-                            :stroke-dasharray="`${(1 - (article.ratio?.trueNewsRatio || 0.5)) * 100}, 100`"
-                            :stroke-dashoffset="-1 * (article.ratio?.trueNewsRatio || 0.5) * 100"
-                            d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                      />
-                    </svg>
-                    <div class="vote-percentage">
-                      <div class="vote-vs">VS</div>
-                    </div>
-                  </div>
-                </div>
+        <div class="best-topics-container">
+          <div v-for="article in bestTopics" :key="article.id" class="best-topic-card">
+            <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
 
-                <div class="vote-labels">
-                  <div class="vote-label true">
-                    <span class="vote-percent">{{ Math.round((article.ratio?.trueNewsRatio || 0.5) * 100) }}%</span>
-                  </div>
-                  <div class="vote-label false">
-                    <span class="vote-percent">{{ Math.round((1 - (article.ratio?.trueNewsRatio || 0.5)) * 100) }}%</span>
+            <div class="best-topic-vote-container">
+              <div class="vote-circle-container">
+                <div class="vote-circle">
+                  <svg viewBox="0 0 36 36" class="vote-chart">
+                    <!-- 배경 원 -->
+                    <path class="vote-circle-bg"
+                          d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <!-- 찬성 부분 (파란색) -->
+                    <path class="vote-circle-true"
+                          :stroke-dasharray="`${(article.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
+                          d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                    <!-- 반대 부분 (빨간색) -->
+                    <path class="vote-circle-false"
+                          :stroke-dasharray="`${(1 - (article.ratio?.trueNewsRatio || 0.5)) * 100}, 100`"
+                          :stroke-dashoffset="-1 * (article.ratio?.trueNewsRatio || 0.5) * 100"
+                          d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"
+                    />
+                  </svg>
+                  <div class="vote-percentage">
+                    <div class="vote-vs">VS</div>
                   </div>
                 </div>
               </div>
-              <div class="best-topic-content">
-                <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
-                  <h3 class="best-topic-title">{{ article.title }}</h3>
-                </router-link>
-                <p class="best-topic-excerpt">{{ article.content }}</p>
+
+              <div class="vote-labels">
+                <div class="vote-label true">
+                  <span class="vote-percent">{{ Math.round((article.ratio?.trueNewsRatio || 0.5) * 100) }}%</span>
+                </div>
+                <div class="vote-label false">
+                  <span class="vote-percent">{{ Math.round((1 - (article.ratio?.trueNewsRatio || 0.5)) * 100) }}%</span>
+                </div>
               </div>
             </div>
+            </router-link>
+            <div class="best-topic-content">
+              <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
+                <h3 class="best-topic-title">{{ article.title }}</h3>
+              </router-link>
+              <p class="best-topic-excerpt">{{ article.content }}</p>
+            </div>
           </div>
+        </div>
       </section>
 
       <!-- 최근 게시글 영역 -->
@@ -112,8 +99,8 @@
           <div v-for="article in filteredArticles" :key="article.id" class="post-item">
             <span class="post-category">{{ article.category ? article.category.name : '없음' }}</span> <!-- 카테고리 이름 출력 -->
             <router-link :to="'/board/view/' + article.id" class="post-title-link">
-                  {{ article.title }}
-              </router-link>
+              {{ article.title }}
+            </router-link>
           </div>
         </div>
       </section>
@@ -126,14 +113,16 @@
 
 <script>
 import LoginBanner from '@/components/LoginBanner.vue';
+import SearchBar from '@/components/SearchBar.vue';
 import axios from 'axios';
+
 export default {
   components: {
-    LoginBanner
+    LoginBanner,
+    SearchBar
   },
   data() {
     return {
-      searchQuery: '',
       categories: ['경제', '연예', '정치', '사회', '국제', '문화'],
       selectedCategory: '전체',  // 기본 카테고리
       bestTopics: [], // 예시로 남겨놓은 Best Topics
@@ -174,8 +163,8 @@ export default {
     },
 
     // 검색 기능 (예시로 alert로 검색어 출력)
-    search() {
-      alert(`검색어: ${this.searchQuery}`);
+    search(query) {
+      alert(`검색어: ${query}`);
     },
 
     async fetchBestTopics() {
@@ -243,7 +232,6 @@ export default {
           console.error("카테고리별 게시글을 불러오는 데 실패했습니다.", error);
         }
       }
-
     }
   },
   created() {
@@ -266,51 +254,6 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-.search-container {
-  position: relative;
-  flex-grow: 1;
-  min-width: 250px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px 45px 12px 16px;
-  border: 1px solid #3A4CA4;
-  border-radius: 10px;
-  background-color: #ffffff;
-  color: #1e293b;
-  font-size: 14px;
-  transition: all 0.3s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #3A4CA4;
-  box-shadow: 0 0 0 2px rgba(58, 76, 164, 0.1);
-}
-
-.search-button {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background-color: #3A4CA4;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.search-button:hover {
-  background-color: #2d3a7c;
 }
 
 .section-header {
