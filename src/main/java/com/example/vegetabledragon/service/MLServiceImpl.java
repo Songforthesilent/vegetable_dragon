@@ -36,7 +36,9 @@ public class MLServiceImpl implements MLService {
 
         // Body로 보낼 데이터
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("text", text);
+        requestBody.put("title", ""); // or post.getTitle() if available
+        requestBody.put("content", text); // post.getContent()
+
 
         // 제대로 request를 보내는지 확인
         try{

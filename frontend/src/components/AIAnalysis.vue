@@ -36,8 +36,13 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   props: {
+    postId: {
+      type: Number,
+      required: true
+    },
     articleContent: {
       type: String,
       required: true
@@ -57,9 +62,29 @@ export default {
   mounted() {
     // 실제로는 API 호출을 통해 AI 분석을 수행하겠지만,
     // 여기서는 시뮬레이션을 위해 setTimeout 사용
-    this.analyzeArticle();
+    this.fetchPrediction();
+    // this.analyzeArticle();
   },
   methods: {
+    async fetchPrediction() {
+      this.isAnalyzing = true;
+      try {
+        const response = await axios.get(`http://localhost:8081/posts/${this.postId}`);
+        const prediction = response.data.prediction;
+
+        if (prediction == null) {
+          this.aiScore = 0;
+        } else {
+          // 예: 0.0~1.0 → 퍼센트 변환
+          this.aiScore = Math.round(prediction * 100);
+        }
+      } catch (e) {
+        console.error("AI 예측 점수 불러오기 실패:", e);
+        this.aiScore = 0;
+      } finally {
+        this.isAnalyzing = false;
+      }
+    },
     analyzeArticle() {
       this.isAnalyzing = true;
 
@@ -71,7 +96,8 @@ export default {
       }, 1500); // 1.5초 후 분석 완료 (시뮬레이션)
     },
     reanalyze() {
-      this.analyzeArticle();
+      // this.analyzeArticle();
+      this.fetchPrediction();
     },
     getScoreGradient() {
       if (this.aiScore >= 80) {
