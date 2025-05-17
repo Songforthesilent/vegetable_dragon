@@ -1,7 +1,14 @@
 package com.example.vegetabledragon.domain;
 
 import jakarta.persistence.*;
+<<<<<<< HEAD
 import lombok.*;
+=======
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +16,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+<<<<<<< HEAD
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+=======
+@Setter
+@NoArgsConstructor
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 @AllArgsConstructor
 @Table(name="posts")
 public class Post {
@@ -24,6 +36,7 @@ public class Post {
     private String content;
 
     @Column(nullable = false)
+<<<<<<< HEAD
     private String authorUsername; // 로그인한 사용자의 익명 이름
 
     @Column(nullable = true)
@@ -32,10 +45,14 @@ public class Post {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = true)
     private Category category;
+=======
+    private String authorUsername;
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+<<<<<<< HEAD
     @Column(nullable = true)
     private Double prediction; // 클래스 1의 확률
 
@@ -61,5 +78,11 @@ public class Post {
 
     public void updatePrediction(Double prediction) {
         this.prediction = prediction;
+=======
+    public Post(String title, String content, String authorUsername) {
+        this.title = title;
+        this.content = content;
+        this.authorUsername = authorUsername;
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     }
 }

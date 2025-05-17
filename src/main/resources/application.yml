@@ -12,7 +12,11 @@ spring:
   web:
     cors:
       allowed-origins: "http://localhost:8080"
+<<<<<<< HEAD
       allowed-methods: "GET,POST, PUT, DELETE"
+=======
+      allowed-methods: "GET,POST"
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
 
 
@@ -32,7 +36,11 @@ spring:
     database: mysql
     database-platform: org.hibernate.dialect.MySQLDialect
     open-in-view: false
+<<<<<<< HEAD
     show-sql: false
+=======
+    show-sql: true
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     hibernate:
       format_sql: true
       ddl-auto: update # 테이블 자동 생성
@@ -40,6 +48,7 @@ spring:
       hibernate:
         format_sql: true
 
+<<<<<<< HEAD
 
 logging:
   level:
@@ -52,3 +61,8 @@ flask:
     url: "https://44a7-218-237-232-179.ngrok-free.app/predict"
 
     # 절대 url 에서 s를 빼먹어선 안돼.
+=======
+flask:
+  api:
+    url: "https://da38-34-125-250-219.ngrok-free.app/predict"
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8

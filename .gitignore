@@ -22,7 +22,10 @@ bin/
 *.iws
 *.iml
 *.ipr
+<<<<<<< HEAD
 #model/venv_yong/
+=======
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
@@ -36,4 +39,8 @@ out/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
 model/*.pklmodel/venv_yong/
+=======
+model/*.pkl
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8

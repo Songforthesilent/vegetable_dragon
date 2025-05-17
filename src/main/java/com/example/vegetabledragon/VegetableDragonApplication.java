@@ -14,7 +14,11 @@ import java.util.Map;
 public class VegetableDragonApplication {
 
     public static void main(String[] args) {
+<<<<<<< HEAD
         // Spring Boot 애플리케이션 실행
+=======
+        // 🔹 Spring Boot 애플리케이션 실행
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         SpringApplication.run(VegetableDragonApplication.class, args);
     }
 }

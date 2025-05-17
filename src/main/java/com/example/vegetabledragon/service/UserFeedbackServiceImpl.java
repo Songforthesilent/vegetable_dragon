@@ -3,16 +3,23 @@ package com.example.vegetabledragon.service;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.domain.UserFeedback;
+<<<<<<< HEAD
 import com.example.vegetabledragon.dto.FakeNewsFeedbackRatioResponse;
 import com.example.vegetabledragon.dto.FeedbackRequest;
 import com.example.vegetabledragon.dto.UserFeedbackResponse;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
+=======
+import com.example.vegetabledragon.dto.FeedbackRequest;
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserFeedbackRepository;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
 import lombok.extern.slf4j.Slf4j;
+=======
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +29,10 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+<<<<<<< HEAD
 @Slf4j
+=======
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 public class UserFeedbackServiceImpl implements UserFeedbackService {
     private final UserFeedbackRepository userFeedbackRepository;
     private final PostRepository postRepository;
@@ -30,6 +40,7 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
     @Override
     @Transactional
+<<<<<<< HEAD
     public UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
 //        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
         Post post = postRepository.findById(postId)
@@ -74,11 +85,47 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
     public FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId));
+=======
+    public UserFeedback saveFeedback(Long postId, String username, FeedbackRequest request) {
+        System.out.println("[DEBUG] saveFeedback() 호출됨 - username: " + username);
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 기존 피드백이 있는지 확인
+        Optional<UserFeedback> exisitngFeedback = userFeedbackRepository.findByPostAndUser(post, user);
+
+        if (exisitngFeedback.isPresent()) {
+            UserFeedback feedback = exisitngFeedback.get();
+            feedback.setFakeNews(request.isFakeNews()); // 기존 피드백 수정
+            return userFeedbackRepository.save(feedback);
+        }
+
+        // 새 피드백 저장
+        UserFeedback newFeedback = new UserFeedback(post, user, request.isFakeNews());
+        return userFeedbackRepository.save(newFeedback);
+    }
+
+    @Override
+    public List<UserFeedback> getFeedbacksByPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        return userFeedbackRepository.findByPost(post);
+    }
+
+    @Override
+    public Map<String, Double> getFakeNewsFeedbackRatio(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
         long fakeNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsTrue(post);
         long trueNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsFalse(post);
         long total = fakeNewsCount + trueNewsCount;
 
+<<<<<<< HEAD
         double fakeNewsRatio = 0;
         double trueNewsRatio = 0;
 
@@ -89,5 +136,14 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
 
         return new FakeNewsFeedbackRatioResponse(fakeNewsCount, trueNewsCount, fakeNewsRatio, trueNewsRatio);
+=======
+        if (total == 0)
+            return Map.of("fakeNewsRatio", 0.0, "trueNewsRatio", 0.0);
+
+        return Map.of(
+                "fakeNewsRatio", (double) fakeNewsCount / total,
+                "trueNewsRatio", (double) trueNewsCount / total
+        );
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     }
 }

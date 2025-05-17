@@ -7,12 +7,22 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+<<<<<<< HEAD
 // JPA 수정함.
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
+=======
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "users")
+@Builder
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

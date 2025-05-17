@@ -48,7 +48,10 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import axios from "axios";
+=======
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 export default {
   data() {
     return {
@@ -63,6 +66,7 @@ export default {
     };
   },
   methods: {
+<<<<<<< HEAD
     async fnSubmit() {
       // 제목과 내용이 비어있는지 체크
       if (!this.post.title.trim() || !this.post.content.trim()){
@@ -73,6 +77,12 @@ export default {
       // 익명 작성 시 작성자 필드를 '익명'으로 설정
       if (this.post.isAnonymous) {
         this.post.author = '익명';
+=======
+    fnSubmit() {
+      // 익명 작성 시 작성자 필드를 '익명'으로 ㅓㄹ정
+      if (this.post.isAnonymous) {
+        this.post.author ='익명';
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
       }
 
       // 비밀번호가 입력되지 않은 경우 경고
@@ -81,6 +91,7 @@ export default {
         return;
       }
 
+<<<<<<< HEAD
       // 비로그인 사용자는 작성 불가(세션 기반)
       try {
         // 게시글 등록 요청을 보낼 때 category를 포함
@@ -113,6 +124,14 @@ export default {
           alert("게시글 등록에 실패했습니다.");
         }
       }
+=======
+      // 백엔드에 게시글 저장 요청을 보내는 코드 (추후 API 연동 필요)
+      console.log("게시글 데이터:", this.post);
+
+      // 게시글 작성 완료 후 목록 페이지로 이동
+      alert('게시글이 등록되었습니다!');
+      this.$router.push('/board/list');
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     },
     fnCancel() {
       // 취소 버튼 클릭 시 게시글 목록 페이지로 이동

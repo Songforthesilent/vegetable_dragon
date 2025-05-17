@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <template>
   <header class="page-header">
     <div class="header-content">
@@ -39,10 +40,22 @@
 
     <div class="header-divider"></div>
   </header>
+=======
+<!-- PageHeader.vue -->
+<template>
+  <header>
+    <div id="nav">
+      <router-link to="/">Home</router-link>
+    </div>
+    <h1>{{ pageTitle }}</h1> <!-- 편재 페이지 제목 -->
+  </header>
+  <hr/>
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 </template>
 
 <script>
 export default {
+<<<<<<< HEAD
   props: {
     showBreadcrumb: {
       type: Boolean,
@@ -60,12 +73,19 @@ export default {
     // 현재 경로가 홈인지 확인
     isHomePage() {
       return this.$route.path === '/';
+=======
+  computed: {
+    // 현재 라우터의 meta.title 가져와서 페이지 제목으로 설정
+    pageTitle() {
+      return this.$route.meta.title || "vege"; // 제목 없으면 기본 제목
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     }
   }
 };
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .page-header {
   width: 100%;
   padding: 30px 0 20px;
@@ -243,3 +263,19 @@ export default {
   }
 }
 </style>
+=======
+header {
+  width: 100%; /* 전체 너비로 설정 */
+  padding: 50px 0; /* 상하 여백을 추가하여 높이 늘리기 */
+  background-color: #f7f7f7; /* 배경색 추가 (선택사항) */
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-top: 20px;
+  color: #333;
+  font-weight: bold;
+}
+</style>
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
