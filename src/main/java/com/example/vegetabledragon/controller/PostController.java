@@ -1,5 +1,6 @@
 package com.example.vegetabledragon.controller;
 
+<<<<<<< HEAD
 import com.example.vegetabledragon.domain.Category;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.dto.PostRequest;
@@ -40,6 +41,30 @@ public class PostController {
         }
         Post savedPost = postService.createPost(loggedInUser, request);
 //        log.info("[PostController] 저장된 Post ID: " + savedPost.getId());
+=======
+import com.example.vegetabledragon.domain.Post;
+import com.example.vegetabledragon.dto.PostRequest;
+import com.example.vegetabledragon.exception.PostNotFoundException;
+import com.example.vegetabledragon.service.PostService;
+import com.example.vegetabledragon.service.PostServiceImpl;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/posts")
+@RequiredArgsConstructor
+public class PostController {
+    private final PostService postService; // PostImpl 에서 PostService -> 상위 인터페이스를 참조하도록 변경.
+
+    // 게시글 작성
+    @PostMapping
+    public ResponseEntity<Post> createPost(@RequestBody PostRequest request) {
+        System.out.println("📌 createP   ost() 실행됨");  // 디버깅 로그
+        Post savedPost = postService.createPost(request.getAnonymousName(), request);
+        System.out.println("📌 저장된 Post ID: " + savedPost.getId());
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         return ResponseEntity.ok(savedPost);
     }
 
@@ -47,20 +72,29 @@ public class PostController {
     @GetMapping
     public ResponseEntity<Page<Post>> getAllPosts(
             @RequestParam(defaultValue = "0") int page,
+<<<<<<< HEAD
             @RequestParam(defaultValue = "10") int size) throws InvalidPageSizeException {
 //        log.info("[PostController] 게시글 목록 조회 - 페이지 : {}, 사이즈 : {}", page, size);
+=======
+            @RequestParam(defaultValue = "10") int size){
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         return ResponseEntity.ok(postService.getAllPosts(page, size));
     }
 
     // 특정 게시글 조회
     @GetMapping("/{postId}")
+<<<<<<< HEAD
     public ResponseEntity<Post> getPostById(@PathVariable Long postId) throws PostNotFoundException {
 //        log.info("[PostController] 특정 게시글 조회 - 게시글 ID: {}", postId);
+=======
+    public ResponseEntity<Post> getPostById(@PathVariable Long postId){
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         return postService.getPostById(postId)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
+<<<<<<< HEAD
     // 카테고리별 게시글 조회
     @GetMapping("/category/{categoryName}")
     public ResponseEntity<List<Post>> getPostsByCategory(
@@ -95,4 +129,6 @@ public class PostController {
         return ResponseEntity.ok(updatedPost);
     }
 
+=======
+>>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 }
