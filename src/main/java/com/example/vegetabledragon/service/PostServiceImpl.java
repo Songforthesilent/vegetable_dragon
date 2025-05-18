@@ -1,6 +1,5 @@
 package com.example.vegetabledragon.service;
 
-<<<<<<< HEAD
 import com.example.vegetabledragon.domain.Category;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
@@ -10,17 +9,11 @@ import com.example.vegetabledragon.repository.CategoryRepository;
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
-=======
-import com.example.vegetabledragon.domain.Post;
-import com.example.vegetabledragon.dto.PostRequest;
-import com.example.vegetabledragon.repository.PostRepository;
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-<<<<<<< HEAD
 import org.springframework.test.context.bean.override.convention.TestBean;
 
 import java.util.List;
@@ -76,30 +69,11 @@ public class PostServiceImpl implements PostService {
     public Page<Post> getAllPosts(int page, int size) throws InvalidPageSizeException {
         if (page < 0 || size <= 0)
             throw new InvalidPageSizeException(page, size);
-=======
 
-import java.util.Optional;
-
-
-@RequiredArgsConstructor
-public class PostServiceImpl implements PostService {
-    private final PostRepository postRepository;
-    private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "createdAt");
-
-    @Override
-    public Post createPost(String username, PostRequest request) {
-        Post post = new Post(request.getTitle(), request.getContent(), username);
-
-        return postRepository.save(post);
-    }
-    @Override
-    public Page<Post> getAllPosts(int page, int size){
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         Pageable pageable = PageRequest.of(page, size, DEFAULT_SORT);
         return postRepository.findAll(pageable);
     }
     @Override
-<<<<<<< HEAD
     public Optional<Post> getPostById(Long postId) throws PostNotFoundException {
         return Optional.ofNullable(postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException(postId)));
@@ -158,10 +132,4 @@ public class PostServiceImpl implements PostService {
         // 업데이트된 게시물 저장
         return postRepository.save(post);
     }
-
-=======
-    public Optional<Post> getPostById(Long postId){
-        return postRepository.findById(postId);
-    }
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 }

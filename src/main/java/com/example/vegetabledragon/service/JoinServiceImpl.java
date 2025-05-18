@@ -6,15 +6,10 @@ import com.example.vegetabledragon.exception.InvalidLoginException;
 import com.example.vegetabledragon.exception.UserAlreadyExistsException;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-=======
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
 @RequiredArgsConstructor
 public class JoinServiceImpl implements JoinService {
@@ -23,11 +18,7 @@ public class JoinServiceImpl implements JoinService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-<<<<<<< HEAD
     public User join(User user) throws UserAlreadyExistsException {
-=======
-    public User join(User user) {
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         // 중복 검사
         validateUser(user);
 
@@ -35,7 +26,6 @@ public class JoinServiceImpl implements JoinService {
         String encryptedPassword = passwordEncoder.encode(user.getPassword());
 
         // 새 사용자 생성
-<<<<<<< HEAD
         User newUser = new User(
                 null,
                 user.getRealName(),
@@ -46,23 +36,12 @@ public class JoinServiceImpl implements JoinService {
                 user.getAnonymousName(),
                 null
         );
-=======
-        User newUser = User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .email(user.getEmail())
-                .anonymousName(user.getAnonymousName())
-                .birthday(user.getBirthday())
-                .realName(user.getRealName())
-                .build();
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
         // 저장
         return userRepository.save(newUser);
 
     }
     @Override
-<<<<<<< HEAD
     public String login(LoginForm loginForm) throws InvalidLoginException {
         User user;
         // 이메일로 사용자 조회
@@ -72,12 +51,6 @@ public class JoinServiceImpl implements JoinService {
         } catch(InvalidLoginException e){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
-=======
-    public String login(LoginForm loginForm) {
-        // 이메일로 사용자 조회
-        User user = userRepository.findByEmail(loginForm.getEmail())
-                .orElseThrow(() -> new InvalidLoginException("The Email does not exist"));
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
         // 비밀번호 검증
         if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
@@ -87,11 +60,7 @@ public class JoinServiceImpl implements JoinService {
         return user.getUsername();
     }
 
-<<<<<<< HEAD
     private void validateUser(User user) throws UserAlreadyExistsException {
-=======
-    private void validateUser(User user) {
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
         if (userRepository.existsByUsername(user.getUsername())) {
             throw new UserAlreadyExistsException("Username already exists");
         }

@@ -13,9 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByAnonymousName(String anonymousName);
     Optional<User> findByEmail(String email);
     Optional<User> findByUsername(String username);
-<<<<<<< HEAD
 
     Optional<User> findByAnonymousName(String username);
-=======
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 }

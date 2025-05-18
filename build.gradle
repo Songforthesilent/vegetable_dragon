@@ -28,12 +28,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-web-services'
 
-<<<<<<< HEAD
     // Spring AOP
     implementation 'org.springframework.boot:spring-boot-starter-aop'
-
-=======
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     // spring Security
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.security:spring-security-test"
@@ -60,12 +56,6 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
-
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 }
 
 tasks.named('test') {
