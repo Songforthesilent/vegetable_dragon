@@ -26,6 +26,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 model/han_env/
+model/
 
 ### NetBeans ###
 /nbproject/private/

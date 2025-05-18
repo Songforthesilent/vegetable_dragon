@@ -7,18 +7,14 @@
 <script>
 import PageHeader from '@/components/PageHeader'
 import PageFooter from '@/components/PageFooter'
-<<<<<<< HEAD
 import { useUserStore } from '@/stores/user'
 import { getSessionUser } from "@/api/auth";
-=======
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
 export default {
   name: 'App',
   components: {
     PageFooter,
     PageHeader,
-<<<<<<< HEAD
   },
   async mounted() {
     try {
@@ -28,8 +24,6 @@ export default {
     } catch (error) {
       console.log('세션 없음 또는 만료됨');
     }
-=======
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
   }
 }
 </script>
@@ -55,8 +49,4 @@ export default {
 #nav a.router-link-exact-active {
   color: #42b983;
 }
-<<<<<<< HEAD
 </style>
-=======
-</style>
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8

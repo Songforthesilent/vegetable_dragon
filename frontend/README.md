@@ -1,9 +1,6 @@
-<<<<<<< HEAD
+
 # vegetable_dragon frontend
 
-=======
-# maza-front
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
 
 ## Project setup
 ```

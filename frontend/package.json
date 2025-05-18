@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "vegetable_dragon",
-=======
-  "name": "maza-front",
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,10 +11,7 @@
     "axios": "^1.8.4",
     "core-js": "^3.8.3",
     "font": "^0.0.4",
-<<<<<<< HEAD
     "pinia": "^3.0.2",
-=======
->>>>>>> 808ff354926d354652e056c47aa6693ac10583e8
     "vue": "^3.2.13",
     "vue-router": "^4.5.0"
   },

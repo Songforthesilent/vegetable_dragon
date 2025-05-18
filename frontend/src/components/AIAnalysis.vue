@@ -76,7 +76,7 @@ export default {
           this.aiScore = 0;
         } else {
           // 예: 0.0~1.0 → 퍼센트 변환
-          this.aiScore = Math.round(prediction * 100);
+          this.aiScore = Math.round(prediction );
         }
       } catch (e) {
         console.error("AI 예측 점수 불러오기 실패:", e);
