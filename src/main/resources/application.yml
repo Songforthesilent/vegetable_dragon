@@ -40,7 +40,6 @@ spring:
       hibernate:
         format_sql: true
 
-
 logging:
   level:
     org.hibernate.SQL: ERROR
@@ -49,6 +48,6 @@ logging:
 
 flask:
   api:
-    url: "https://72a4-34-82-115-4.ngrok-free.app/predict"
+    url: "https://7966-218-237-232-179.ngrok-free.app/predict"
 
     # 절대 url 에서 s를 빼먹어선 안돼.

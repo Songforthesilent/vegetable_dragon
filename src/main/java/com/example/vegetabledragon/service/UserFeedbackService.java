@@ -19,4 +19,5 @@ public interface UserFeedbackService {
 
     // 특정 게시글의 가짜뉴스 비율 조회
     FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException;
+
 }

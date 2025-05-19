@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpSession;
 import java.util.List;
 
 public interface CommentService {
+
     Comment saveComment(Long postId, HttpSession session, CommentRequest request) throws PostNotFoundException, UserNotFoundException;
     List<Comment> getCommentsByPost(Long postId) throws PostNotFoundException;
     Comment updateComment(Long commentId, HttpSession session, CommentRequest request) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException;

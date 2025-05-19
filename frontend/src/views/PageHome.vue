@@ -20,47 +20,47 @@
           <div v-for="article in bestTopics" :key="article.id" class="best-topic-card">
             <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
 
-            <div class="best-topic-vote-container">
-              <div class="vote-circle-container">
-                <div class="vote-circle">
-                  <svg viewBox="0 0 36 36" class="vote-chart">
-                    <!-- 배경 원 -->
-                    <path class="vote-circle-bg"
-                          d="M18 2.0845
+              <div class="best-topic-vote-container">
+                <div class="vote-circle-container">
+                  <div class="vote-circle">
+                    <svg viewBox="0 0 36 36" class="vote-chart">
+                      <!-- 배경 원 -->
+                      <path class="vote-circle-bg"
+                            d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <!-- 찬성 부분 (파란색) -->
-                    <path class="vote-circle-true"
-                          :stroke-dasharray="`${(article.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
-                          d="M18 2.0845
+                      />
+                      <!-- 찬성 부분 (파란색) -->
+                      <path class="vote-circle-true"
+                            :stroke-dasharray="`${(article.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
+                            d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <!-- 반대 부분 (빨간색) -->
-                    <path class="vote-circle-false"
-                          :stroke-dasharray="`${(1 - (article.ratio?.trueNewsRatio || 0.5)) * 100}, 100`"
-                          :stroke-dashoffset="-1 * (article.ratio?.trueNewsRatio || 0.5) * 100"
-                          d="M18 2.0845
+                      />
+                      <!-- 반대 부분 (빨간색) -->
+                      <path class="vote-circle-false"
+                            :stroke-dasharray="`${(1 - (article.ratio?.trueNewsRatio || 0.5)) * 100}, 100`"
+                            :stroke-dashoffset="-1 * (article.ratio?.trueNewsRatio || 0.5) * 100"
+                            d="M18 2.0845
                         a 15.9155 15.9155 0 0 1 0 31.831
                         a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div class="vote-percentage">
-                    <div class="vote-vs">VS</div>
+                      />
+                    </svg>
+                    <div class="vote-percentage">
+                      <div class="vote-vs">VS</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="vote-labels">
+                  <div class="vote-label true">
+                    <span class="vote-percent">{{ Math.round((article.ratio?.trueNewsRatio || 0.5) * 100) }}%</span>
+                  </div>
+                  <div class="vote-label false">
+                    <span class="vote-percent">{{ Math.round((1 - (article.ratio?.trueNewsRatio || 0.5)) * 100) }}%</span>
                   </div>
                 </div>
               </div>
-
-              <div class="vote-labels">
-                <div class="vote-label true">
-                  <span class="vote-percent">{{ Math.round((article.ratio?.trueNewsRatio || 0.5) * 100) }}%</span>
-                </div>
-                <div class="vote-label false">
-                  <span class="vote-percent">{{ Math.round((1 - (article.ratio?.trueNewsRatio || 0.5)) * 100) }}%</span>
-                </div>
-              </div>
-            </div>
             </router-link>
             <div class="best-topic-content">
               <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
