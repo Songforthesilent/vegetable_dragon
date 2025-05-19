@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.bean.override.convention.TestBean;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 // 예외도 발생하는지 처리해야한다.
@@ -25,6 +26,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
+    private final MLService mlService;
 
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "createdAt");
 
@@ -48,6 +50,19 @@ public class PostServiceImpl implements PostService {
 
         Post post = new Post(request.getTitle(), request.getContent(), user.get().getAnonymousName(), category, user.get().getEmail());
 //        post.setAuthorUsername(user.get().getAnonymousName()); // 로그인된 사용자의 annonymousName을 넣어준다.
+
+
+        try {
+            Map<String, Object> result = mlService.predict(post.getContent());
+
+            Map<String, Object> probabilities = (Map<String, Object>) result.get("probabilities");
+            Double probClass1 = ((Number) probabilities.get("class_1")).doubleValue();
+
+
+            post.updatePrediction(probClass1); // 다시 저장 (update)
+        } catch (Exception e) {
+            // 예측 실패 시 무시하고 저장은 유지
+        }
 
         return postRepository.save(post);
     }
@@ -116,6 +131,11 @@ public class PostServiceImpl implements PostService {
 
         // 업데이트된 게시물 저장
         return postRepository.save(post);
+    }
+
+    @Override
+    public List<Post> searchPostsByTitle(String title) {
+        return postRepository.findByTitleContainingIgnoreCase(title);
     }
 
 }

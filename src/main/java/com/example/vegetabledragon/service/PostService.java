@@ -22,4 +22,6 @@ public interface PostService {
     void deletePostById(Long postId, HttpSession session) throws PostNotFoundException, UnauthorizedException;
 
     Post updatePost(Long postId, PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException;
+
+    List<Post> searchPostsByTitle(String title);
 }

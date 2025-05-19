@@ -8,4 +8,5 @@ import com.example.vegetabledragon.exception.UserAlreadyExistsException;
 public interface JoinService {
     User join(User user) throws UserAlreadyExistsException;
     String login(LoginForm loginForm) throws InvalidLoginException;
+
 }

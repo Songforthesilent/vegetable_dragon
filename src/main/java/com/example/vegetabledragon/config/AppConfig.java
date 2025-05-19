@@ -15,8 +15,8 @@ import org.springframework.web.client.RestTemplate;
 @EnableAspectJAutoProxy // AOP 활성화
 public class AppConfig {
     @Bean
-    public PostService postService(PostRepository postRepository, UserRepository userRepository, CategoryRepository categoryRepository) {
-        return new PostServiceImpl(postRepository, userRepository, categoryRepository);
+    public PostService postService(PostRepository postRepository, UserRepository userRepository, CategoryRepository categoryRepository, MLService mlService) {
+        return new PostServiceImpl(postRepository, userRepository, categoryRepository, mlService);
     }
 
     @Bean

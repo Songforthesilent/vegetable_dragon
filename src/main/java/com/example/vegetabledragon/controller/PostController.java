@@ -76,6 +76,12 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Post>> searchPosts(@RequestParam String title) {
+        List<Post> results = postService.searchPostsByTitle(title);
+        return ResponseEntity.ok(results);
+    }
+
 
     // 게시글 삭제
     @DeleteMapping("/{postId}")
@@ -94,5 +100,7 @@ public class PostController {
 //        log.info("[PostController] 게시글 수정 완료");
         return ResponseEntity.ok(updatedPost);
     }
+
+
 
 }

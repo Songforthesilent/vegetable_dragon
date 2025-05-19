@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -36,6 +37,10 @@ public class Post {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(nullable = true)
+    private Double prediction; // 클래스 1의 확률
+
+
     public Post(String title, String content, String authorUsername, Category category, String authorEmail) {
         this.title = title;
         this.content = content;
@@ -54,5 +59,9 @@ public class Post {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public void updatePrediction(Double prediction) {
+        this.prediction = prediction;
     }
 }
