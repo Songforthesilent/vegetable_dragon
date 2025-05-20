@@ -1,7 +1,7 @@
 <template>
   <div class="article-content">
     <h2>{{ title }}</h2>
-    <p>{{ content }}</p>
+    <p class="content-text">{{ content }}</p>
     <a :href="link" target="_blank" class="article-link" v-if="link">기사 원문 보기</a>
   </div>
 </template>
@@ -26,6 +26,9 @@ export default {
 </script>
 
 <style scoped>
+.content-text{
+  white-space: pre-line;
+}
 .article-content {
   text-align: left;
 }
