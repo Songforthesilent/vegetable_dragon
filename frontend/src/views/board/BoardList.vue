@@ -2,11 +2,6 @@
   <div class="main-container">
     <div class="content">
       <article class="board-list-container">
-        <!-- 페이지 제목 -->
-        <!--<div class="page-header">
-          <p class="page-description">다양한 주제의 게시글을 확인하세요</p>
-        </div>-->
-
         <!-- 검색 및 필터 영역 -->
         <section class="filter-section">
           <div class="filter-controls">
