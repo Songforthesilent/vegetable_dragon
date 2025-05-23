@@ -3,7 +3,6 @@ package com.example.vegetabledragon.controller;
 import com.example.vegetabledragon.domain.Comment;
 import com.example.vegetabledragon.dto.CommentRequest;
 import com.example.vegetabledragon.dto.PasswordRequest;
-import com.example.vegetabledragon.exception.CommentNotPermissionException;
 import com.example.vegetabledragon.exception.PostNotFoundException;
 import com.example.vegetabledragon.exception.UnauthorizedException;
 import com.example.vegetabledragon.exception.UserNotFoundException;
@@ -28,7 +27,7 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Comment> addComment(@PathVariable Long postId,
                                               @RequestBody CommentRequest request,
-                                              HttpSession session) throws PostNotFoundException, UserNotFoundException {
+                                              HttpSession session){
         String sessionUsername = (String) session.getAttribute("loggedInUser"); // 오류 날 거 같음
         Comment saved = commentService.saveComment(postId, session, request);
 
@@ -46,7 +45,7 @@ public class CommentController {
     public ResponseEntity<Comment> updateComment(@PathVariable Long postId,
                                                  @PathVariable Long commentId,
                                                  @RequestBody CommentRequest request,
-                                                 HttpSession session) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException {
+                                                 HttpSession session) {
         Comment updated = commentService.updateComment(commentId, session, request);
         return ResponseEntity.ok(updated);
     }
@@ -55,18 +54,13 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(@PathVariable Long postId,
                                               @PathVariable Long commentId,
                                               @RequestBody PasswordRequest request,
-                                              HttpSession session) throws PostNotFoundException, UserNotFoundException, CommentNotPermissionException, UnauthorizedException {
+                                              HttpSession session) {
         String sessionsUsername = (String) session.getAttribute("loggedInUser");
 
-        try {
-//            log.info("[CommentController] 댓글 번호 - {} 삭제, 권한 요청 사용자 - {}", commentId, sessionsUsername);
-            commentService.deleteComment(commentId, sessionsUsername, request.getPassword());
+        //            log.info("[CommentController] 댓글 번호 - {} 삭제, 권한 요청 사용자 - {}", commentId, sessionsUsername);
+        commentService.deleteComment(commentId, sessionsUsername, request.getPassword());
 //            log.info("[CommentController] 댓글 번호 - {} 성공적으로 삭제", commentId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } catch (CommentNotPermissionException e) {
-//            log.error("[CommentController] 댓글 번호 - {} 소유자가 아닌 사용자가 삭제 시도 - {}", commentId, sessionsUsername);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }
