@@ -12,12 +12,12 @@ import java.util.Map;
 
 public interface UserFeedbackService {
     // 피드백 저장
-    UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException;
+    UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request);
 
     // 특정 게시글의 피드백 조회
-    List<UserFeedbackResponse> getFeedbacksByPost(Long postId) throws PostNotFoundException;
+    List<UserFeedbackResponse> getFeedbacksByPost(Long postId);
 
     // 특정 게시글의 가짜뉴스 비율 조회
-    FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException;
+    FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId);
 
 }

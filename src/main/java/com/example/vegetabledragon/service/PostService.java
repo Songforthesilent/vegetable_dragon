@@ -12,16 +12,16 @@ import java.util.Optional;
 
 // DIP를 위해 인터페이스 추가작업.
 public interface PostService {
-    Post createPost(String username, PostRequest request) throws InvalidPostFieldException, UserNotFoundException;
-    Page<Post> getAllPosts(int page, int size) throws InvalidPageSizeException;
-    Optional<Post> getPostById(Long postId) throws PostNotFoundException;
+    Post createPost(String username, PostRequest request);
+    Page<Post> getAllPosts(int page, int size);
+    Optional<Post> getPostById(Long postId);
 
     List<Post> getPostsByCategory(Category category, int limit);
 
     //  CRUD에서 UD 추가
-    void deletePostById(Long postId, HttpSession session) throws PostNotFoundException, UnauthorizedException;
+    void deletePostById(Long postId, HttpSession session);
 
-    Post updatePost(Long postId, PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException;
+    Post updatePost(Long postId, PostRequest request, HttpSession session);
 
     List<Post> searchPostsByTitle(String title);
 }

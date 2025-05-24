@@ -25,6 +25,8 @@ public enum ErrorStatus implements BaseErrorCode {
     // 회원 조회 시
     EMAIL_NOT_FOUND(HttpStatus.UNAUTHORIZED, "EMAIL4011", "이메일이 존재하지 않습니다."),
     USER_NOT_FOUND(HttpStatus.UNAUTHORIZED, "USER4011", "가입되지 않은 사용자입니다."),
+    // 로그인 시
+    PASSWORD_INCORRECT(HttpStatus.UNAUTHORIZED, "USER4012", "비밀번호가 틀렸습니다."),
     // 페이지 요청 시
     PAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "PAGE4001", "요청 페이지 번호는 0 이상이어야 합니다."),
 
