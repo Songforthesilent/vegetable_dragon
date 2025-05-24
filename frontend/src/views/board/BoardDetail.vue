@@ -443,16 +443,14 @@ export default {
       this.confirmingEditComment = this.isLoggedIn;  // 로그인 사용자는 비밀번호 없이 바로 수정 가능
     },
     confirmEditComment() {
-      const comment = this.comments[this.editingCommentIndex];
       if (!this.editCommentPassword.trim()) {
         alert("비밀번호를 입력하세요.");
         return;
       }
-      if (this.editCommentPassword === comment.password) {
-        this.confirmingEditComment = true;
-      } else {
-        alert("비밀번호가 일치하지 않거나 삭제 권한이 없습니다.");
-      }
+
+      // 여기서 password를 임시 저장
+      this._tempEditPassword = this.editCommentPassword;
+      this.confirmingEditComment = true;
     },
     async saveEditComment() {
       const comment = this.comments[this.editingCommentIndex];
@@ -461,7 +459,7 @@ export default {
 
       const requestBody = {
         comment: this.editCommentText,
-        password: this.isLoggedIn ? "LOGIN_USER" : this.editCommentPassword
+        password: this.isLoggedIn ? "LOGIN_USER" : this._tempEditPassword
       };
 
       try {
