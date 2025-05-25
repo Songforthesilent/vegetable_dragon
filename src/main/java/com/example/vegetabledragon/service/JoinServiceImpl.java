@@ -1,14 +1,13 @@
 package com.example.vegetabledragon.service;
 
+import com.example.vegetabledragon.apiPayload.code.status.ErrorStatus;
+import com.example.vegetabledragon.apiPayload.exception.GeneralException;
 import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.dto.LoginForm;
-import com.example.vegetabledragon.exception.InvalidLoginException;
-import com.example.vegetabledragon.exception.UserAlreadyExistsException;
 import com.example.vegetabledragon.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @RequiredArgsConstructor
@@ -18,7 +17,7 @@ public class JoinServiceImpl implements JoinService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User join(User user) throws UserAlreadyExistsException {
+    public User join(User user) {
         // 중복 검사
         validateUser(user);
 
@@ -42,33 +41,33 @@ public class JoinServiceImpl implements JoinService {
 
     }
     @Override
-    public String login(LoginForm loginForm) throws InvalidLoginException {
+    public String login(LoginForm loginForm) {
         User user;
         // 이메일로 사용자 조회
         try {
             user = userRepository.findByEmail(loginForm.getEmail())
-                    .orElseThrow(() -> new InvalidLoginException("The email does not exist"));
-        } catch(InvalidLoginException e){
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_FOUND));
+        } catch(GeneralException e){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, e.getMessage());
         }
 
-        // 비밀번호 검증
+        // 비밀번호 검증 (암호화 -> matches 로 비교)
         if(!passwordEncoder.matches(loginForm.getPassword(), user.getPassword())) {
-            throw new InvalidLoginException("The password is incorrect");
+            throw new GeneralException(ErrorStatus.PASSWORD_INCORRECT);
         }
 
         return user.getUsername();
     }
 
-    private void validateUser(User user) throws UserAlreadyExistsException {
+    private void validateUser(User user) {
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new UserAlreadyExistsException("Username already exists");
+            throw new GeneralException(ErrorStatus.USER_NAME_DUPLICATE);
         }
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new UserAlreadyExistsException("Email already exists");
+            throw new GeneralException(ErrorStatus.USER_EMAIL_DUPLICATE);
         }
         if (userRepository.existsByAnonymousName(user.getAnonymousName())) {
-            throw new UserAlreadyExistsException("Anonymous name already exists");
+            throw new GeneralException(ErrorStatus.USER_ANONYMOUS_DUPLICATE);
         }
     }
 }

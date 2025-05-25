@@ -94,34 +94,24 @@ export default {
     }
   },
   methods: {
-    vote(type) {
-      // 새 투표 추가
-      if (type === 'agree') {
-        this.agreeVotes++;
-      } else {
-        this.disagreeVotes++;
+    async vote(type) {
+      try {
+        await this.submitVote(type);  // 서버 요청 먼저
+        this.voteType = type;         // 투표 유형 표시
+        await this.fetchVoteRatio();  // 실제 반영된 값 동기화
+      } catch (error) {
+        console.error('투표 실패:', error);
+        const msg = error.response?.data?.message || "투표 실패";
+        alert(msg);
       }
-
-      this.voteType = type;
-
-      // 백엔드로 투표 요청 보내기
-      this.submitVote(type);
     },
 
     async submitVote(type) {
-      try {
-        const response = await axios.post(
-            `http://localhost:8081/feedback/${this.postId}`,
-            { fakeNews: type === 'disagree' }, // 가짜뉴스일 경우 true
-            { withCredentials: true }
-        );
-        console.log('투표 성공:', response.data);
-        // 투표 후 비율 가져오기
-        this.fetchVoteRatio();
-      } catch (error) {
-        console.error('투표 실패:', error);
-        alert('투표 실패');
-      }
+      return axios.post(
+          `http://localhost:8081/feedback/${this.postId}`,
+          { fakeNews: type === 'disagree' },
+          { withCredentials: true }
+      );
     },
 
     async fetchVoteRatio() {

@@ -1,5 +1,7 @@
 package com.example.vegetabledragon.service;
 
+import com.example.vegetabledragon.apiPayload.code.status.ErrorStatus;
+import com.example.vegetabledragon.apiPayload.exception.GeneralException;
 import com.example.vegetabledragon.domain.Category;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
@@ -14,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.test.context.bean.override.convention.TestBean;
 
 import java.util.List;
 import java.util.Map;
@@ -31,25 +32,24 @@ public class PostServiceImpl implements PostService {
     private static final Sort DEFAULT_SORT = Sort.by(Sort.Direction.DESC, "createdAt");
 
     @Override
-    public Post createPost(String username, PostRequest request) throws InvalidPostFieldException, UserNotFoundException {
+    public Post createPost(String username, PostRequest request) {
         if (username == null)
-            throw new InvalidPostFieldException(username);
+            throw new GeneralException(ErrorStatus.POST_USERNAME_NOT_EXIST);
         if (request.getTitle() == null)
-            throw new InvalidPostFieldException(request.getTitle());
+            throw new GeneralException(ErrorStatus.POST_TITLE_NOT_EXIST);
         if (request.getContent() == null)
-            throw new InvalidPostFieldException(request.getContent());
+            throw new GeneralException(ErrorStatus.POST_CONTENT_NOT_EXIST);
         if (request.getCategory() == null)
-            throw new InvalidPostFieldException(request.getCategory());
+            throw new GeneralException(ErrorStatus.POST_CATEGORY_NOT_EXIST);
 
         // 현재 로그인된 사용자의 Name을 가져오기
         Optional<User> user = Optional.ofNullable(userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(username)));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND)));
 
         // 카테고리 이름으로 Category 객체를 찾음
         Category category = categoryRepository.findByName(request.getCategory());
 
         Post post = new Post(request.getTitle(), request.getContent(), user.get().getAnonymousName(), category, user.get().getEmail());
-//        post.setAuthorUsername(user.get().getAnonymousName()); // 로그인된 사용자의 annonymousName을 넣어준다.
 
 
         try {
@@ -67,16 +67,16 @@ public class PostServiceImpl implements PostService {
         return postRepository.save(post);
     }
     @Override
-    public Page<Post> getAllPosts(int page, int size) throws InvalidPageSizeException {
+    public Page<Post> getAllPosts(int page, int size) {
         if (page < 0 || size <= 0)
-            throw new InvalidPageSizeException(page, size);
+            throw new GeneralException(ErrorStatus.PAGE_NOT_EXIST);
         Pageable pageable = PageRequest.of(page, size, DEFAULT_SORT);
         return postRepository.findAll(pageable);
     }
     @Override
-    public Optional<Post> getPostById(Long postId) throws PostNotFoundException {
+    public Optional<Post> getPostById(Long postId){
         return Optional.ofNullable(postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId)));
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND)));
     }
 
     @Override
@@ -88,36 +88,36 @@ public class PostServiceImpl implements PostService {
 
 
     @Override
-    public void deletePostById(Long postId, HttpSession session) throws PostNotFoundException, UnauthorizedException {
+    public void deletePostById(Long postId, HttpSession session) {
         String loggedInUsername = (String) session.getAttribute("loggedInUser");
         String userEmail = (String) session.getAttribute("loggedInEmail");
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND));
 
         if (!post.getAuthorEmail().equals(userEmail))
-            throw new UnauthorizedException();
+            throw new GeneralException(ErrorStatus.AUTHOR_DIFFERENT_WITH_LOGGEDIN);
 
         postRepository.deleteById(postId); // postRepository가 JpaRepository를 확장하고 있으므로, CrudRepository에 있는 deleteById(ID id)를 사용할 수 있다.
     }
 
     @Override
-    public Post updatePost(Long postId, PostRequest request, HttpSession session) throws PostNotFoundException, InvalidPostFieldException, UnauthorizedException {
+    public Post updatePost(Long postId, PostRequest request, HttpSession session) {
         // 게시물 존재 확인
         String loggedInUsername = (String) session.getAttribute("loggedInUser");
         String userEmail = (String) session.getAttribute("loggedInEmail");
 
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND));
 
         if (!post.getAuthorEmail().equals(userEmail))
-            throw new UnauthorizedException();
+            throw new GeneralException(ErrorStatus.AUTHOR_DIFFERENT_WITH_LOGGEDIN);
 
         // 수정할 필드의 유효성 검사
         if (request.getTitle() == null)
-            throw new InvalidPostFieldException(request.getTitle());
+            throw new GeneralException(ErrorStatus.POST_TITLE_NOT_EXIST);
 
         if (request.getContent() == null)
-            throw new InvalidPostFieldException(request.getContent());
+            throw new GeneralException(ErrorStatus.POST_CONTENT_NOT_EXIST);
 
         // 카테고리 수정
         if (request.getCategory() != null){

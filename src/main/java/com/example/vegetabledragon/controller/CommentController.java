@@ -4,8 +4,6 @@ import com.example.vegetabledragon.domain.Comment;
 import com.example.vegetabledragon.dto.CommentRequest;
 import com.example.vegetabledragon.dto.PasswordRequest;
 import com.example.vegetabledragon.exception.PostNotFoundException;
-import com.example.vegetabledragon.exception.UnauthorizedException;
-import com.example.vegetabledragon.exception.UserNotFoundException;
 import com.example.vegetabledragon.service.CommentService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
