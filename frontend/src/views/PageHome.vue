@@ -5,6 +5,9 @@
       <!-- 검색창 영역 -->
       <search-bar v-if="showSearch" @search="search" />
 
+      <!-- MainHeader 영역 -->
+      <HeroSection />
+
       <!-- Best Topics 영역 -->
       <best-topic-section />
 
@@ -13,12 +16,11 @@
     </article>
 
     <!-- 로그인 배너 영역 -->
-    <login-banner />
   </div>
 </template>
 
 <script>
-import LoginBanner from '@/components/LoginBanner.vue';
+import HeroSection from '@/components/home/HeroSection.vue';
 import SearchBar from '@/components/home/SearchBar.vue';
 import BestTopicSection from '@/components/home/BestTopicSection.vue';
 import RecentPostSection from '@/components/home/RecentPostSection.vue';
@@ -26,7 +28,7 @@ import axios from 'axios';
 
 export default {
   components: {
-    LoginBanner,
+    HeroSection,
     SearchBar,
     BestTopicSection,
     RecentPostSection
@@ -155,12 +157,10 @@ export default {
 .main-container {
   display: flex;
   justify-content: space-between;
-  padding: 0 250px;
-  margin-top: 30px;
 }
 
 .content {
-  width: 74%;
+  width:100%;
   display: flex;
   flex-direction: column;
   gap: 10px;

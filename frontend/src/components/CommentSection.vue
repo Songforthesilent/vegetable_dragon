@@ -1,31 +1,59 @@
 <template>
   <div class="comments-section">
-    <h3>댓글</h3>
-    <div class="comment-input">
-      <textarea v-model="newComment" placeholder="댓글을 입력하세요"></textarea>
-      <div class="comment-actions">
-        <input
-            v-if="!isLoggedIn"
-            type="password"
-            v-model="commentPassword"
-            placeholder="비밀번호 입력"
-        />
-        <button @click="addComment">등록</button>
+    <h3 class="comments-title">댓글 {{ comments.length }}개</h3>
+
+    <div class="comment-input-container">
+      <textarea
+          v-model="newComment"
+          placeholder="건전한 토론 문화를 위해 예의를 지켜주세요..."
+          class="comment-textarea"
+      ></textarea>
+
+      <div class="comment-form-bottom">
+        <button @click="addComment" class="submit-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22,2 15,22 11,13 2,9"/>
+          </svg>
+          댓글 등록
+        </button>
       </div>
     </div>
 
-    <ul>
-      <li v-for="(comment, index) in comments" :key="comment.id || index">
-        <div class="comment-text">
-          <strong>{{ comment.user }}</strong>: {{ comment.text }}
-          <span class="comment-timestamp">{{ comment.timestamp }}</span>
+    <div class="comments-list">
+      <div v-for="(comment, index) in comments" :key="comment.id || index" class="comment-item">
+        <div class="comment-header">
+          <div class="comment-avatar">
+            {{ getInitial(comment.user) }}
+          </div>
+          <div class="comment-meta">
+            <span class="comment-author">{{ comment.user }}</span>
+            <span class="comment-time">{{ formatTime(comment.timestamp) }}</span>
+          </div>
         </div>
-        <div class="comment-buttons">
-          <button @click="$emit('edit-comment', index)">수정</button>
-          <button @click="$emit('delete-comment', index)">삭제</button>
+
+        <div class="comment-content">
+          {{ comment.text }}
         </div>
-      </li>
-    </ul>
+
+        <div class="comment-actions">
+          <button class="action-btn edit-btn" @click="$emit('edit-comment', index)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+            수정
+          </button>
+          <button class="action-btn delete-btn" @click="$emit('delete-comment', index)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+            삭제
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,6 +94,15 @@ export default {
 
       this.newComment = '';
       this.commentPassword = '';
+    },
+
+    getInitial(username) {
+      return username ? username.charAt(0).toUpperCase() : 'U';
+    },
+
+    formatTime(timestamp) {
+      // 간단한 시간 포맷팅 (실제로는 더 정교한 로직 필요)
+      return timestamp || '2025.5.2 오전 9:13';
     }
   }
 };
@@ -73,174 +110,273 @@ export default {
 
 <style scoped>
 .comments-section {
-  margin-top: 50px;
-  text-align: left;
-  font-size: 14px;
+  margin-top: 40px;
+  background: white;
+  border-radius: 12px;
+  padding: 5px;
 }
 
-.comments-section h3 {
+.comments-title {
   font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  text-align: left;
+  border-bottom: 1px solid #f1f5f9;
 }
 
-.comments-section textarea {
+/* 댓글 입력 영역 */
+.comment-input-container {
+  margin-bottom: 32px;
+}
+
+.comment-textarea {
   width: 100%;
-  height: auto;
-  min-height: 100px;
-  padding: 15px;
-  margin: 10px 0;
-  border: 1px solid #ddd;
+  min-height: 120px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
+  line-height: 1.5;
   resize: vertical;
-  transition: border-color 0.3s;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  background: #fafbfc;
 }
 
-.comments-section textarea:focus {
-  border-color: #3A4CA4;
+.comment-textarea:focus {
   outline: none;
-  box-shadow: 0 0 5px rgba(58, 76, 164, 0.2);
+  border-color: #3662E3;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.comment-input {
+.comment-textarea::placeholder {
+  color: #94a3b8;
+}
+
+.comment-form-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 12px;
+}
+
+.submit-button {
+  display: flex;
+  align-items: end;
+  gap: 6px;
+  padding: 10px 20px;
+  background: #3662E3;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+.submit-button:active {
+  transform: translateY(0);
+}
+
+/* 댓글 목록 */
+.comments-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 20px;
+}
+
+.comment-item {
+  padding: 20px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.comment-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 14px;
+}
+
+
+.comment-time {
+  color: #64748b;
+  font-size: 12px;
+  margin-left: auto;
+}
+
+.comment-content {
+  color: #374151;
+  line-height: 1.6;
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 16px;
+  padding-left: 52px;
 }
 
 .comment-actions {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 16px;
+  padding-left: 45px;
 }
 
-.comment-actions input {
-  width: 170px;
-  height: 40px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s;
-}
-
-.comment-actions input:focus {
-  border-color: #3A4CA4;
-  box-shadow: 0 0 5px rgba(58, 76, 164, 0.2);
-}
-
-.comment-actions button {
-  width: 80px;
-  height: 40px;
-  background-color: #3A4CA4;
-  color: white;
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 8px;
+  background: none;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.comment-actions button:hover {
-  background-color: #2A357A;
-}
-
-.comment-actions button:active {
-  transform: scale(0.95);
-}
-
-.comments-section ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 30px;
-  background-color: #f8f9fc;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.comments-section li {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.comments-section li:last-child {
-  border-bottom: none;
-}
-
-.comment-text {
-  flex: 1;
-  text-align: left;
-  padding-right: 15px;
-  word-wrap: break-word;
-  line-height: 1.5;
-}
-
-.comment-timestamp {
+  color: #64748b;
   font-size: 12px;
-  color: #888;
-  margin-left: 10px;
-  font-style: italic;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
-.comment-buttons {
-  display: flex;
-  gap: 8px;
+.action-btn:hover {
+  background: #f1f5f9;
+  color: #374151;
+}
+
+.like-btn:hover {
+  color: #ef4444;
+}
+
+.reply-btn:hover {
+  color: #3662E3;
+}
+
+.edit-btn:hover {
+  color: #f59e0b;
+}
+
+.delete-btn:hover {
+  color: #ef4444;
+}
+
+.action-btn svg {
   flex-shrink: 0;
 }
 
-.comment-buttons button {
-  background-color: white;
-  border: 1px solid #ddd;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 12px;
-}
-
-.comment-buttons button:hover {
-  background-color: #f0f0f0;
-  border-color: #ccc;
-}
-
-.comment-buttons button:active {
-  transform: scale(0.95);
-}
-
+/* 반응형 디자인 */
 @media (max-width: 768px) {
-  .comment-actions {
+  .comments-section {
+    padding: 16px;
+    margin-top: 24px;
+  }
+
+  .comment-form-bottom {
     flex-direction: column;
     align-items: stretch;
+    gap: 12px;
   }
 
-  .comment-actions input,
-  .comment-actions button {
-    width: 100%;
+  .nickname-input {
+    flex: none;
   }
 
-  .comments-section li {
-    flex-direction: column;
+  .submit-button {
+    justify-content: center;
   }
 
-  .comment-buttons {
-    margin-top: 10px;
-    align-self: flex-end;
+  .comment-header {
+    gap: 8px;
   }
 
-  .comment-text {
-    max-width: 100%;
-    padding-right: 0;
+  .comment-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .comment-content {
+    padding-left: 40px;
+    font-size: 13px;
+  }
+
+  .comment-actions {
+    padding-left: 40px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .comments-section {
+    padding: 12px;
+  }
+
+  .comment-textarea {
+    min-height: 100px;
+    padding: 12px;
+  }
+
+  .comment-content {
+    padding-left: 0;
+    margin-top: 8px;
+  }
+
+  .comment-actions {
+    padding-left: 0;
+    gap: 8px;
+  }
+
+  .comment-header {
+    flex-wrap: wrap;
+  }
+
+  .comment-time {
+    margin-left: 0;
+    order: 3;
+    flex-basis: 100%;
+    margin-top: 4px;
   }
 }
 </style>
