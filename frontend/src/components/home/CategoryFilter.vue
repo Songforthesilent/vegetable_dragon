@@ -37,7 +37,7 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 20px;
+  margin: 30px 0 20px 0;
 }
 
 .category-button {
@@ -58,7 +58,7 @@ export default {
 }
 
 .category-button.active {
-  background-color: #3A4CA4;
+  background-color: #3662E3;
   color: white;
 }
 
