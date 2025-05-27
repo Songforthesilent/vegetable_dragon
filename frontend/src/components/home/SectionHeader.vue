@@ -1,12 +1,10 @@
 <template>
   <div class="section-header">
     <h2 class="section-title">{{ title }}</h2>
-    <router-link :to="moreLink" class="more-link">
-      더보기
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="9 18 15 12 9 6"></polyline>
-      </svg>
-    </router-link>
+
+  </div>
+  <div class="section-subtitle">
+    <p v-if="subtitle">{{ subtitle }}</p>
   </div>
 </template>
 
@@ -17,6 +15,10 @@ export default {
     title: {
       type: String,
       required: true
+    },
+    subtitle: {
+      type: String,
+      default: ''
     },
     moreLink: {
       type: String,
@@ -35,7 +37,7 @@ export default {
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 25px;
   font-weight: 700;
   color: #1e293b;
   margin: 0;
@@ -51,8 +53,17 @@ export default {
   transform: translateY(-50%);
   width: 4px;
   height: 20px;
-  background-color: #3A4CA4;
+  background-color: #3662E3;
   border-radius: 2px;
+}
+
+.section-subtitle {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 10px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: left;
 }
 
 .more-link {
