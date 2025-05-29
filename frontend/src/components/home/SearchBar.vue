@@ -26,8 +26,22 @@ export default {
     };
   },
   methods: {
-    handleSearch() {
-      this.$emit('search', this.searchQuery);
+    async handleSearch() {
+      if (!this.searchQuery) return;
+
+      try {
+        const response = await fetch(`http://localhost:8081/posts/search?title=${encodeURIComponent(this.searchQuery)}`);
+        if (!response.ok) throw new Error('검색 실패');
+
+        const data = await response.json();
+        console.log('검색 결과:', data);
+
+        //부모 컴포넌트에 검색 결과 전달
+        this.$emit('search-result', data);
+      } catch (error) {
+        console.error('검색 중 오류 발생:', error);
+        alert('검색 중 오류가 발생했씁니다.')
+      }
     }
   }
 };

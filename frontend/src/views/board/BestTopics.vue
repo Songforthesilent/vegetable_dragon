@@ -1,8 +1,14 @@
 <template>
   <div class="main-container">
+    <!-- 페이지 제목 헤더 -->
+    <div class="page-title-header">
+      <h1 class="page-title">인기 게시판</h1>
+      <p class="page-subtitle">가장 활발한 토론에 참여해보세요</p>
+    </div>
+
     <!-- 페이지 헤더 -->
     <div class="page-header">
-      <!-- 필터 옵션 -->
+      <!-- 필터 옵션-->
       <div class="filter-options">
         <button
             class="filter-button active"
@@ -47,72 +53,62 @@
               :to="'/board/view/' + topic.id"
               class="topic-card"
           >
-            <div class="vote-visualization">
-              <div class="topic-badge">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 4-3 4-6.5-2.5 0-4 2.5-8 2.5s-5.5-2.5-8-2.5c0 3.5 1 6.5 4 6.5 1.25 0 2.5-1.06 4-1.06z"></path>
-                  <path d="M12 11.94c1.5 0 2.75 1.06 4 1.06 3 0 4-3 4-6.5-2.5 0-4 2.5-8 2.5s-5.5-2.5-8-2.5c0 3.5 1 6.5 4 6.5 1.25 0 2.5-1.06 4-1.06z"></path>
+            <!-- 상단 헤더 -->
+            <div class="card-header">
+              <span class="topic-tag">토론</span>
+            </div>
+
+            <!-- 제목 -->
+            <h3 class="topic-title">{{ topic.title }}</h3>
+
+            <!-- VS 차트 -->
+            <div class="vs-chart-container">
+              <div class="vote-circle">
+                <svg viewBox="0 0 36 36" class="vote-chart">
+                  <!-- 배경 원 -->
+                  <path class="vote-circle-bg"
+                        d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <!-- 찬성 부분 (파란색) -->
+                  <path class="vote-circle-true"
+                        :stroke-dasharray="`${(topic.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
+                        d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
                 </svg>
-                인기
-              </div>
-
-              <div class="vote-circle-container">
-                <div class="vote-circle">
-                  <svg viewBox="0 0 36 36" class="vote-chart">
-                    <!-- 배경 원 -->
-                    <path class="vote-circle-bg"
-                          d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <!-- 찬성 부분 (파란색) -->
-                    <path class="vote-circle-true"
-                          :stroke-dasharray="`${(topic.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
-                          d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <!-- 반대 부분 (빨간색) -->
-                    <path class="vote-circle-false"
-                          :stroke-dasharray="`${(1 - (topic.ratio?.trueNewsRatio || 0.5)) * 100}, 100`"
-                          :stroke-dashoffset="-1 * (topic.ratio?.trueNewsRatio || 0.5) * 100"
-                          d="M18 2.0845
-                        a 15.9155 15.9155 0 0 1 0 31.831
-                        a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                  </svg>
-                  <div class="vote-percentage">
-                    <div class="vote-vs">VS</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="vote-labels">
-                <div class="vote-label true">
-                  <span class="vote-text">진짜뉴스</span>
-                  <span class="vote-percent">{{ Math.round((topic.ratio?.trueNewsRatio || 0.5) * 100) }}%</span>
-                </div>
-                <div class="vote-label false">
-                  <span class="vote-text">가짜뉴스</span>
-                  <span class="vote-percent">{{ Math.round((1 - (topic.ratio?.trueNewsRatio || 0.5)) * 100) }}%</span>
-                </div>
+                <div class="vs-overlay">VS</div>
               </div>
             </div>
-            <div class="topic-info">
-              <div class="topic-meta">
-                <span class="topic-category">{{ getCategoryName(topic.category) }}</span>
-                <span class="topic-date">{{ formatDate(topic.createdAt) }}</span>
+
+            <!-- 하단 퍼센트 표시 -->
+            <div class="percentage-container">
+              <div class="percentage-item">
+                <span class="percentage-label">진짜뉴스</span>
+                <span class="percentage-value" :class="{ 'positive': (topic.ratio?.trueNewsRatio || 0.5) >= 0.5 }">
+                  {{ (topic.ratio?.trueNewsRatio || 0.5) >= 0.5 ? '>' : '<' }} {{ Math.round((topic.ratio?.trueNewsRatio || 0.5) * 100) }}%
+                </span>
               </div>
-              <div class="topic-meta2">
-                <h3 class="topic-title">{{ topic.title }}</h3>
-                <p class="topic-author">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                  </svg>
-                  {{ topic.authorUsername }}
-                </p>
+              <div class="percentage-item">
+                <span class="percentage-label">가짜뉴스</span>
+                <span class="percentage-value" :class="{ 'positive': (1 - (topic.ratio?.trueNewsRatio || 0.5)) >= 0.5 }">
+                  {{ (1 - (topic.ratio?.trueNewsRatio || 0.5)) >= 0.5 ? '>' : '<' }} {{ Math.round((1 - (topic.ratio?.trueNewsRatio || 0.5)) * 100) }}%
+                </span>
               </div>
+            </div>
+
+            <!-- 하단 메타 정보 -->
+            <div class="card-footer">
+              <span class="topic-date">{{ formatDate(topic.createdAt) }}</span>
+              <span class="topic-author">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                {{ topic.authorUsername }}
+              </span>
             </div>
           </router-link>
         </div>
@@ -177,12 +173,6 @@ export default {
         );
 
         this.bestTopics = filtered.slice(0,10); // 상위 10개
-        // 카테고리 디버깅
-        console.log("카테고리 정보:", filtered.map(post => ({
-          id: post.id,
-          category: post.category,
-          mappedCategory: this.getCategoryName(post.category)
-        })));
       } catch (error) {
         console.error("Best Topics 불러오기 실패", error);
         this.error = true;
@@ -213,6 +203,30 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  background-color: ;
+}
+
+/* 페이지 제목 헤더 */
+.page-title-header {
+  padding: 40px 0 20px 0;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 15px 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
 }
 
 /* 페이지 헤더 */
@@ -251,9 +265,9 @@ export default {
 }
 
 .filter-button.active {
-  background-color: #3A4CA4;
+  background-color: #3662E3;
   color: white;
-  border-color: #3A4CA4;
+  border-color: #3662E3;
 }
 
 .filter-button.active svg {
@@ -272,50 +286,78 @@ export default {
 
 .topics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
 
+/* 토픽 카드 (사진과 동일한 디자인) */
 .topic-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  border: 1px solid #f1f5f9;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   text-decoration: none;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 100%;
+  color: inherit;
 }
 
 .topic-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* 투표 시각화 컴포넌트 */
-.vote-visualization {
-  position: relative;
-  padding: 20px;
-  background: linear-gradient(145deg, #f8fafc, #f1f5f9);
-  border-bottom: 1px solid #e2e8f0;
-  height: 200px;
+/* 상단 헤더 */
+.card-header {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.vote-circle-container {
+.topic-tag {
+  background: #3662E3;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* 제목 */
+.topic-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.4;
+  margin: 0 0 24px 0;
+  transition: color 0.2s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.topic-card:hover .topic-title {
+  color: #3662E3;
+}
+
+/* VS 차트 컨테이너 */
+.vs-chart-container {
   display: flex;
   justify-content: center;
+  margin: 20px 0;
+  flex: 1;
   align-items: center;
-  flex-grow: 1;
 }
 
 .vote-circle {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
 }
 
 .vote-chart {
@@ -326,207 +368,144 @@ export default {
 
 .vote-circle-bg {
   fill: none;
-  stroke: #e2e8f0;
-  stroke-width: 3.8;
+  stroke: #f1f5f9;
+  stroke-width: 3;
 }
 
 .vote-circle-true {
   fill: none;
-  stroke: #3A4CA4;
-  stroke-width: 3.8;
+  stroke: #3662E3;
+  stroke-width: 3;
   stroke-linecap: round;
   transition: stroke-dasharray 0.8s ease;
 }
 
-.vote-circle-false {
-  fill: none;
-  stroke: #ef4444;
-  stroke-width: 3.8;
-  stroke-linecap: round;
-  transition: stroke-dasharray 0.8s ease, stroke-dashoffset 0.8s ease;
-}
-
-.vote-percentage {
+.vs-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.vote-vs {
-  font-size: 20px;
-  font-weight: 800;
-  color: #1e293b;
-  background: linear-gradient(135deg, #3A4CA4, #ef4444);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: -1px;
-}
-
-.vote-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.vote-label {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 45%;
-}
-
-.vote-label.true {
-  color: #3A4CA4;
-}
-
-.vote-label.false {
-  color: #ef4444;
-}
-
-.vote-icon {
-  font-size: 18px;
-  margin-bottom: 5px;
-}
-
-.vote-text {
   font-size: 12px;
-  font-weight: 500;
-  margin-bottom: 3px;
-}
-
-.vote-percent {
-  font-size: 16px;
   font-weight: 700;
-}
-
-/* 기존 topic-badge 스타일 수정 */
-.topic-badge {
-  position: absolute;
-  top: 15px;
-  right: 15px;
+  color: #64748b;
+  background: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  background-color: rgba(255, 215, 0, 0.9);
-  color: #1e293b;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 2;
 }
 
-.topic-info {
-  padding: 20px;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.topic-meta {
+/* 하단 퍼센트 표시 */
+.percentage-container {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  gap: 16px;
+  margin: 16px 0;
 }
 
-.topic-category {
-  display: inline-block;
-  padding: 4px 10px;
-  background-color: #f1f5f9;
-  color: #475569;
-  border-radius: 20px;
+.percentage-item {
+  flex: 1;
+  text-align: center;
+}
+
+.percentage-label {
+  display: block;
   font-size: 12px;
+  color: #94a3b8;
+  margin-bottom: 4px;
   font-weight: 500;
 }
 
-.topic-date {
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-.topic-meta2 {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.topic-title {
-  font-size: 16px;
+.percentage-value {
+  display: block;
+  font-size: 14px;
   font-weight: 600;
-  text-align: left;
-  color: #1e293b;
-  margin: 0 0 0 5px;
-  line-height: 1.4;
+  color: #94a3b8;
   transition: color 0.2s ease;
 }
 
-.topic-card:hover .topic-title {
-  color: #3A4CA4;
+.percentage-value.positive {
+  color: #3662E3;
+}
+
+/* 하단 메타 정보 */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.topic-date {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .topic-author {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 14px;
+  gap: 4px;
+  font-size: 12px;
   color: #64748b;
-  margin: 0 0 10px 0;
 }
 
 .topic-author svg {
   stroke: #64748b;
 }
 
+/* 빈 상태 */
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  color: #64748b;
+  text-align: center;
+}
+
+.empty-title {
+  margin: 16px 0 8px 0;
+  color: #1e293b;
+}
+
+.empty-message {
+  margin: 0;
+  color: #64748b;
+}
+
 /* 반응형 디자인 */
-@media (max-width: 1024px) {
-  .topics-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
-  .page-title {
-    font-size: 28px;
-  }
-
-  .filter-options {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .filter-button {
-    width: 100%;
-    justify-content: center;
-  }
-}
-
-@media (max-width: 640px) {
   .topics-grid {
     grid-template-columns: 1fr;
   }
 
-  .vote-visualization {
-    height: 180px;
-    padding: 15px;
+  .topic-card {
+    padding: 16px;
   }
 
-  .vote-circle {
-    width: 100px;
-    height: 100px;
+  .topic-title {
+    font-size: 15px;
+    margin-bottom: 20px;
   }
 
-  .vote-vs {
-    font-size: 18px;
+  .vs-overlay {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
   }
+}
 
-  .vote-text {
-    font-size: 11px;
-  }
-
-  .vote-percent {
-    font-size: 14px;
+@media (max-width: 480px) {
+  .main-container {
+    padding: 0 16px;
   }
 }
 </style>

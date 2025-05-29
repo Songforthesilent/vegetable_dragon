@@ -49,6 +49,10 @@ dependencies {
 //    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
+    // validation
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
 
     // Test 관련 의존성
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -23,7 +23,7 @@ public class FeedbackController {
 
     // 게시글에 대한 피드백 추가
     @PostMapping("/{postId}")
-    public ResponseEntity<?> addFeedback(@PathVariable Long postId, @RequestBody FeedbackRequest request, HttpSession session) throws UserNotFoundException, PostNotFoundException {
+    public ResponseEntity<?> addFeedback(@PathVariable Long postId, @RequestBody FeedbackRequest request, HttpSession session) {
         String loggedInUser = (String) session.getAttribute("loggedInUser");
 
         if (loggedInUser == null)
@@ -35,14 +35,14 @@ public class FeedbackController {
 
     // 특정 게시글의 모든 피드백 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<List<UserFeedbackResponse>> getFeedbacks(@PathVariable Long postId) throws PostNotFoundException {
+    public ResponseEntity<List<UserFeedbackResponse>> getFeedbacks(@PathVariable Long postId){
         List<UserFeedbackResponse> feedbacks = userFeedbackService.getFeedbacksByPost(postId);
         return ResponseEntity.ok(feedbacks);
     }
 
     // 특정 게시글의 가짜 뉴스 비율 조회
     @GetMapping("/{postId}/ratio")
-    public ResponseEntity<FakeNewsFeedbackRatioResponse> getFakeNewsRatio(@PathVariable Long postId) throws PostNotFoundException {
+    public ResponseEntity<FakeNewsFeedbackRatioResponse> getFakeNewsRatio(@PathVariable Long postId) {
         FakeNewsFeedbackRatioResponse response = userFeedbackService.getFakeNewsFeedbackRatio(postId);
         return ResponseEntity.ok(response);
     }

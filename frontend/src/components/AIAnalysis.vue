@@ -28,9 +28,7 @@
     </div>
 
     <div class="ai-actions">
-      <button @click="reanalyze" class="ai-action-button" :disabled="isAnalyzing">
-        <span class="ai-action-icon">🔄</span> 다시 분석하기
-      </button>
+        <span class="ai-action-icon">※ 모델은 참고용입니다.</span>
     </div>
   </div>
 </template>
@@ -118,17 +116,12 @@ export default {
 
 <style scoped>
 .ai-analysis-section {
-  margin-top: 80px;
   padding: 20px;
-  border-radius: 12px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .ai-header {
   display: flex;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .ai-title {
@@ -207,6 +200,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 10px;
 }
 
 .ai-score-circle {
@@ -237,30 +231,6 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 20px;
-}
-
-.ai-action-button {
-  display: flex;
-  align-items: center;
-  padding: 8px 14px;
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #475569;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ai-action-button:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-}
-
-.ai-action-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .ai-action-icon {

@@ -1,5 +1,7 @@
 package com.example.vegetabledragon.service;
 
+import com.example.vegetabledragon.apiPayload.code.status.ErrorStatus;
+import com.example.vegetabledragon.apiPayload.exception.GeneralException;
 import com.example.vegetabledragon.domain.Post;
 import com.example.vegetabledragon.domain.User;
 import com.example.vegetabledragon.domain.UserFeedback;
@@ -30,12 +32,11 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
 
     @Override
     @Transactional
-    public UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) throws UserNotFoundException, PostNotFoundException {
-//        log.debug("[DEBUG] saveFeedback() 호출됨 - username: " + username);
+    public UserFeedbackResponse saveFeedback(Long postId, String username, FeedbackRequest request) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND));
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(username));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 실제 서비스 시에는 허용시켜야 할 부분
         // Test 시에는 많은 사용자가 없기 때문에 하나의 계정으로 처리할 예정.
@@ -53,16 +54,13 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
         UserFeedback newFeedback = new UserFeedback(post, user, request.isFakeNews());
         UserFeedback saved = userFeedbackRepository.save(newFeedback);
 
-        // Hibernate 로그를 줄이고, 스프링 로그로 생성
-//        log.info("[UserfeedbackService_vote] User '{}' voted on Post {} -> fakeNews = {}", user.getUsername(), post.getId(), request.isFakeNews());
-
         return UserFeedbackResponse.from(saved);
     }
 
     @Override
-    public List<UserFeedbackResponse> getFeedbacksByPost(Long postId) throws PostNotFoundException {
+    public List<UserFeedbackResponse> getFeedbacksByPost(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND));
 
         return userFeedbackRepository.findByPost(post).
                 stream()
@@ -71,9 +69,9 @@ public class UserFeedbackServiceImpl implements UserFeedbackService {
     }
 
     @Override
-    public FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId) throws PostNotFoundException {
+    public FakeNewsFeedbackRatioResponse getFakeNewsFeedbackRatio(Long postId){
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException(postId));
+                .orElseThrow(() -> new GeneralException(ErrorStatus._NOT_FOUND));
 
         long fakeNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsTrue(post);
         long trueNewsCount = userFeedbackRepository.countByPostAndIsFakeNewsFalse(post);

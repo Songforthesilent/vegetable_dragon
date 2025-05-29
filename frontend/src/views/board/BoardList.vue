@@ -2,49 +2,31 @@
   <div class="main-container">
     <div class="content">
       <article class="board-list-container">
-        <!-- 페이지 제목 -->
-        <!--<div class="page-header">
-          <p class="page-description">다양한 주제의 게시글을 확인하세요</p>
-        </div>-->
+        <!-- 페이지 제목 헤더 -->
+        <div class="page-title-header">
+          <h1 class="page-title">전체 게시판</h1>
+          <p class="page-subtitle">다양한 주제의 토론에 참여하고 의견을 나누세요</p>
+        </div>
 
         <!-- 검색 및 필터 영역 -->
         <section class="filter-section">
-          <div class="filter-controls">
-            <div class="select-wrapper">
-              <select v-model="selectedCategory" class="category-select" @change="search">
-                <option value="">전체</option>
-                <option value="v1">경제</option>
-                <option value="v2">연예</option>
-                <option value="v3">정치</option>
-                <option value="v4">사회</option>
-                <option value="v5">국제</option>
-                <option value="v6">문화</option>
-              </select>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-icon">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-            </div>
-
-            <div class="search-container">
-              <input
-                  v-model="searchQuery"
-                  type="text"
-                  placeholder="검색어를 입력하세요"
-                  class="search-input"
-                  @keyup.enter="search"
-              />
-              <button @click="search" class="search-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-              </button>
-            </div>
+          <div class="post-count">
+            <span class="count-text">총 {{ totalElements }}개의 게시글</span>
           </div>
 
-          <button @click="fnWrite" class="write-button">
-            글 등록하기
-          </button>
+          <div class="search-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="토론 주제를 검색해보세요..."
+                class="search-input"
+                @keyup.enter="search"
+            />
+          </div>
         </section>
 
         <!-- 게시글 목록 -->
@@ -227,9 +209,6 @@ export default {
       this.currentPage = 0; // 검색 시 첫 페이지로 이동
       this.fnGetList();
     },
-    fnWrite() {
-      this.$router.push('/board/write');
-    },
     fnView(id) {
       // id 파라미터를 사용하여 상세 페이지로 이동
       this.$router.push(`/board/view/${id}`);
@@ -256,10 +235,9 @@ export default {
 <style scoped>
 /* 전체 레이아웃 */
 .main-container {
-  display: flex;
-  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0 20px;
-  margin-top: 30px;
 }
 
 .content {
@@ -273,6 +251,28 @@ export default {
   gap: 30px;
 }
 
+/* 페이지 제목 헤더 */
+.page-title-header {
+  padding: 40px 0 20px 0;
+  border-bottom: 1px solid #f1f5f9;
+  text-align: left;
+}
+
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 15px 0;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
 /* 필터 섹션 */
 .filter-section {
   display: flex;
@@ -282,112 +282,59 @@ export default {
   gap: 20px;
 }
 
-.filter-controls {
+/* 게시글 개수 */
+.post-count {
   display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-.select-wrapper {
-  position: relative;
-}
-
-.category-select {
-  appearance: none;
-  padding: 12px 40px 12px 16px;
-  border: 1px solid #3A4CA4;
-  border-radius: 10px;
-  background-color: #ffffff;
-  color: #1e293b;
+.count-text {
   font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 90px;
-}
-
-.category-select:focus {
-  outline: none;
-  border-color: #3A4CA4;
-  box-shadow: 0 0 0 2px rgba(58, 76, 164, 0.1);
-}
-
-.select-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
   color: #64748b;
-  pointer-events: none;
+  font-weight: 500;
 }
 
+/* 검색창 */
 .search-container {
   position: relative;
-  flex-grow: 1;
-  min-width: 250px;
+  width: 650px;
+  max-width: 650px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 1;
 }
 
 .search-input {
   width: 100%;
-  padding: 12px 45px 12px 16px;
-  border: 1px solid #3A4CA4;
-  border-radius: 10px;
-  background-color: #ffffff;
+  padding: 14px 20px 14px 50px;
+  border: none;
+  border-radius: 25px;
+  background-color: #f1f5f9;
   color: #1e293b;
   font-size: 14px;
   transition: all 0.3s ease;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
 }
 
 .search-input:focus {
-  outline: none;
-  border-color: #3A4CA4;
-  box-shadow: 0 0 0 2px rgba(58, 76, 164, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px #3662E3;
+  transform: translateY(-1px);
 }
 
-.search-button {
-  position: absolute;
-  right: 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background-color: #3A4CA4;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.search-button:hover {
-  background-color: #2d3a7c;
-}
-
-.write-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  background-color: #3A4CA4;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.write-button:hover {
-  background-color: #2d3a7c;
-  transform: translateY(-2px);
-}
-
-.button-icon {
-  stroke: white;
+.search-input:focus ~ .search-icon {
+  color: #3662E3;
 }
 
 /* 게시글 목록 테이블 */
@@ -469,7 +416,7 @@ export default {
 }
 
 .post-row:hover .post-title {
-  color: #3A4CA4;
+  color: #3662E3;
 }
 
 .empty-row td {
@@ -559,14 +506,9 @@ export default {
 }
 
 .page-number.active {
-  background-color: #3A4CA4;
+  background-color: #3662E3;
   color: white;
-  border-color: #3A4CA4;
-}
-
-.page-info {
-  font-size: 14px;
-  color: #64748b;
+  border-color: #3662E3;
 }
 
 /* 반응형 디자인 */
@@ -574,30 +516,57 @@ export default {
   .filter-section {
     flex-direction: column;
     align-items: stretch;
-  }
-
-  .filter-controls {
-    flex-direction: column;
-    width: 100%;
+    gap: 16px;
   }
 
   .search-container {
+    max-width: none;
     width: 100%;
   }
 
-  .write-button {
-    width: 100%;
+  .post-count {
     justify-content: center;
   }
 
-  .col-id, .col-date {
-    display: none;
+  .page-title-header {
+    padding: 30px 0 16px 0;
+    margin-bottom: 20px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-container {
+    padding: 0 10px;
+  }
+
+  .page-title {
+    font-size: 20px;
+  }
+
+  .page-subtitle {
+    font-size: 13px;
+  }
+
+  .search-input {
+    font-size: 16px; /* iOS 줌 방지 */
   }
 
   .page-numbers {
-    max-width: 250px;
-    flex-wrap: wrap;
-    justify-content: center;
+    max-width: 240px;
+  }
+
+  .page-button, .page-number {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
   }
 }
 </style>
