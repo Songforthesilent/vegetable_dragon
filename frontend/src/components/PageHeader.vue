@@ -31,7 +31,6 @@
           <router-link to="/best-topics" class="nav-item" :class="{ active: $route.path === '/best-topics' }">
             인기 주제
           </router-link>
-          <a href="#" class="nav-item">가이드</a>
         </div>
 
         <!-- 로그인 배너 섹션 -->
