@@ -116,16 +116,7 @@ export default {
       loading: false,
       error: null,
       page: 0,
-      size: 5,
-      categoryMap: {
-        "vue": "사회",
-        "react": "정치",
-        "angular": "문화",
-        "economy": "경제",
-        "entertainment": "연예",
-        "international": "국제",
-        "": "기타"
-      }
+      size: 5
     };
   },
   computed: {
@@ -190,30 +181,21 @@ export default {
       this.error = null;
 
       try {
-        // 카테고리 이름을 API 호출에 맞게 변환
-        const categoryKey = Object.keys(this.categoryMap).find(
-            key => this.categoryMap[key] === category
-        ) || category;
-
-        console.log("카테고리 키:", categoryKey);
-
-        const url = `http://localhost:8081/posts/category/${categoryKey}`;
+        // 카테고리 이름을 직접 사용 (서버에서 한글 카테고리명을 받음)
+        const url = `http://localhost:8081/posts/category/${category}`;
         console.log("요청 URL:", url);
 
         const response = await axios.get(url, {
           params: {
-            page: this.page,
-            size: this.size,
+            limit: this.size,  // limit 파라미터 사용
           },
         });
 
         console.log("카테고리별 응답:", response.data);
 
-        // 응답 형식에 따라 처리
+        // 카테고리별 API는 List<Post>를 반환하므로 직접 배열 할당
         if (Array.isArray(response.data)) {
           this.recentArticles = response.data;
-        } else if (response.data.content) {
-          this.recentArticles = response.data.content;
         } else {
           this.recentArticles = [];
         }
@@ -227,17 +209,29 @@ export default {
     },
 
     getCategoryName(article) {
+      // 디버깅을 위한 로그
+      console.log("게시글 카테고리 정보:", article.category);
+
+      // 카테고리가 null이거나 undefined인 경우
+      if (!article.category) {
+        console.log("카테고리가 null 또는 undefined");
+        return '기타';
+      }
+
       // 카테고리가 객체인 경우 (name 속성이 있는 경우)
-      if (article.category && typeof article.category === 'object' && article.category.name) {
+      if (typeof article.category === 'object' && article.category.name) {
+        console.log("카테고리 객체의 name:", article.category.name);
         return article.category.name;
       }
 
       // 카테고리가 문자열인 경우
-      if (article.category && typeof article.category === 'string') {
-        return this.categoryMap[article.category] || article.category;
+      if (typeof article.category === 'string') {
+        console.log("카테고리 문자열:", article.category);
+        return article.category;
       }
 
-      // 카테고리가 없는 경우
+      // 그 외의 경우
+      console.log("카테고리가 인식되지 않는 형태:", article.category);
       return '기타';
     },
 
@@ -306,6 +300,7 @@ export default {
 </script>
 
 <style scoped>
+/* 스타일은 동일 */
 /* 전체 섹션 */
 .recent-posts-section {
   padding: 60px 0;
