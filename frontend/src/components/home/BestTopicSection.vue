@@ -63,6 +63,7 @@
 import axios from 'axios';
 import SectionHeader from '@/components/home/SectionHeader.vue';
 import TopicCard from '@/components/topic/TopicCard.vue';
+import { getCategoryByContent } from '@/utils/CategoryUtils';
 
 export default {
   name: 'BestTopicsSection',
@@ -103,7 +104,8 @@ export default {
           console.log(`게시글 ID ${post.id}:`, {
             title: post.title,
             category: post.category,
-            categoryType: typeof post.category
+            categoryType: typeof post.category,
+            autoCategory: this.getCategoryName(post)
           });
 
           // 카테고리 정보 처리 - 각 게시글에 categoryName 속성 추가
@@ -141,6 +143,12 @@ export default {
         this.bestTopics = controversialPosts.slice(0, 3);
 
         console.log('필터링된 베스트 토픽:', this.bestTopics);
+        console.log('카테고리 정보:', this.bestTopics.map(post => ({
+          id: post.id,
+          title: post.title,
+          categoryName: post.categoryName,
+          autoCategory: getCategoryByContent(post.title, post.content)
+        })));
 
       } catch (error) {
         console.error("Best Topics 불러오기 실패:", error);
@@ -158,25 +166,28 @@ export default {
         categoryType: typeof article.category
       });
 
-      // 1. 카테고리가 객체이고 name 속성이 있는 경우
-      if (article.category && typeof article.category === 'object' && article.category.name) {
-        return article.category.name;
+      // 1. API에서 가져온 카테고리 정보 우선 사용
+      if (article.categoryName) {
+        return article.categoryName;
       }
 
-      // 2. 카테고리가 문자열인 경우
-      if (article.category && typeof article.category === 'string') {
-        return article.category;
+      // 2. 카테고리 객체가 있는 경우
+      if (article.category) {
+        // 카테고리가 객체이고 name 속성이 있는 경우
+        if (typeof article.category === 'object' && article.category.name) {
+          return article.category.name;
+        }
+
+        // 카테고리가 문자열인 경우
+        if (typeof article.category === 'string') {
+          return article.category;
+        }
       }
 
-      // 3. 카테고리가 null이거나 undefined인 경우
-      if (!article.category) {
-        console.warn(`게시글 ID ${article.id}에 카테고리 정보가 없습니다.`);
-        return '기타';
-      }
-
-      // 4. 예상하지 못한 형태의 카테고리
-      console.warn(`게시글 ID ${article.id}의 카테고리 형태가 예상과 다릅니다:`, article.category);
-      return '기타';
+      // 3. 자동분류 로직 사용
+      const autoCategory = getCategoryByContent(article.title, article.content);
+      console.log(`게시글 ID ${article.id} 자동분류 결과:`, autoCategory);
+      return autoCategory;
     }
   }
 }

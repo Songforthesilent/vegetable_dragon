@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <!-- 카테고리 선택 -->
+      <!-- 카테고리 선택
       <div class="form-group">
         <label for="category" class="form-label">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,14 +55,14 @@
           </svg>
         </div>
 
-        <!-- 선택된 카테고리 표시 -->
+        선택된 카테고리 표시
         <div v-if="post.category" class="selected-category">
           <span class="category-badge" :class="getCategoryClass(post.category)">
             <span class="category-icon">{{ getCategoryIcon(post.category) }}</span>
             {{ post.category }}
           </span>
         </div>
-      </div>
+      </div>-->
 
       <!-- 내용 및 익명 옵션 -->
       <div class="form-group">
@@ -412,13 +412,13 @@ export default {
 /* 텍스트에어리어 */
 .form-textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
-  min-height: 120px;
+  min-height: 260px;
   transition: border-color 0.2s ease;
 }
 
