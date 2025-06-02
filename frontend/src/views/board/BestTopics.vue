@@ -8,40 +8,59 @@
 
     <!-- 페이지 헤더 -->
     <div class="page-header">
-      <!-- 필터 옵션-->
-      <div class="filter-options">
-        <button
-            class="filter-button active"
-            title="박빙인 주제"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
+      <div class="post-count">
+        <span class="count-text">총 {{ totalElements }}개의 게시글</span>
+        <span v-if="searchQuery" class="search-result-text">
+          '{{ searchQuery }}' 검색 결과: {{ bestTopics.length }}개
+        </span>
+      </div>
+
+      <div class="search-container">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="토론 주제를 검색해보세요..."
+            class="search-input"
+            @keyup.enter="search"
+        />
+        <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn" title="검색어 지우기">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
-          박빙
-        </button>
-        <button
-            class="filter-button"
-            title="논쟁이 많은 주제"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          논쟁 많은 주제
         </button>
       </div>
     </div>
 
     <!-- 게시글 영역 -->
     <article class="content">
+      <!-- 로딩 상태 -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">게시글을 불러오는 중...</p>
+      </div>
+
       <!-- 데이터가 없는 상태 -->
-      <div v-if="bestTopics.length === 0" class="empty-container">
+      <div v-else-if="bestTopics.length === 0" class="empty-container">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="8" y1="12" x2="16" y2="12"></line>
         </svg>
-        <h3 class="empty-title">표시할 게시글이 없습니다</h3>
-        <p class="empty-message">아직 인기 게시글이 없습니다. 나중에 다시 확인해주세요.</p>
+        <h3 class="empty-title">{{ searchQuery ? '검색 결과가 없습니다' : '표시할 게시글이 없습니다' }}</h3>
+        <p class="empty-message">
+          {{ searchQuery ? `'${searchQuery}'에 대한 검색 결과가 없습니다.` : '아직 인기 게시글이 없습니다. 나중에 다시 확인해주세요.' }}
+        </p>
+        <button v-if="searchQuery" @click="clearSearch" class="reset-search-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 2v6h6M21.5 22v-6h-6"></path>
+            <path d="M22 11.5A10 10 0 0 0 3.2 7.2M2 12.5a10 10 0 0 0 18.8 4.2"></path>
+          </svg>
+          검색 초기화
+        </button>
       </div>
 
       <!-- 게시글 그리드 -->
@@ -55,7 +74,16 @@
           >
             <!-- 상단 헤더 -->
             <div class="card-header">
-              <span class="topic-tag">토론</span>
+              <span
+                  class="topic-tag"
+                  :class="getCategoryClass(getCategoryName(topic))"
+                  :style="{
+                  backgroundColor: getCategoryBackgroundColor(getCategoryName(topic)),
+                  color: getCategoryTextColor(getCategoryName(topic))
+                }"
+              >
+                {{ getCategoryName(topic) }}
+              </span>
             </div>
 
             <!-- 제목 -->
@@ -71,8 +99,9 @@
                       a 15.9155 15.9155 0 0 1 0 31.831
                       a 15.9155 15.9155 0 0 1 0 -31.831"
                   />
-                  <!-- 찬성 부분 (파란색) -->
+                  <!-- 찬성 부분 -->
                   <path class="vote-circle-true"
+                        :stroke="getCategoryProgressColor(getCategoryName(topic))"
                         :stroke-dasharray="`${(topic.ratio?.trueNewsRatio || 0.5) * 100}, 100`"
                         d="M18 2.0845
                       a 15.9155 15.9155 0 0 1 0 31.831
@@ -87,13 +116,21 @@
             <div class="percentage-container">
               <div class="percentage-item">
                 <span class="percentage-label">진짜뉴스</span>
-                <span class="percentage-value" :class="{ 'positive': (topic.ratio?.trueNewsRatio || 0.5) >= 0.5 }">
+                <span
+                    class="percentage-value"
+                    :class="{ 'positive': (topic.ratio?.trueNewsRatio || 0.5) >= 0.5 }"
+                    :style="{ color: (topic.ratio?.trueNewsRatio || 0.5) >= 0.5 ? getCategoryTextColor(getCategoryName(topic)) : '#94a3b8' }"
+                >
                   {{ (topic.ratio?.trueNewsRatio || 0.5) >= 0.5 ? '>' : '<' }} {{ Math.round((topic.ratio?.trueNewsRatio || 0.5) * 100) }}%
                 </span>
               </div>
               <div class="percentage-item">
                 <span class="percentage-label">가짜뉴스</span>
-                <span class="percentage-value" :class="{ 'positive': (1 - (topic.ratio?.trueNewsRatio || 0.5)) >= 0.5 }">
+                <span
+                    class="percentage-value"
+                    :class="{ 'positive': (1 - (topic.ratio?.trueNewsRatio || 0.5)) >= 0.5 }"
+                    :style="{ color: (1 - (topic.ratio?.trueNewsRatio || 0.5)) >= 0.5 ? getCategoryTextColor(getCategoryName(topic)) : '#94a3b8' }"
+                >
                   {{ (1 - (topic.ratio?.trueNewsRatio || 0.5)) >= 0.5 ? '>' : '<' }} {{ Math.round((1 - (topic.ratio?.trueNewsRatio || 0.5)) * 100) }}%
                 </span>
               </div>
@@ -119,16 +156,20 @@
 
 <script>
 import axios from "axios";
+import { getCategoryByContent, getCategoryClass, getCategoryBackgroundColor, getCategoryTextColor, getCategoryProgressColor } from '@/utils/CategoryUtils';
 
 export default {
   data() {
     return {
       bestTopics: [],
+      allTopics: [], // 모든 게시글을 저장하는 배열 추가
       loading: true,
       error: false,
       errorMessage: "",
       currentPage: 0,
       totalPages: 1,
+      totalElements: 0, // 총 게시글 수 추가
+      searchQuery: "", // 검색어 추가
       categories: {
         "v1": "경제",
         "v2": "연예",
@@ -151,6 +192,10 @@ export default {
         const res = await axios.get("http://localhost:8081/posts", {
           params: { page: 0, size: 100 }
         });
+
+        // 총 게시글 수 저장
+        this.totalElements = res.data.totalElements || res.data.content.length;
+
         const posts = res.data.content;
 
         const ratioPromises = posts.map(post =>
@@ -164,6 +209,10 @@ export default {
 
         const postsWithRatio = (await Promise.all(ratioPromises)).filter(Boolean);
 
+        // 모든 게시글 저장
+        this.allTopics = postsWithRatio;
+
+        // 논란이 되는 게시글 필터링 (비율이 0.5에 가까운 것들)
         const filtered = postsWithRatio.filter(p =>
             Math.abs(p.ratio.trueNewsRatio - 0.5) <= 0.05
         );
@@ -172,14 +221,71 @@ export default {
             Math.abs(a.ratio.trueNewsRatio - 0.5) - Math.abs(b.ratio.trueNewsRatio - 0.5)
         );
 
-        this.bestTopics = filtered.slice(0,10); // 상위 10개
+        this.bestTopics = filtered.slice(0, 10); // 상위 10개
       } catch (error) {
         console.error("Best Topics 불러오기 실패", error);
         this.error = true;
         this.errorMessage = "서버에서 데이터를 불러오는 중 오류가 발생했습니다.";
+      } finally {
         this.loading = false;
       }
     },
+
+    // 검색 기능 추가
+    search() {
+      if (!this.searchQuery.trim()) {
+        // 검색어가 없으면 모든 게시글 표시
+        this.resetSearch();
+        return;
+      }
+
+      this.loading = true;
+
+      // 검색어를 소문자로 변환하여 대소문자 구분 없이 검색
+      const query = this.searchQuery.toLowerCase();
+
+      // 제목, 내용, 작성자 이름에서 검색
+      const searchResults = this.allTopics.filter(topic => {
+        const title = (topic.title || '').toLowerCase();
+        const content = (topic.content || '').toLowerCase();
+        const author = (topic.authorUsername || '').toLowerCase();
+        const category = this.getCategoryName(topic).toLowerCase();
+
+        return title.includes(query) ||
+            content.includes(query) ||
+            author.includes(query) ||
+            category.includes(query);
+      });
+
+      // 검색 결과를 논란이 되는 순서로 정렬
+      searchResults.sort((a, b) =>
+          Math.abs(a.ratio.trueNewsRatio - 0.5) - Math.abs(b.ratio.trueNewsRatio - 0.5)
+      );
+
+      this.bestTopics = searchResults;
+      this.loading = false;
+    },
+
+    // 검색 초기화
+    clearSearch() {
+      this.searchQuery = "";
+      this.resetSearch();
+    },
+
+    // 검색 초기화 후 원래 게시글 표시
+    resetSearch() {
+      // 논란이 되는 게시글 필터링 (비율이 0.5에 가까운 것들)
+      const filtered = this.allTopics.filter(p =>
+          Math.abs(p.ratio.trueNewsRatio - 0.5) <= 0.05
+      );
+
+      filtered.sort((a, b) =>
+          Math.abs(a.ratio.trueNewsRatio - 0.5) - Math.abs(b.ratio.trueNewsRatio - 0.5)
+      );
+
+      this.bestTopics = filtered.slice(0, 10); // 상위 10개
+    },
+
     formatDate(dateString) {
       if (!dateString) return "";
 
@@ -190,9 +296,32 @@ export default {
 
       return `${year}-${month}-${day}`;
     },
-    getCategoryName(category) {
-      return this.categories[category] || "기타";
-    }
+    getCategoryName(topic) {
+      // 1. API에서 가져온 카테고리 정보 우선 사용
+      if (topic.categoryName) {
+        return topic.categoryName;
+      }
+
+      // 2. 카테고리 객체가 있는 경우
+      if (topic.category) {
+        // 카테고리가 객체이고 name 속성이 있는 경우
+        if (typeof topic.category === 'object' && topic.category.name) {
+          return topic.category.name;
+        }
+
+        // 카테고리가 문자열인 경우
+        if (typeof topic.category === 'string') {
+          return topic.category;
+        }
+      }
+
+      // 3. 자동분류 로직 사용
+      return getCategoryByContent(topic.title, topic.content);
+    },
+    getCategoryClass,
+    getCategoryBackgroundColor,
+    getCategoryTextColor,
+    getCategoryProgressColor
   }
 };
 </script>
@@ -203,7 +332,6 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-  background-color: ;
 }
 
 /* 페이지 제목 헤더 */
@@ -231,51 +359,132 @@ export default {
 
 /* 페이지 헤더 */
 .page-header {
-  margin: 40px 0 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+/* 게시글 수 표시 */
+.post-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+}
+
+.count-text {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.search-result-text {
+  font-size: 13px;
+  color: #3662E3;
+  font-weight: 500;
+}
+
+/* 검색 컨테이너 */
+.search-container {
+  position: relative;
+  align-items: center;
+  width: 650px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px 14px 50px;
+  border: none;
+  border-radius: 25px;
+  background-color: #f8fafc;
+  color: #1e293b;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.search-input:focus {
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px #3662E3;
+  transform: translateY(-1px);
+}
+
+.search-input:focus ~ .search-icon {
+  color: #3662E3;
+}
+
+/* 검색어 지우기 버튼 */
+.clear-search-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.clear-search-btn:hover {
+  color: #64748b;
+  background-color: #f1f5f9;
+}
+
+/* 로딩 상태 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #64748b;
   text-align: center;
 }
 
-/* 필터 옵션 */
-.filter-options {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 25px;
-  flex-wrap: wrap;
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f1f5f9;
+  border-top: 3px solid #3662E3;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
 }
 
-.filter-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  color: #475569;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
   font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.filter-button:hover {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
-}
-
-.filter-button.active {
-  background-color: #3662E3;
-  color: white;
-  border-color: #3662E3;
-}
-
-.filter-button.active svg {
-  stroke: white;
+  color: #64748b;
+  margin: 0;
 }
 
 /* 콘텐츠 영역 */
 .content {
+  margin-top: 30px;
   margin-bottom: 50px;
 }
 
@@ -290,7 +499,7 @@ export default {
   gap: 24px;
 }
 
-/* 토픽 카드 (사진과 동일한 디자인) */
+/* 토픽 카드 */
 .topic-card {
   background: white;
   border-radius: 12px;
@@ -319,12 +528,22 @@ export default {
 }
 
 .topic-tag {
-  background: #3662E3;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.topic-tag:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* 제목 */
@@ -374,7 +593,6 @@ export default {
 
 .vote-circle-true {
   fill: none;
-  stroke: #3662E3;
   stroke-width: 3;
   stroke-linecap: round;
   transition: stroke-dasharray 0.8s ease;
@@ -424,12 +642,7 @@ export default {
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #94a3b8;
   transition: color 0.2s ease;
-}
-
-.percentage-value.positive {
-  color: #3662E3;
 }
 
 /* 하단 메타 정보 */
@@ -471,18 +684,55 @@ export default {
   text-align: center;
 }
 
+.empty-container svg {
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
 .empty-title {
   margin: 16px 0 8px 0;
   color: #1e293b;
+  font-size: 18px;
 }
 
 .empty-message {
-  margin: 0;
+  margin: 0 0 20px;
   color: #64748b;
+  font-size: 14px;
+}
+
+.reset-search-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #3662E3;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-search-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #3662E3;
+  transform: translateY(-1px);
 }
 
 /* 반응형 디자인 */
 @media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-container {
+    width: 100%;
+  }
+
   .topics-grid {
     grid-template-columns: 1fr;
   }
@@ -506,6 +756,14 @@ export default {
 @media (max-width: 480px) {
   .main-container {
     padding: 0 16px;
+  }
+
+  .page-title {
+    font-size: 22px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
   }
 }
 </style>

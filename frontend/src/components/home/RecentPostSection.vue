@@ -61,8 +61,15 @@
               @click="goToPost(article.id)"
           >
             <div class="post-header">
-              <span class="post-category" :class="getCategoryClass(article)">
-                {{ getCategoryIcon(article) }} {{ getCategoryName(article) }}
+              <span
+                  class="post-category"
+                  :class="getCategoryClass(article)"
+                  :style="{
+                  backgroundColor: getCategoryBackgroundColor(getCategoryName(article)),
+                  color: getCategoryTextColor(getCategoryName(article))
+                }"
+              >
+                {{ getCategoryName(article) }}
               </span>
               <span class="post-date">{{ formatDate(article.createdAt) }}</span>
             </div>
@@ -101,6 +108,7 @@
 import axios from 'axios';
 import SectionHeader from '@/components/home/SectionHeader.vue';
 import CategoryFilter from '@/components/home/CategoryFilter.vue';
+import { getCategoryByContent, getCategoryClass, getCategoryBackgroundColor, getCategoryTextColor} from '@/utils/CategoryUtils';
 
 export default {
   name: 'RecentPostsSection',
@@ -110,7 +118,7 @@ export default {
   },
   data() {
     return {
-      categories: ['경제', '연예', '정치', '사회', '국제', '문화'],
+      categories: ['경제', '연예', '정치', '사회', '국제', '문화', '기술', '기타'],
       selectedCategory: '전체',
       recentArticles: [],
       loading: false,
@@ -141,11 +149,8 @@ export default {
   methods: {
     filterCategory(category) {
       this.selectedCategory = category;
-      if (category === '전체') {
-        this.fetchRecentPosts();
-      } else {
-        this.fetchPostsByCategory(category);
-      }
+      // 자동분류 로직을 사용하므로 모든 게시글을 가져와서 프론트엔드에서 필터링
+      this.fetchRecentPosts();
     },
 
     async fetchRecentPosts() {
@@ -156,7 +161,7 @@ export default {
         const response = await axios.get("http://localhost:8081/posts", {
           params: {
             page: this.page,
-            size: this.size,
+            size: 20, // 필터링을 위해 더 많은 게시글을 가져옴
           },
         });
         this.recentArticles = response.data.content;
@@ -165,8 +170,8 @@ export default {
         console.log("최근 게시글 데이터:", this.recentArticles);
         console.log("카테고리 정보:", this.recentArticles.map(post => ({
           id: post.id,
-          category: post.category,
-          mappedCategory: this.getCategoryName(post)
+          title: post.title,
+          autoCategory: this.getCategoryName(post)
         })));
       } catch (error) {
         console.error("게시글을 불러오는 데 실패했습니다.", error);
@@ -176,97 +181,40 @@ export default {
       }
     },
 
-    async fetchPostsByCategory(category) {
-      this.loading = true;
-      this.error = null;
-
-      try {
-        // 카테고리 이름을 직접 사용 (서버에서 한글 카테고리명을 받음)
-        const url = `http://localhost:8081/posts/category/${category}`;
-        console.log("요청 URL:", url);
-
-        const response = await axios.get(url, {
-          params: {
-            limit: this.size,  // limit 파라미터 사용
-          },
-        });
-
-        console.log("카테고리별 응답:", response.data);
-
-        // 카테고리별 API는 List<Post>를 반환하므로 직접 배열 할당
-        if (Array.isArray(response.data)) {
-          this.recentArticles = response.data;
-        } else {
-          this.recentArticles = [];
-        }
-      } catch (error) {
-        console.error("카테고리별 게시글을 불러오는 데 실패했습니다.", error);
-        this.error = error;
-        this.recentArticles = [];
-      } finally {
-        this.loading = false;
-      }
-    },
-
     getCategoryName(article) {
-      // 디버깅을 위한 로그
-      console.log("게시글 카테고리 정보:", article.category);
-
-      // 카테고리가 null이거나 undefined인 경우
-      if (!article.category) {
-        console.log("카테고리가 null 또는 undefined");
-        return '기타';
+      // 1. API에서 가져온 카테고리 정보 우선 사용
+      if (article.categoryName) {
+        return article.categoryName;
       }
 
-      // 카테고리가 객체인 경우 (name 속성이 있는 경우)
-      if (typeof article.category === 'object' && article.category.name) {
-        console.log("카테고리 객체의 name:", article.category.name);
-        return article.category.name;
+      // 2. 카테고리 객체가 있는 경우
+      if (article.category) {
+        // 카테고리가 객체이고 name 속성이 있는 경우
+        if (typeof article.category === 'object' && article.category.name) {
+          return article.category.name;
+        }
+
+        // 카테고리가 문자열인 경우
+        if (typeof article.category === 'string') {
+          return article.category;
+        }
       }
 
-      // 카테고리가 문자열인 경우
-      if (typeof article.category === 'string') {
-        console.log("카테고리 문자열:", article.category);
-        return article.category;
-      }
-
-      // 그 외의 경우
-      console.log("카테고리가 인식되지 않는 형태:", article.category);
-      return '기타';
+      // 3. 자동분류 로직 사용
+      return getCategoryByContent(article.title, article.content);
     },
 
     getCategoryClass(article) {
       const categoryName = this.getCategoryName(article);
-      const classMap = {
-        '정치': 'category-politics',
-        '경제': 'category-economy',
-        '사회': 'category-society',
-        '문화': 'category-culture',
-        '연예': 'category-entertainment',
-        '국제': 'category-international',
-        '스포츠': 'category-sports',
-        '기술': 'category-tech',
-        '환경': 'category-environment',
-        '기타': 'category-default'
-      };
-      return classMap[categoryName] || 'category-default';
+      return getCategoryClass(categoryName);
     },
 
-    getCategoryIcon(article) {
-      const categoryName = this.getCategoryName(article);
-      const iconMap = {
-        '정치': '🏛️',
-        '경제': '💰',
-        '사회': '👥',
-        '문화': '🎨',
-        '연예': '🎭',
-        '국제': '🌍',
-        '스포츠': '⚽',
-        '기술': '💻',
-        '환경': '🌱',
-        '기타': '📝'
-      };
-      return iconMap[categoryName] || '📝';
+    getCategoryBackgroundColor(categoryName) {
+      return getCategoryBackgroundColor(categoryName);
+    },
+
+    getCategoryTextColor(categoryName) {
+      return getCategoryTextColor(categoryName);
     },
 
     formatDate(dateString) {
@@ -300,7 +248,6 @@ export default {
 </script>
 
 <style scoped>
-/* 스타일은 동일 */
 /* 전체 섹션 */
 .recent-posts-section {
   padding: 60px 0;
@@ -340,8 +287,12 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* 에러 상태 */
@@ -477,24 +428,20 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 50px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
-/* 카테고리별 색상 */
-.category-politics { background-color: #ef4444; }
-.category-economy { background-color: #10b981; }
-.category-society { background-color: #3A4CA4; }
-.category-culture { background-color: #8b5cf6; }
-.category-entertainment { background-color: #f59e0b; }
-.category-international { background-color: #06b6d4; }
-.category-sports { background-color: #84cc16; }
-.category-tech { background-color: #6366f1; }
-.category-environment { background-color: #059669; }
-.category-default { background-color: #64748b; }
+.post-category:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
 
 .post-date {
   font-size: 12px;
