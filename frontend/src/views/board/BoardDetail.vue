@@ -110,15 +110,12 @@
       />
     </ModalContainer>
 
-    <ModalContainer
+    <EditPostModal
         :show="editPostModal"
-        title="게시글 수정"
-        @confirm="saveEditPost"
+        :post="article"
+        @save="saveEditPost"
         @cancel="editPostModal = false"
-    >
-      <input type="text" v-model="article.title" placeholder="제목 입력" />
-      <textarea v-model="article.content" placeholder="내용 입력"></textarea>
-    </ModalContainer>
+    />
 
     <ModalContainer
         :show="editPostPasswordModal"
@@ -144,14 +141,14 @@
       <input type="password" v-model="editCommentPassword" placeholder="비밀번호 입력" />
     </ModalContainer>
 
-    <ModalContainer
-        :show="confirmingEditComment && editingCommentIndex !== null"
-        title="수정할 댓글 내용을 입력하세요"
-        @confirm="saveEditComment"
+    <EditCommentModal
+        :show="editingCommentIndex !== null"
+        :comment="editingCommentIndex !== null ? comments[editingCommentIndex] : {}"
+        :is-logged-in="isLoggedIn"
+        @verify-password="handleVerifyCommentPassword"
+        @save="handleSaveComment"
         @cancel="cancelEditComment"
-    >
-      <textarea v-model="editCommentText" placeholder="수정할 댓글 내용"></textarea>
-    </ModalContainer>
+    />
 
     <ModalContainer
         :show="deletingCommentIndex !== null"
@@ -181,6 +178,8 @@ import VoteSection from '@/components/VoteSection.vue';
 import CommentSection from '@/components/CommentSection.vue';
 import ModalContainer from '@/components/ModalContainer.vue';
 import AIAnalysis from '@/components/AIAnalysis.vue';
+import EditPostModal from '@/components/EditPostModal.vue';
+import EditCommentModal from '@/components/EditCommentModal.vue';
 
 export default {
   components: {
@@ -188,7 +187,9 @@ export default {
     VoteSection,
     CommentSection,
     ModalContainer,
-    AIAnalysis
+    AIAnalysis,
+    EditPostModal,
+    EditCommentModal
   },
   data() {
     return {

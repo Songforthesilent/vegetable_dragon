@@ -12,7 +12,7 @@ import java.util.Optional;
 
 // DIP를 위해 인터페이스 추가작업.
 public interface PostService {
-    Post createPost(String username, PostRequest request);
+    Post createPost(String username, PostRequest request, Category category);
     Page<Post> getAllPosts(int page, int size);
     Optional<Post> getPostById(Long postId);
 

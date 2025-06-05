@@ -57,7 +57,7 @@ export default {
 .confirm-btn {
   width: 100px;
   padding: 10px;
-  background-color: #3A4CA4;
+  background-color: #3662E3;
   color: white;
   border: none;
   border-radius: 6px;

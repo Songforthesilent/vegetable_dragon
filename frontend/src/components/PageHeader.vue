@@ -8,9 +8,15 @@
           <div class="brand-logo">
             <div class="logo-icon">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 8C8 8 5 11 5 15C5 19 8 22 12 22C16 22 19 19 19 15C19 11 16 8 12 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- 잎사귀들 -->
+                <path d="M8 8C6 6 6 4 8 3C10 4 10 6 8 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 7C12 5 13 3 15 2C16 3 15 5 12 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M16 8C18 6 18 4 16 3C14 4 14 6 16 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- 뿌리 무늬 -->
+                <path d="M10 12L14 12" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                <path d="M9 15L15 15" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+                <path d="M10 18L14 18" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
               </svg>
             </div>
           </div>
@@ -31,7 +37,6 @@
           <router-link to="/best-topics" class="nav-item" :class="{ active: $route.path === '/best-topics' }">
             인기 주제
           </router-link>
-          <a href="#" class="nav-item">가이드</a>
         </div>
 
         <!-- 로그인 배너 섹션 -->
@@ -356,7 +361,7 @@ export default {
 .logo-icon {
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #7D3DE1 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;

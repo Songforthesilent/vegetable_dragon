@@ -9,7 +9,7 @@
       <!-- 제목 입력 -->
       <div class="form-group">
         <label for="title" class="form-label">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
             <line x1="4" y1="22" x2="4" y2="15"></line>
           </svg>
@@ -30,10 +30,10 @@
         </div>
       </div>
 
-      <!-- 카테고리 선택 -->
+      <!-- 카테고리 선택
       <div class="form-group">
         <label for="category" class="form-label">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
           </svg>
           카테고리
@@ -47,27 +47,28 @@
             <option value="정치">정치</option>
             <option value="문화">문화</option>
             <option value="연예">연예</option>
+            <option value="경제">경제</option>
             <option value="국제">국제</option>
           </select>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="select-icon">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </div>
 
-        <!-- 선택된 카테고리 표시 -->
+        선택된 카테고리 표시
         <div v-if="post.category" class="selected-category">
           <span class="category-badge" :class="getCategoryClass(post.category)">
             <span class="category-icon">{{ getCategoryIcon(post.category) }}</span>
             {{ post.category }}
           </span>
         </div>
-      </div>
+      </div>-->
 
       <!-- 내용 및 익명 옵션 -->
       <div class="form-group">
         <div class="content-header">
           <label for="content" class="form-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -95,7 +96,7 @@
       <div class="form-actions">
         <div class="password-section">
           <label for="password" class="password-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
               <circle cx="12" cy="16" r="1"></circle>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -114,13 +115,13 @@
 
         <div class="buttons">
           <button type="button" class="cancel-button" @click="fnCancel">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
             취소
           </button>
           <button type="submit" class="submit-button" :disabled="!isFormValid || isSubmitting">
-            <svg v-if="isSubmitting" class="loading-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg v-if="isSubmitting" class="loading-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="2" x2="12" y2="6"></line>
               <line x1="12" y1="18" x2="12" y2="22"></line>
               <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
@@ -130,7 +131,7 @@
               <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
               <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
             </svg>
-            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
             {{ isSubmitting ? '등록 중...' : '글 등록하기' }}
@@ -244,6 +245,7 @@ export default {
         '정치': 'category-politics',
         '문화': 'category-culture',
         '연예': 'category-entertainment',
+        '경제': 'category-economy',
         '국제': 'category-international'
       };
       return classMap[category] || 'category-default';
@@ -256,7 +258,9 @@ export default {
         '정치': '🏛️',
         '문화': '🎨',
         '연예': '🎭',
+        '경제': '💰',
         '국제': '🌍'
+
       };
       return iconMap[category] || '📝';
     }
@@ -393,6 +397,7 @@ export default {
 .category-politics { background-color: #ef4444; }
 .category-culture { background-color: #8b5cf6; }
 .category-entertainment { background-color: #f59e0b; }
+.category-economy { background-color: #10b981; }
 .category-international { background-color: #06b6d4; }
 .category-default { background-color: #64748b; }
 
@@ -407,13 +412,13 @@ export default {
 /* 텍스트에어리어 */
 .form-textarea {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 16px;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
-  min-height: 120px;
+  min-height: 260px;
   transition: border-color 0.2s ease;
 }
 

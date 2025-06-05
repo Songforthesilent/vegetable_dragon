@@ -38,7 +38,7 @@ public class PostController {
         if (loggedInUser == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // 401 반환
         }
-        Post savedPost = postService.createPost(loggedInUser, request);
+        Post savedPost = postService.createPost(loggedInUser, request, category);
 
         return ResponseEntity.ok(savedPost);
     }

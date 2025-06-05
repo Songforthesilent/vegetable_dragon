@@ -4,7 +4,16 @@
       <div class="best-topic-content">
         <!-- 카테고리 -->
         <div class="topic-header">
-          <span class="topic-category">{{ category }}</span>
+          <span
+              class="topic-category"
+              :class="getCategoryClass(category)"
+              :style="{
+              backgroundColor: getCategoryBackgroundColor(category),
+              color: getCategoryTextColor(category)
+            }"
+          >
+            {{ category }}
+          </span>
           <span class="topic-date">{{ formattedDate }}</span>
         </div>
 
@@ -17,18 +26,30 @@
       <!-- 투표결과 -->
       <router-link :to="'/board/view/' + article.id" class="best-topic-title-link">
         <div class="best-topic-vote-container">
-          <vote-circle :true-ratio="article.ratio?.trueNewsRatio" />
-          <vote-labels :true-ratio="article.ratio?.trueNewsRatio" />
+          <vote-circle
+              :true-ratio="article.ratio?.trueNewsRatio"
+              :category-color="getCategoryProgressColor(category)"
+          />
+          <vote-labels
+              :true-ratio="article.ratio?.trueNewsRatio"
+              :category-color="getCategoryTextColor(category)"
+          />
         </div>
       </router-link>
     </div>
   </div>
-
 </template>
 
 <script>
 import VoteCircle from '@/components/vote/VoteCircle.vue';
 import VoteLabels from '@/components/vote/VoteLabels.vue';
+import {
+  getCategoryByContent,
+  getCategoryClass,
+  getCategoryBackgroundColor,
+  getCategoryTextColor,
+  getCategoryProgressColor
+} from '@/utils/CategoryUtils';
 
 export default {
   name: 'TopicCard',
@@ -55,29 +76,33 @@ export default {
       return date.toISOString().split('T')[0];
     },
     category() {
-      // 카테고리 자동 분류 로직
-      if (!this.article.title && !this.article.content) return '토론';
-
-      const text = (this.article.title + ' ' + (this.article.content || '')).toLowerCase();
-
-      if (text.includes('정치') || text.includes('선거') || text.includes('정부') || text.includes('국회')) {
-        return '정치';
-      } else if (text.includes('경제') || text.includes('금융') || text.includes('투자') || text.includes('주식')) {
-        return '경제';
-      } else if (text.includes('사회') || text.includes('복지') || text.includes('교육') || text.includes('의료')) {
-        return '사회';
-      } else if (text.includes('문화') || text.includes('예술') || text.includes('영화') || text.includes('음악')) {
-        return '문화';
-      } else if (text.includes('기술') || text.includes('IT') || text.includes('AI') || text.includes('과학')) {
-        return '기술';
-      } else if (text.includes('환경') || text.includes('기후') || text.includes('에너지')) {
-        return '환경';
-      } else if (text.includes('스포츠') || text.includes('축구') || text.includes('야구') || text.includes('올림픽')) {
-        return '스포츠';
-      } else {
-        return '토론';
+      // 1. API에서 가져온 카테고리 정보 우선 사용
+      if (this.article.categoryName) {
+        return this.article.categoryName;
       }
+
+      // 2. 카테고리 객체가 있는 경우
+      if (this.article.category) {
+        // 카테고리가 객체이고 name 속성이 있는 경우
+        if (typeof this.article.category === 'object' && this.article.category.name) {
+          return this.article.category.name;
+        }
+
+        // 카테고리가 문자열인 경우
+        if (typeof this.article.category === 'string') {
+          return this.article.category;
+        }
+      }
+
+      // 3. 자동분류 로직 사용
+      return getCategoryByContent(this.article.title, this.article.content);
     }
+  },
+  methods: {
+    getCategoryClass,
+    getCategoryBackgroundColor,
+    getCategoryTextColor,
+    getCategoryProgressColor
   }
 }
 </script>
@@ -121,12 +146,22 @@ export default {
 }
 
 .topic-category {
-  background: #3662E3;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.topic-category:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .topic-date {
@@ -179,8 +214,9 @@ export default {
   }
 
   .topic-category {
-    font-size: 11px;
-    padding: 3px 10px;
+    font-size: 10px;
+    padding: 5px 14px;
+    min-width: 45px;
   }
 
   .topic-date {

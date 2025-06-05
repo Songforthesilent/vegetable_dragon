@@ -26,6 +26,12 @@
                 class="search-input"
                 @keyup.enter="search"
             />
+            <button v-if="searchQuery" @click="clearSearch" class="clear-search-btn" title="검색어 지우기">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
         </section>
 
@@ -35,7 +41,7 @@
             <table class="board-table">
               <thead>
               <tr>
-                <th class="col-id">No</th>
+                <!-- 게시글 번호 열 제거 -->
                 <th class="col-title">제목</th>
                 <th class="col-author">작성자</th>
                 <th class="col-date">등록일시</th>
@@ -43,7 +49,7 @@
               </thead>
               <tbody>
               <tr v-for="post in posts" :key="post.id" @click="fnView(post.id)" class="post-row">
-                <td class="col-id">{{ post.id }}</td>
+                <!-- 게시글 번호 열 제거 -->
                 <td class="col-title">
                   <div class="post-title-container">
                     <span class="post-title">{{ post.title }}</span>
@@ -53,14 +59,14 @@
                 <td class="col-date">{{ formatDate(post.createdAt) }}</td>
               </tr>
               <tr v-if="posts.length === 0" class="empty-row">
-                <td colspan="4">
+                <td colspan="3"> <!-- colspan 값 3으로 변경 -->
                   <div class="empty-message">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="12" r="10"></circle>
                       <line x1="12" y1="8" x2="12" y2="12"></line>
                       <line x1="12" y1="16" x2="12.01" y2="16"></line>
                     </svg>
-                    <p>게시글이 없습니다</p>
+                    <p>{{ searchQuery ? '검색 결과가 없습니다' : '게시글이 없습니다' }}</p>
                   </div>
                 </td>
               </tr>
@@ -147,6 +153,7 @@ export default {
       totalElements: 0, // 전체 게시글 수
       selectedCategory: '',
       searchQuery: '',
+      allSearchResults: [], // 검색 결과 전체 저장용
     };
   },
   computed: {
@@ -168,19 +175,65 @@ export default {
   },
   methods: {
     fnGetList() {
-      // API 호출 파라미터 설정
+      // 검색어가 있는 경우 검색 API 사용
+      if (this.searchQuery && this.searchQuery.trim()) {
+        this.fnSearchPosts();
+      } else {
+        this.fnGetAllPosts();
+      }
+    },
+
+    fnSearchPosts() {
+      // 검색 API 호출
+      const params = {
+        title: this.searchQuery.trim()
+      };
+
+      axios.get("http://localhost:8081/posts/search", { params })
+          .then(response => {
+            // 검색 결과 전체 저장
+            this.allSearchResults = response.data;
+            this.totalElements = this.allSearchResults.length;
+            this.totalPages = Math.ceil(this.totalElements / this.pageSize);
+
+            // 현재 페이지에 해당하는 결과만 표시
+            this.updateDisplayedPosts();
+          })
+          .catch(error => {
+            console.error('검색 중 오류가 발생했습니다:', error);
+            if (error.response) {
+              console.error('Error response:', error.response);
+              alert(`검색 오류 발생: ${error.response.status} - ${error.response.data.message || '알 수 없는 오류'}`);
+            } else if (error.message.includes('Network Error')) {
+              alert('네트워크가 원활하지 않습니다. 잠시 후 다시 시도해주세요.');
+            } else {
+              alert('검색 중 알 수 없는 오류가 발생했습니다.');
+            }
+            // 오류 발생 시 빈 결과 표시
+            this.posts = [];
+            this.totalElements = 0;
+            this.totalPages = 0;
+            this.allSearchResults = [];
+          });
+    },
+
+    updateDisplayedPosts() {
+      // 검색 결과에서 현재 페이지에 해당하는 게시글만 표시
+      const startIndex = this.currentPage * this.pageSize;
+      const endIndex = startIndex + this.pageSize;
+      this.posts = this.allSearchResults.slice(startIndex, endIndex);
+    },
+
+    fnGetAllPosts() {
+      // 기존 전체 목록 API 호출
       const params = {
         page: this.currentPage,
         size: this.pageSize
       };
 
-      // 카테고리나 검색어가 있는 경우 파라미터 추가
+      // 카테고리가 있는 경우 파라미터 추가
       if (this.selectedCategory) {
         params.category = this.selectedCategory;
-      }
-
-      if (this.searchQuery) {
-        params.keyword = this.searchQuery;
       }
 
       // API 호출
@@ -190,6 +243,7 @@ export default {
             this.posts = response.data.content;
             this.totalPages = response.data.totalPages;
             this.totalElements = response.data.totalElements;
+            this.allSearchResults = []; // 검색 결과 초기화
           })
           .catch(error => {
             console.error('게시글 목록을 불러오는 중 오류가 발생했습니다:', error);
@@ -205,18 +259,36 @@ export default {
             }
           });
     },
+
     search() {
       this.currentPage = 0; // 검색 시 첫 페이지로 이동
       this.fnGetList();
     },
+
+    clearSearch() {
+      this.searchQuery = '';
+      this.currentPage = 0;
+      this.allSearchResults = [];
+      this.fnGetList();
+    },
+
     fnView(id) {
       // id 파라미터를 사용하여 상세 페이지로 이동
       this.$router.push(`/board/view/${id}`);
     },
+
     fnPage(page) {
       this.currentPage = page;
-      this.fnGetList(); // 페이지 변경 시 목록 다시 호출
+
+      // 검색 중인 경우 클라이언트 사이드 페이지네이션
+      if (this.searchQuery && this.searchQuery.trim()) {
+        this.updateDisplayedPosts();
+      } else {
+        // 일반 목록인 경우 서버 사이드 페이지네이션
+        this.fnGetList();
+      }
     },
+
     formatDate(dateString) {
       // ISO 형식의 날짜를 사용자 친화적인 형식으로 변환
       const date = new Date(dateString);
@@ -315,7 +387,7 @@ export default {
   padding: 14px 20px 14px 50px;
   border: none;
   border-radius: 25px;
-  background-color: #f1f5f9;
+  background-color: #f8fafc;
   color: #1e293b;
   font-size: 14px;
   transition: all 0.3s ease;
@@ -335,6 +407,27 @@ export default {
 
 .search-input:focus ~ .search-icon {
   color: #3662E3;
+}
+
+/* 검색어 지우기 버튼 */
+.clear-search-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.clear-search-btn:hover {
+  color: #64748b;
+  background-color: #f1f5f9;
 }
 
 /* 게시글 목록 테이블 */
@@ -376,13 +469,11 @@ export default {
   font-size: 14px;
 }
 
-.col-id {
-  width: 80px;
-  text-align: center;
-}
-
+/* 게시글 번호 열 제거 후 제목 열 스타일 조정 */
 .col-title {
   min-width: 300px;
+  text-align: left; /* 제목 왼쪽 정렬 */
+  padding-left: 24px; /* 왼쪽 여백 추가 */
 }
 
 .col-author {
