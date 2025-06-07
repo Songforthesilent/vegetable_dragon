@@ -1,5 +1,4 @@
 package com.example.vegetabledragon.config;
-
 import com.example.vegetabledragon.repository.CategoryRepository;
 import com.example.vegetabledragon.repository.PostRepository;
 import com.example.vegetabledragon.repository.UserRepository;
