@@ -88,7 +88,7 @@ export default {
 
       try {
         // 게시글을 카테고리 정보와 함께 가져오기
-        const res = await axios.get("http://localhost:8081/posts", {
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/posts`, {
           params: {
             page: 0,
             size: 100
@@ -114,7 +114,7 @@ export default {
 
         // 각 게시글의 비율 정보 가져오기
         const ratioPromises = posts.map(post =>
-            axios.get(`http://localhost:8081/feedback/${post.id}/ratio`)
+            axios.get(`${process.env.VUE_APP_API_URL}/feedback/${post.id}/ratio`)
                 .then(ratioRes => ({
                   ...post,
                   ratio: ratioRes.data

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:8081',
+    baseURL: process.env.VUE_APP_API_URL,
     withCredentials: true, // 세션 기반 인증 위해 필요
 });
 

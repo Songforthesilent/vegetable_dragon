@@ -30,7 +30,7 @@ export default {
       if (!this.searchQuery) return;
 
       try {
-        const response = await fetch(`http://localhost:8081/posts/search?title=${encodeURIComponent(this.searchQuery)}`);
+        const response = await fetch(`${process.env.VUE_APP_API_URL}/posts/search?title=${encodeURIComponent(this.searchQuery)}`);
         if (!response.ok) throw new Error('검색 실패');
 
         const data = await response.json();
