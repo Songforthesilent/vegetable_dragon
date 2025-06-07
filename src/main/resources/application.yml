@@ -50,6 +50,6 @@ logging:
 
 flask:
   api:
-    url: "https://979a-218-235-241-148.ngrok-free.app/predict"
+    url: ${FLASK_URL}
 
     # 절대 url 에서 s를 빼먹어선 안돼.
