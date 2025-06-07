@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <!-- 카테고리 선택
+      <!-- 카테고리 선택 -->
       <div class="form-group">
         <label for="category" class="form-label">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -42,27 +42,27 @@
         <div class="select-wrapper">
           <select id="category" v-model="post.category" class="form-select" required>
             <option value="">카테고리를 선택하세요</option>
-            <option value="전체">전체</option>
+            <option value="카테고리는 자동생성 됩니다 !" class="category_btn">카테고리는 자동생성 됩니다 !</option>
+            <!-- <option value="전체">전체</option>
             <option value="사회">사회</option>
             <option value="정치">정치</option>
             <option value="문화">문화</option>
             <option value="연예">연예</option>
             <option value="경제">경제</option>
-            <option value="국제">국제</option>
+            <option value="국제">국제</option>-->
           </select>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" class="select-icon">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </div>
 
-        선택된 카테고리 표시
         <div v-if="post.category" class="selected-category">
           <span class="category-badge" :class="getCategoryClass(post.category)">
             <span class="category-icon">{{ getCategoryIcon(post.category) }}</span>
             {{ post.category }}
           </span>
         </div>
-      </div>-->
+      </div>
 
       <!-- 내용 및 익명 옵션 -->
       <div class="form-group">
@@ -359,6 +359,22 @@ export default {
   outline: none;
   border-color: #3A4CA4;
   box-shadow: 0 0 0 3px rgba(58, 76, 164, 0.1);
+}
+
+option {
+  background-color: white;
+  color: black;
+  font-size: 14px;
+}
+
+option.category_btn {
+  background-color: #ffffff;
+  padding: 12px 40px 12px 16px;
+}
+
+
+.category_btn:focus {
+  background-color: #e2e8f0;
 }
 
 .select-icon {
