@@ -189,7 +189,7 @@ export default {
         title: this.searchQuery.trim()
       };
 
-      axios.get("http://localhost:8081/posts/search", { params })
+      axios.get(`${process.env.VUE_APP_API_URL}/posts/search`, { params })
           .then(response => {
             // 검색 결과 전체 저장
             this.allSearchResults = response.data;
@@ -237,7 +237,7 @@ export default {
       }
 
       // API 호출
-      axios.get("http://localhost:8081/posts", { params })
+      axios.get(`${process.env.VUE_APP_API_URL}/posts`, { params })
           .then(response => {
             // API 응답 데이터 처리
             this.posts = response.data.content;

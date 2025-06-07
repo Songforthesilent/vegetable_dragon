@@ -81,14 +81,14 @@ export default {
 
     async fetchBestTopics() {
       try {
-        const res = await axios.get("http://localhost:8081/posts", {
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/posts`, {
           params: { page: 0, size: 100 }
         });
 
         const posts = res.data.content;
 
         const ratioPromises = posts.map(post =>
-            axios.get(`http://localhost:8081/feedback/${post.id}/ratio`)
+            axios.get(`${process.env.VUE_APP_API_URL}/feedback/${post.id}/ratio`)
                 .then(ratioRes => ({
                   ...post,
                   ratio: ratioRes.data
@@ -116,7 +116,7 @@ export default {
     async fetchRecentPosts() {
       if (this.selectedCategory === "전체"){
         try {
-          const response = await axios.get("http://localhost:8081/posts", {
+          const response = await axios.get(`${process.env.VUE_APP_API_URL}/posts`, {
             params: {
               page: this.page, // 현재 페이지
               size: this.size, // 한 페이지에 표시할 게시글 수
@@ -129,7 +129,7 @@ export default {
       } else {
         try {
           // const encodedCategory = encodeURIComponent(this.selectedCategory);
-          const url = `http://localhost:8081/posts/category/${this.selectedCategory}`;
+          const url = `${process.env.VUE_APP_API_URL}/posts/category/${this.selectedCategory}`;
           console.log("Request URL:", url); // 요청 URL 확인용 로그
           const response = await axios.get(url, {
             params: {

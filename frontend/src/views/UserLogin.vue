@@ -188,7 +188,7 @@ export default {
       this.isLoading = true;
 
       try {
-        const response = await fetch("http://localhost:8081/join/login", {
+        const response = await fetch(`${process.env.VUE_APP_API_URL}/join/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

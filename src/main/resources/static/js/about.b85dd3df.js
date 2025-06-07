@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkvegetable_dragon"]=self["webpackChunkvegetable_dragon"]||[]).push([[594],{3845:function(e,n,r){r.r(n),r.d(n,{default:function(){return o}});var t=r(6768);const u={class:"about"};function a(e,n){return(0,t.uX)(),(0,t.CE)("div",u,n[0]||(n[0]=[(0,t.Lk)("h5",null,"김용재 김채원 최소은",-1)]))}var c=r(1241);const s={},l=(0,c.A)(s,[["render",a]]);var o=l}}]);
+//# sourceMappingURL=about.b85dd3df.js.map

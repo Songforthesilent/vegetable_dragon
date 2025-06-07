@@ -197,7 +197,7 @@ export default {
       try {
         // 게시글 등록 요청을 보낼 때 category를 포함
         const response = await axios.post(
-            "http://localhost:8081/posts",  // 백엔드 URL
+            `${process.env.VUE_APP_API_URL}/posts`,  // 백엔드 URL
             {
               title: this.post.title,
               content: this.post.content,

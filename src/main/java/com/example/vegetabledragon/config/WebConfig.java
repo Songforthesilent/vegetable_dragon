@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**") // 모든 api 허용
-                .allowedOrigins("http://localhost:8080") // 프론트 주소 // s 뺐는데
+                .allowedOrigins("https://vegetable-dragon.herokuapp.com") // 프론트 주소 // s 뺐는데
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // OPTIONS 추가
                 .allowedHeaders("*") // 추가함
                 .allowCredentials(true); // 세션 쿠키 허용

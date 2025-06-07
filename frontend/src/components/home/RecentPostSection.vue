@@ -158,7 +158,7 @@ export default {
       this.error = null;
 
       try {
-        const response = await axios.get("http://localhost:8081/posts", {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/posts`, {
           params: {
             page: this.page,
             size: 20, // 필터링을 위해 더 많은 게시글을 가져옴
