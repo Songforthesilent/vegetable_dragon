@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     login() { // 8080 -> 8081로 변경
-      fetch("http://localhost:8081/join/login", {
+      fetch(`${process.env.VUE_APP_API_URL}/join/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -105,7 +105,7 @@ export default {
           });
     },
     logout() { // 로그아웃 연결
-      fetch("http://localhost:8081/join/logout", {
+      fetch(`${process.env.VUE_APP_API_URL}/join/logout`, {
         method: "POST",
         credentials: "include"
       })

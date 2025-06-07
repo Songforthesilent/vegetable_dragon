@@ -205,7 +205,7 @@ export default {
   methods: {
     async checkLoginStatus() {
       try {
-        const response = await axios.get('http://localhost:8081/join/session', {
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/join/session`, {
           withCredentials: true
         });
 
@@ -264,7 +264,7 @@ export default {
 
     async handleLogout() {
       try {
-        await axios.post('http://localhost:8081/join/logout', {}, {
+        await axios.post(`${process.env.VUE_APP_API_URL}/join/logout`, {}, {
           withCredentials: true
         });
 

@@ -112,7 +112,7 @@ export default {
 
     async submitVote(type) {
       return axios.post(
-          `http://localhost:8081/feedback/${this.postId}`,
+          `${process.env.VUE_APP_API_URL}81/feedback/${this.postId}`,
           { fakeNews: type === 'disagree' },
           { withCredentials: true }
       );
@@ -121,7 +121,7 @@ export default {
     async fetchVoteRatio() {
       try {
         const response = await axios.get(
-            `http://localhost:8081/feedback/${this.postId}/ratio`,
+            `${process.env.VUE_APP_API_URL}/feedback/${this.postId}/ratio`,
             { withCredentials: true }
         );
 

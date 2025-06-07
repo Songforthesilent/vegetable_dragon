@@ -252,7 +252,7 @@ export default {
             ? {}
             : { password: this.deletePostPassword };
 
-        await axios.delete(`http://localhost:8081/posts/${postId}`, {
+        await axios.delete(`${process.env.VUE_APP_API_URL}/posts/${postId}`, {
           data: requestBody,
           withCredentials: true
         });
@@ -269,7 +269,7 @@ export default {
     },
     async checkLoginStatus() {
       try {
-        const res = await axios.get("http://localhost:8081/join/session", {withCredentials: true});
+        const res = await axios.get(`${process.env.VUE_APP_API_URL}/join/session`, {withCredentials: true});
         console.log("로그인된 사용자", res.data);
         this.loggedInUser = res.data;
       } catch (e) {
@@ -280,7 +280,7 @@ export default {
     async fetchComments() {
       try {
         const postId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:8081/posts/${postId}/comments`);
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/posts/${postId}/comments`);
 
         this.comments = response.data.map(comment => ({
           id: comment.id,
@@ -298,7 +298,7 @@ export default {
       this.loading = true;
       try {
         const postId = this.$route.params.id;
-        const response = await axios.get(`http://localhost:8081/posts/${postId}`);
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/posts/${postId}`);
 
         this.article = {
           id: response.data.id,
@@ -335,7 +335,7 @@ export default {
       const postId = this.article.id;
 
       if (this.isLoggedIn) {
-        axios.post(`http://localhost:8081/posts/${postId}/comments`, {
+        axios.post(`${process.env.VUE_APP_API_URL}/posts/${postId}/comments`, {
           comment: commentData.text
         }, {
           withCredentials: true
@@ -352,7 +352,7 @@ export default {
           alert("댓글 저장 중 오류가 발생했습니다.");
         });
       } else {
-        axios.post(`http://localhost:8081/posts/${postId}/comments`, {
+        axios.post(`${process.env.VUE_APP_API_URL}/posts/${postId}/comments`, {
           comment: commentData.text,
           password: commentData.password
         }).then(res => {
@@ -402,7 +402,7 @@ export default {
           category: this.article.category,
         };
 
-        await axios.put(`http://localhost:8081/posts/${postId}`, requestBody, {
+        await axios.put(`${process.env.VUE_APP_API_URL}/posts/${postId}`, requestBody, {
           withCredentials: true
         });
 
@@ -431,7 +431,7 @@ export default {
           password: this.isLoggedIn ? "LOGIN_USER" : this.deleteCommentPassword
         };
 
-        await axios.delete(`http://localhost:8081/posts/${postId}/comments/${commentId}`, {
+        await axios.delete(`${process.env.VUE_APP_API_URL}/posts/${postId}/comments/${commentId}`, {
           data: requestBody,
           withCredentials: true
         });
@@ -483,7 +483,7 @@ export default {
 
       try {
         await axios.put(
-            `http://localhost:8081/posts/${postId}/comments/${commentId}`,
+            `${process.env.VUE_APP_API_URL}/posts/${postId}/comments/${commentId}`,
             requestBody,
             { withCredentials: true }
         );

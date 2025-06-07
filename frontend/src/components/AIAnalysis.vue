@@ -67,7 +67,7 @@ export default {
     async fetchPrediction() {
       this.isAnalyzing = true;
       try {
-        const response = await axios.get(`http://localhost:8081/posts/${this.postId}`);
+        const response = await axios.get(`${process.env.VUE_APP_API_URL}/posts/${this.postId}`);
         const prediction = response.data.prediction;
 
         if (prediction == null) {
