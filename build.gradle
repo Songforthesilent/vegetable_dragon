@@ -65,3 +65,10 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    destinationDirectory = file("./target")
+    archiveBaseName = 'vegetable-dragon'
+    archiveFileName = 'vegetable-dragon.jar'
+    archiveVersion = "0.0.1"
+}

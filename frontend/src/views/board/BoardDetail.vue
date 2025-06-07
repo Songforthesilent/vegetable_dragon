@@ -65,7 +65,7 @@
           <h3 class="sidebar-title">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
+            </svg>
             투표
           </h3>
           <VoteSection
@@ -110,12 +110,15 @@
       />
     </ModalContainer>
 
-    <EditPostModal
+    <ModalContainer
         :show="editPostModal"
-        :post="article"
-        @save="saveEditPost"
+        title="게시글 수정"
+        @confirm="saveEditPost"
         @cancel="editPostModal = false"
-    />
+    >
+      <input type="text" class="edit-post-input" v-model="article.title" placeholder="제목 입력" />
+      <textarea v-model="article.content" class="edit-post-textarea" rows="8" placeholder="내용 입력"></textarea>
+    </ModalContainer>
 
     <ModalContainer
         :show="editPostPasswordModal"
@@ -141,14 +144,14 @@
       <input type="password" v-model="editCommentPassword" placeholder="비밀번호 입력" />
     </ModalContainer>
 
-    <EditCommentModal
-        :show="editingCommentIndex !== null"
-        :comment="editingCommentIndex !== null ? comments[editingCommentIndex] : {}"
-        :is-logged-in="isLoggedIn"
-        @verify-password="handleVerifyCommentPassword"
-        @save="handleSaveComment"
+    <ModalContainer
+        :show="confirmingEditComment && editingCommentIndex !== null"
+        title="수정할 댓글 내용을 입력하세요"
+        @confirm="saveEditComment"
         @cancel="cancelEditComment"
-    />
+    >
+      <textarea v-model="editCommentText" class="edit-comment-textarea" rows="4" placeholder="수정할 댓글 내용"></textarea>
+    </ModalContainer>
 
     <ModalContainer
         :show="deletingCommentIndex !== null"
@@ -178,8 +181,6 @@ import VoteSection from '@/components/VoteSection.vue';
 import CommentSection from '@/components/CommentSection.vue';
 import ModalContainer from '@/components/ModalContainer.vue';
 import AIAnalysis from '@/components/AIAnalysis.vue';
-import EditPostModal from '@/components/EditPostModal.vue';
-import EditCommentModal from '@/components/EditCommentModal.vue';
 
 export default {
   components: {
@@ -187,9 +188,7 @@ export default {
     VoteSection,
     CommentSection,
     ModalContainer,
-    AIAnalysis,
-    EditPostModal,
-    EditCommentModal
+    AIAnalysis
   },
   data() {
     return {
@@ -745,6 +744,86 @@ export default {
   border-top: 3px solid #3b82f6;
   border-radius: 50%;
   animation: spin 1s linear infinite;
+}
+
+.edit-post-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 16px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.edit-post-input::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.edit-post-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  background-color: #ffffff;
+}
+
+.edit-post-textarea {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 16px;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  box-sizing: border-box;
+  resize: vertical;
+  line-height: 1.6;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #f8fafc;
+  color: #1e293b;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  min-height: 180px;
+}
+
+.edit-post-textarea::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.edit-post-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+  background-color: #ffffff;
+}
+
+.edit-comment-textarea {
+  width: 100%;
+  padding: 22px 16px;
+  border: 2px solid #cbd5e1; /* 연한 회색 테두리 */
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1e293b;
+  background-color: #f8fafc;
+  resize: vertical;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Noto Sans KR', sans-serif; /* 한글 글꼴 예시 */
+}
+
+.edit-comment-textarea::placeholder {
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.edit-comment-textarea:focus {
+  outline: none;
+  border-color: #3b82f6; /* 파란색 */
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.5);
+  background-color: #fff;
 }
 
 /* 반응형 디자인 */
