@@ -99,7 +99,7 @@
         <!-- 회원가입 링크 -->
         <div class="signup-section">
           <p>아직 계정이 없으신가요?</p>
-          <a href="/register" class="signup-link">회원가입하기</a>
+          <router-link to="/register" class="signup-link">회원가입하기</router-link>
         </div>
       </form>
     </div>
