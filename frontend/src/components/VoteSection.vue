@@ -112,7 +112,7 @@ export default {
 
     async submitVote(type) {
       return axios.post(
-          `${process.env.VUE_APP_API_URL}81/feedback/${this.postId}`,
+          `${process.env.VUE_APP_API_URL}/feedback/${this.postId}`,
           { fakeNews: type === 'disagree' },
           { withCredentials: true }
       );
