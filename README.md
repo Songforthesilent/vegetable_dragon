@@ -23,6 +23,7 @@
   - 구체적으로, 각 뉴스의 핵심 문장 구조와 내용을 참고하여, “다음의 룰을 기반으로 기사를 생성하라”는 형태로 프롬프트를 구성했고, 이를 통해 AI가 생성한 뉴스 데이터를 추가로 확보하였다. 이 방식으로 데이터셋을 구축하였다.
 
 - 모델 개발 과정 및 선택 이유
+  ![image](https://github.com/user-attachments/assets/710b56a6-07a7-4f93-a9f4-3345a14c61e0)
   - 모델 개발에는 문맥 이해 능력이 뛰어난 HAN(Hierarchical Attention Network) 모델을 채택하였다. HAN 모델은 문서의 구조적 특성을 반영하여, 단어수준에서 문장수준으로, 문장수준에서 문서 전체로 계층적으로 정보를 처리한다.
   - 각 계층에서는 어텐션 메커니즘을 통해 중요한 단어나 문장에 더 높은 가중치를 부여함으로써, 문맥의 흐름과 의미를 보다 정밀하게 파악할 수 있다. 이는 뉴스 텍스트처럼 길고 구조적인 데이터를 처리하는데 매우 적합했다.
   - 초기에는 BERT 등의 사전학습 기반 모델들도 구축하여 비교 실험을 하였다. BERT는 문맥 이해에서 매우 강력한 성능을 보였으나 파라미터 수가 많고 모델 서빙 시 연산 자원을 많이 소모하는 단점이 존재했다.
@@ -66,9 +67,7 @@
  - 동시에, AI 판별 결과와 인간의 판단을 결합하는 하이브리드 시스템이 정보 신뢰성 판별의 정확도를 높이고, 사용자로 하여금 더 비판적이고 반성적인 사고를 유도할 수 있음을 실험적으로 증명했다고 볼 수 있다.
 
 ### 3. 과제 결과물
-![image](https://github.com/user-attachments/assets/710b56a6-07a7-4f93-a9f4-3345a14c61e0)
 ![image](https://github.com/user-attachments/assets/b4e0cfde-2c41-4005-ae06-5cbb3eb6a3d3)
-![image](https://github.com/user-attachments/assets/bc651a39-bfdb-4a8b-889d-46c9c079f4d7)
 
 - 시연영상(유튜브 업로드) : <https://youtu.be/v3efXp_aYOI?si=x5ChNcN7UhwquklW>
 
