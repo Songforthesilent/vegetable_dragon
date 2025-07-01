@@ -40,8 +40,7 @@
  - 사용자가 글을 작성하면 해당 텍스트에서 키워드의 출현 빈도를 계산하여 각 카테고리에 점수를 부여하고 점수가 가장 높은 카테고리를 추천한다. 추천 결과는 실시간으로 화면의 카테고리 선택 창에 반영된다.
 
 - 백엔드
-  ![image](https://github.com/user-attachments/assets/db684f04-edf5-4a92-aaaa-d26be2e7b1a7)
-
+- ![image](https://github.com/user-attachments/assets/db684f04-edf5-4a92-aaaa-d26be2e7b1a7)
   - SpringBoot와 MySQL을 사용하여 백엔드 서버를 구축하였다. 회원 관리, 게시글 작성, 투표 등 CRUD 기능을 구현하고, 이를 위한 Controller와 Service 계층을 나누어 개발하였다.
   - 에러 처리를 일관되게 관리하기 위해 ErrorHandler를 추가하였고, Postman을 이용해 기능을 검증하였다. 데이터베이스는 JPA를 사용하여 관리하며, AOP를 활용해 개발 과정 중 로그를 남겼다.
   - 또한, 모델에 데이터를 전달하는 Controller를 따로 만들고, 적절한 Response 응답 DTO를 설계하여 반환하였다.
